@@ -1,0 +1,140 @@
+{
+  "project_name": "Wipro Fire & Safety",
+  "theme_strategy": "Dark Premium Industrial",
+  "emotional_tone": "Trust, Precision, Alertness, High-Tech",
+  "typography": {
+    "headings": {
+      "font_family": "Barlow Condensed, sans-serif",
+      "weights": ["700", "900"],
+      "usage": "Hero titles, Section headers, Feature names",
+      "letter_spacing": "tracking-tight",
+      "case": "uppercase for top-level headers"
+    },
+    "body": {
+      "font_family": "Manrope, sans-serif",
+      "weights": ["400", "500"],
+      "usage": "Paragraphs, UI elements, Card details",
+      "letter_spacing": "tracking-normal"
+    },
+    "mono": {
+      "font_family": "JetBrains Mono, monospace",
+      "weights": ["400"],
+      "usage": "Data points, Technical specs, Numbers"
+    }
+  },
+  "colors": {
+    "palette": {
+      "background": {
+        "default": "#020617",
+        "paper": "#0F172A",
+        "subtle": "#1E293B"
+      },
+      "primary": {
+        "main": "#F97316",
+        "light": "#FB923C",
+        "dark": "#EA580C",
+        "contrast": "#FFFFFF"
+      },
+      "secondary": {
+        "main": "#EAB308",
+        "light": "#FACC15",
+        "dark": "#CA8A04"
+      },
+      "text": {
+        "primary": "#F8FAFC",
+        "secondary": "#94A3B8",
+        "muted": "#64748B"
+      },
+      "status": {
+        "success": "#22C55E",
+        "error": "#EF4444",
+        "warning": "#F59E0B"
+      }
+    },
+    "gradients": {
+      "hero_glow": "radial-gradient(circle at 50% 50%, rgba(249, 115, 22, 0.15), transparent 70%)",
+      "card_surface": "linear-gradient(145deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%)",
+      "fire_accent": "linear-gradient(90deg, #F97316 0%, #EAB308 100%)"
+    }
+  },
+  "layout_strategies": {
+    "container_width": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+    "spacing_scale": {
+      "section_gap": "py-24 or py-32",
+      "element_gap": "gap-8 or gap-12"
+    },
+    "bento_grid": {
+      "description": "Use for Services and Industries Served. Mix 1x1, 2x1, and 2x2 blocks.",
+      "classes": "grid grid-cols-1 md:grid-cols-3 gap-6"
+    },
+    "glassmorphism": {
+      "navbar": "backdrop-blur-xl bg-slate-950/70 border-b border-white/10",
+      "card": "backdrop-blur-md bg-slate-900/60 border border-white/5 hover:border-orange-500/50 transition-colors duration-300"
+    }
+  },
+  "visual_enhancers": {
+    "shadows": {
+      "glow": "0 0 40px -10px rgba(249, 115, 22, 0.3)",
+      "sharp": "0 1px 2px 0 rgba(0, 0, 0, 0.5)"
+    },
+    "borders": {
+      "subtle": "1px solid rgba(255, 255, 255, 0.08)",
+      "highlight": "1px solid rgba(249, 115, 22, 0.5)"
+    },
+    "animations": {
+      "hover_lift": "hover:-translate-y-1 hover:shadow-lg transition-all duration-300",
+      "text_reveal": "staggered fade-in from bottom",
+      "marquee": "slow scrolling client logos"
+    }
+  },
+  "components_library": {
+    "buttons": {
+      "primary": "bg-gradient-to-r from-orange-600 to-orange-500 text-white font-bold tracking-wide uppercase px-8 py-3 rounded-none skew-x-[-10deg] hover:skew-x-0 transition-transform",
+      "secondary": "border border-slate-700 hover:border-orange-500 text-slate-300 hover:text-white px-8 py-3 rounded-none uppercase tracking-wide transition-colors",
+      "icon": "p-3 rounded-full bg-slate-800 hover:bg-orange-600 transition-colors text-white"
+    },
+    "cards": {
+      "feature": "group relative overflow-hidden bg-slate-900 border border-slate-800 p-8 hover:bg-slate-800/80 transition-all",
+      "product": "relative aspect-[4/5] bg-slate-900 group overflow-hidden border border-slate-800",
+      "testimonial": "bg-slate-900/50 p-8 border-l-4 border-orange-500"
+    },
+    "inputs": {
+      "default": "bg-slate-950 border-slate-800 focus:border-orange-500 text-slate-200 placeholder:text-slate-600 rounded-md h-12"
+    }
+  },
+  "image_assets": {
+    "hero_bg": "https://images.unsplash.com/photo-1761933401853-09566029ed3a",
+    "industrial_interior": "https://images.unsplash.com/photo-1767294274634-613a3545e36d",
+    "firefighter_mood": "https://images.unsplash.com/photo-1698533188601-2432adf826f4",
+    "ceo_portrait": "https://images.unsplash.com/photo-1742981365880-698cfb84492d",
+    "safety_equipment_cover": "https://images.unsplash.com/photo-1766788467067-d443f19314b6",
+    "office_night": "https://images.unsplash.com/photo-1762271458610-5f402f8dedf3"
+  },
+  "ai_avatar_specs": {
+    "position": "fixed bottom-8 right-8 z-50",
+    "style": "Floating glass orb or futuristic badge",
+    "animation": "gentle float (y: [-5, 5]) with glow pulse",
+    "interaction": "Click expands to chat panel with glassmorphism backdrop"
+  },
+  "admin_panel_specs": {
+    "theme": "Dark dashboard, high density data",
+    "layout": "Sidebar navigation, top header with user profile",
+    "charts": "Recharts with custom dark theme colors (#F97316, #EAB308, #3B82F6)"
+  },
+  "instructions_to_main_agent": [
+    "Install 'lucide-react' for icons if not present.",
+    "Install 'framer-motion' for animations.",
+    "Install 'recharts' for the admin dashboard.",
+    "Use 'Barlow Condensed' from Google Fonts for all headings.",
+    "Ensure ALL text has sufficient contrast against the dark background.",
+    "Do NOT use gradients for text, only for backgrounds or borders.",
+    "Implement the AI Chatbot as a floating widget that persists across pages.",
+    "Use the provided image URLs strictly for their assigned categories.",
+    "Ensure mobile responsiveness: stack bento grids to 1 column on mobile."
+  ],
+  "UNIVERSAL_GUIDELINES": {
+    "testing": "All interactive elements MUST have data-testid attributes.",
+    "contrast": "Ensure WCAG AA compliance for text contrast.",
+    "motion": "Respect prefers-reduced-motion media query."
+  }
+}
