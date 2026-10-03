@@ -158,30 +158,30 @@ function AdminProducts() {
   const filtered = filter === 'All' ? items : items.filter(p => p.category === filter)
 
   const getStockStatus = (item) => {
-    if (item.stock === 0) return { color: '#ef4444', label: 'Out of Stock', bg: 'rgba(239,68,68,0.1)' }
-    if (item.stock <= (item.minStock || 5)) return { color: '#f59e0b', label: 'Low Stock', bg: 'rgba(245,158,11,0.1)' }
-    return { color: '#22c55e', label: 'In Stock', bg: 'rgba(34,197,94,0.1)' }
+    if (item.stock === 0) return { color: '#62584f', label: 'Out of Stock', bg: 'rgba(239,68,68,0.1)' }
+    if (item.stock <= (item.minStock || 5)) return { color: '#b84030', label: 'Low Stock', bg: 'rgba(191,73,55,0.1)' }
+    return { color: '#356345', label: 'In Stock', bg: 'rgba(34,197,94,0.1)' }
   }
 
   return (
-    <div style={{ background: '#020617', minHeight: '100vh', padding: '30px', color: 'white' }}>
+    <div style={{ background: '#fff9f0', minHeight: '100vh', padding: '30px', color: '#302820' }}>
 
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
-          <h1 style={{ fontSize: '28px', fontWeight: 900, color: 'white', textTransform: 'uppercase', letterSpacing: '-0.5px' }}>
-            Product & <span style={{ color: '#f97316' }}>Stock Manager</span>
+          <h1 style={{ fontSize: '28px', fontWeight: 900, color: '#302820', textTransform: 'uppercase', letterSpacing: '-0.5px' }}>
+            Product & <span style={{ color: '#b84030' }}>Stock Manager</span>
           </h1>
           <p style={{ color: '#64748b', fontSize: '13px', marginTop: '4px' }}>Track inventory, manage products, export reports</p>
         </div>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-          <button onClick={exportToExcel} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: '10px', color: '#22c55e', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
+          <button onClick={exportToExcel} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: '10px', color: '#356345', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
             <Download size={16} /> Export Excel
           </button>
-          <button onClick={() => setShowForm(!showForm)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: 'linear-gradient(135deg, #ea580c, #f97316)', border: 'none', borderRadius: '10px', color: 'white', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
+          <button onClick={() => setShowForm(!showForm)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: 'linear-gradient(135deg, #bf4937, #bf4937)', border: 'none', borderRadius: '10px', color: '#302820', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
             <Plus size={16} /> Add Product
           </button>
-          <button onClick={() => { localStorage.removeItem('admin_token'); navigate('/admin/login') }} style={{ padding: '10px 20px', background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '10px', color: '#ef4444', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
+          <button onClick={() => { localStorage.removeItem('admin_token'); navigate('/admin/login') }} style={{ padding: '10px 20px', background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '10px', color: '#62584f', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
             Logout
           </button>
         </div>
@@ -190,14 +190,14 @@ function AdminProducts() {
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
         {[
-          { icon: Package, label: 'Total Products', value: items.length, color: '#f97316' },
-          { icon: TrendingUp, label: 'Total Stock Units', value: totalStock, color: '#eab308' },
-          { icon: AlertTriangle, label: 'Low Stock Alerts', value: lowStockCount, color: '#ef4444' },
-          { icon: CheckCircle, label: 'Healthy Stock', value: items.length - lowStockCount, color: '#22c55e' },
+          { icon: Package, label: 'Total Products', value: items.length, color: '#b84030' },
+          { icon: TrendingUp, label: 'Total Stock Units', value: totalStock, color: '#b84030' },
+          { icon: AlertTriangle, label: 'Low Stock Alerts', value: lowStockCount, color: '#62584f' },
+          { icon: CheckCircle, label: 'Healthy Stock', value: items.length - lowStockCount, color: '#356345' },
         ].map((s, i) => {
           const Icon = s.icon
           return (
-            <div key={i} style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', padding: '20px' }}>
+            <div key={i} style={{ background: '#f5ecdf', border: '1px solid #f5ecdf', borderRadius: '12px', padding: '20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
                   <div style={{ fontSize: '32px', fontWeight: 900, color: s.color }}>{s.value}</div>
@@ -214,9 +214,9 @@ function AdminProducts() {
 
       {/* Add Product Form */}
       {showForm && (
-        <div style={{ background: '#0f172a', border: '1px solid rgba(249,115,22,0.3)', borderRadius: '16px', padding: '28px', marginBottom: '24px', position: 'relative', overflow: 'hidden' }}>
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: 'linear-gradient(90deg, #f97316, #eab308)' }} />
-          <h3 style={{ color: 'white', fontWeight: 800, fontSize: '18px', marginBottom: '20px', textTransform: 'uppercase' }}>Add New Product</h3>
+        <div style={{ background: '#f5ecdf', border: '1px solid rgba(191,73,55,0.3)', borderRadius: '16px', padding: '28px', marginBottom: '24px', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: 'linear-gradient(90deg, #bf4937, #bf4937)' }} />
+          <h3 style={{ color: '#302820', fontWeight: 800, fontSize: '18px', marginBottom: '20px', textTransform: 'uppercase' }}>Add New Product</h3>
           <form onSubmit={add}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
               {[
@@ -240,10 +240,10 @@ function AdminProducts() {
             <textarea placeholder="Product Description" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} required rows={3} style={{ ...inputStyle, width: '100%', resize: 'vertical', fontFamily: 'inherit', marginBottom: '16px' }} />
 
             <div style={{ display: 'flex', gap: '12px' }}>
-              <button type="submit" disabled={adding} style={{ padding: '12px 28px', background: 'linear-gradient(135deg, #ea580c, #f97316)', border: 'none', borderRadius: '10px', color: 'white', fontWeight: 800, fontSize: '14px', cursor: 'pointer', textTransform: 'uppercase' }}>
+              <button type="submit" disabled={adding} style={{ padding: '12px 28px', background: 'linear-gradient(135deg, #bf4937, #bf4937)', border: 'none', borderRadius: '10px', color: '#302820', fontWeight: 800, fontSize: '14px', cursor: 'pointer', textTransform: 'uppercase' }}>
                 {adding ? 'Adding...' : 'Add Product'}
               </button>
-              <button type="button" onClick={() => setShowForm(false)} style={{ padding: '12px 28px', background: 'transparent', border: '1px solid #334155', borderRadius: '10px', color: '#94a3b8', fontWeight: 700, fontSize: '14px', cursor: 'pointer' }}>
+              <button type="button" onClick={() => setShowForm(false)} style={{ padding: '12px 28px', background: 'transparent', border: '1px solid #f5ecdf', borderRadius: '10px', color: '#62584f', fontWeight: 700, fontSize: '14px', cursor: 'pointer' }}>
                 Cancel
               </button>
             </div>
@@ -255,7 +255,7 @@ function AdminProducts() {
       {lowStockCount > 0 && (
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 20px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '12px', marginBottom: '20px' }}>
           <AlertTriangle size={18} color="#ef4444" />
-          <span style={{ color: '#ef4444', fontWeight: 700, fontSize: '14px' }}>
+          <span style={{ color: '#62584f', fontWeight: 700, fontSize: '14px' }}>
             {lowStockCount} product{lowStockCount > 1 ? 's' : ''} need restocking! Export the Excel report for details.
           </span>
         </div>
@@ -264,18 +264,18 @@ function AdminProducts() {
       {/* Category Filter */}
       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '20px' }}>
         {['All', ...CATEGORIES].map(cat => (
-          <button key={cat} onClick={() => setFilter(cat)} style={{ padding: '6px 16px', borderRadius: '999px', border: filter === cat ? 'none' : '1px solid #334155', background: filter === cat ? 'linear-gradient(135deg, #ea580c, #f97316)' : 'transparent', color: filter === cat ? 'white' : '#64748b', fontWeight: 600, fontSize: '12px', cursor: 'pointer' }}>
+          <button key={cat} onClick={() => setFilter(cat)} style={{ padding: '6px 16px', borderRadius: '999px', border: filter === cat ? 'none' : '1px solid #f5ecdf', background: filter === cat ? 'linear-gradient(135deg, #bf4937, #bf4937)' : 'transparent', color: filter === cat ? '#302820' : '#64748b', fontWeight: 600, fontSize: '12px', cursor: 'pointer' }}>
             {cat}
           </button>
         ))}
       </div>
 
       {/* Products Table */}
-      <div style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: '16px', overflow: 'hidden' }}>
+      <div style={{ background: '#f5ecdf', border: '1px solid #f5ecdf', borderRadius: '16px', overflow: 'hidden' }}>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ borderBottom: '1px solid #1e293b' }}>
+              <tr style={{ borderBottom: '1px solid #f5ecdf' }}>
                 {['Product', 'Category', 'Stock', 'Min Stock', 'Status', 'Actions'].map(h => (
                   <th key={h} style={{ padding: '14px 20px', color: '#64748b', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.8px', textAlign: 'left', fontWeight: 700 }}>{h}</th>
                 ))}
@@ -289,33 +289,33 @@ function AdminProducts() {
               ) : filtered.map(item => {
                 const status = getStockStatus(item)
                 return (
-                  <tr key={item.id} style={{ borderBottom: '1px solid #1e293b', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                  <tr key={item.id} style={{ borderBottom: '1px solid #f5ecdf', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(160,135,111,0.02)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                     <td style={{ padding: '16px 20px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        {item.image_url && <img src={item.image_url} alt={item.title} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #1e293b' }} onError={e => e.target.style.display = 'none'} />}
+                        {item.image_url && <img src={item.image_url} alt={item.title} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #f5ecdf' }} onError={e => e.target.style.display = 'none'} />}
                         <div>
-                          <div style={{ color: 'white', fontWeight: 700, fontSize: '14px' }}>{item.title}</div>
+                          <div style={{ color: '#302820', fontWeight: 700, fontSize: '14px' }}>{item.title}</div>
                           <div style={{ color: '#64748b', fontSize: '12px', marginTop: '2px', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.description}</div>
                         </div>
                       </div>
                     </td>
                     <td style={{ padding: '16px 20px' }}>
-                      <span style={{ padding: '4px 10px', background: 'rgba(249,115,22,0.12)', border: '1px solid rgba(249,115,22,0.2)', borderRadius: '999px', color: '#f97316', fontSize: '11px', fontWeight: 700 }}>{item.category}</span>
+                      <span style={{ padding: '4px 10px', background: 'rgba(191,73,55,0.12)', border: '1px solid rgba(191,73,55,0.2)', borderRadius: '999px', color: '#b84030', fontSize: '11px', fontWeight: 700 }}>{item.category}</span>
                     </td>
                     <td style={{ padding: '16px 20px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <button onClick={() => updateStock(item.id, item.stock - 1)} style={{ width: '24px', height: '24px', borderRadius: '6px', border: '1px solid #334155', background: 'transparent', color: '#94a3b8', cursor: 'pointer', fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}>−</button>
-                        <input type="number" value={item.stock} onChange={e => updateStock(item.id, e.target.value)} min="0" style={{ width: '60px', padding: '4px 8px', background: '#020617', border: '1px solid #334155', borderRadius: '6px', color: 'white', fontSize: '14px', fontWeight: 700, textAlign: 'center' }} />
-                        <button onClick={() => updateStock(item.id, item.stock + 1)} style={{ width: '24px', height: '24px', borderRadius: '6px', border: '1px solid #334155', background: 'transparent', color: '#94a3b8', cursor: 'pointer', fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}>+</button>
+                        <button onClick={() => updateStock(item.id, item.stock - 1)} style={{ width: '24px', height: '24px', borderRadius: '6px', border: '1px solid #f5ecdf', background: 'transparent', color: '#62584f', cursor: 'pointer', fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}>−</button>
+                        <input type="number" value={item.stock} onChange={e => updateStock(item.id, e.target.value)} min="0" style={{ width: '60px', padding: '4px 8px', background: '#fff9f0', border: '1px solid #f5ecdf', borderRadius: '6px', color: '#302820', fontSize: '14px', fontWeight: 700, textAlign: 'center' }} />
+                        <button onClick={() => updateStock(item.id, item.stock + 1)} style={{ width: '24px', height: '24px', borderRadius: '6px', border: '1px solid #f5ecdf', background: 'transparent', color: '#62584f', cursor: 'pointer', fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}>+</button>
                         <span style={{ color: '#64748b', fontSize: '11px' }}>{item.unit || 'pcs'}</span>
                       </div>
                     </td>
-                    <td style={{ padding: '16px 20px', color: '#94a3b8', fontSize: '14px' }}>{item.minStock || 5} {item.unit || 'pcs'}</td>
+                    <td style={{ padding: '16px 20px', color: '#62584f', fontSize: '14px' }}>{item.minStock || 5} {item.unit || 'pcs'}</td>
                     <td style={{ padding: '16px 20px' }}>
                       <span style={{ padding: '4px 12px', borderRadius: '999px', background: status.bg, color: status.color, fontSize: '12px', fontWeight: 700 }}>{status.label}</span>
                     </td>
                     <td style={{ padding: '16px 20px' }}>
-                      <button onClick={() => del(item.id)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '7px 14px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '8px', color: '#ef4444', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>
+                      <button onClick={() => del(item.id)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '7px 14px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '8px', color: '#62584f', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>
                         <Trash2 size={13} /> Delete
                       </button>
                     </td>
@@ -329,10 +329,10 @@ function AdminProducts() {
 
       {/* Stock bar chart */}
       {items.length > 0 && (
-        <div style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: '16px', padding: '24px', marginTop: '20px' }}>
+        <div style={{ background: '#f5ecdf', border: '1px solid #f5ecdf', borderRadius: '16px', padding: '24px', marginTop: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-            <BarChart3 size={18} color="#f97316" />
-            <h3 style={{ color: 'white', fontWeight: 800, fontSize: '16px', textTransform: 'uppercase' }}>Stock Levels</h3>
+            <BarChart3 size={18} color="#bf4937" />
+            <h3 style={{ color: '#302820', fontWeight: 800, fontSize: '16px', textTransform: 'uppercase' }}>Stock Levels</h3>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {items.map(item => {
@@ -342,10 +342,10 @@ function AdminProducts() {
               return (
                 <div key={item.id}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                    <span style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600 }}>{item.title}</span>
+                    <span style={{ color: '#62584f', fontSize: '13px', fontWeight: 600 }}>{item.title}</span>
                     <span style={{ color: status.color, fontSize: '13px', fontWeight: 700 }}>{item.stock} {item.unit || 'pcs'}</span>
                   </div>
-                  <div style={{ height: '8px', background: '#1e293b', borderRadius: '999px', overflow: 'hidden' }}>
+                  <div style={{ height: '8px', background: '#f5ecdf', borderRadius: '999px', overflow: 'hidden' }}>
                     <div style={{ height: '100%', width: `${pct}%`, background: `linear-gradient(90deg, ${status.color}, ${status.color}99)`, borderRadius: '999px', transition: 'width 0.5s ease' }} />
                   </div>
                 </div>
@@ -362,9 +362,9 @@ function AdminProducts() {
 const inputStyle = {
   padding: '12px 16px',
   borderRadius: '10px',
-  border: '1px solid #1e293b',
-  background: 'rgba(255,255,255,0.03)',
-  color: 'white',
+  border: '1px solid #f5ecdf',
+  background: 'rgba(160,135,111,0.03)',
+  color: '#302820',
   fontSize: '14px',
   outline: 'none',
   width: '100%'

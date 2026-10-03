@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { Flame, Menu, X, Phone, MessageCircle, ClipboardList, UserRound, LogOut, LayoutDashboard, Package } from 'lucide-react'
 import AIChat from './AIChat'
-import LivingLogo from './LivingLogo'
 import { useQuote } from '../context/QuoteContext'
 
 // Original tips are retained. Reduced-motion visitors see a stable first tip.
@@ -13,7 +12,6 @@ const SAFETY_TIPS = [
   'Fire extinguishers expire — check the gauge every 6 months',
   '18,545 office fires were reported in India in 2021 alone',
   'Most fire deaths occur at night due to smoke inhalation',
-  'A Wipro-serviced extinguisher saves a life every 5 minutes in Kurnool',
 ]
 const links = [['/','Home'],['/about','About'],['/products','Products'],['/services','Services'],['/clients','Clients'],['/contact','Contact']]
 export default function Navbar() {
@@ -52,7 +50,7 @@ export default function Navbar() {
         <Link className="brand-link" to="/" aria-label="Wipro Fire and Safety home"><img className="company-logo" src="/company-logo-dark.png?v=2" alt="Wipro Fire & Safety — Consultants, Stockists, Suppliers" width="1976" height="796" /></Link>
         <nav className="desktop-nav" aria-label="Main navigation">{links.map(([to,label]) => <NavLink end={to === '/'} key={to} to={to}>{label}</NavLink>)}</nav>
         <div className="nav-actions">
-          <LivingLogo onClick={() => setChatOpen(true)} />
+          <button className="icon-button" aria-label="Open safety assistant" title="Safety assistant" onClick={() => setChatOpen(true)}><MessageCircle size={20} /></button>
           <Link className="icon-button quote-link" to="/contact#inquiry" aria-label={`Your quote, ${items.length} products`} title="Your quote"><ClipboardList size={21} />{items.length > 0 && <span className="quote-count">{items.length}</span>}</Link>
           <a className="nav-call" href="tel:+918019918288"><Phone size={16} /><span>Call now</span></a>
           <div ref={accountRef} className="account-wrap"><button className="icon-button account-trigger" aria-label="Account options" aria-expanded={accountOpen} aria-controls="account-options" onClick={() => setAccountOpen(!accountOpen)}><UserRound size={20} /></button>{accountOpen && <div id="account-options" className="account-menu">{isLoggedIn ? <><Link to="/admin/dashboard"><LayoutDashboard size={16} />Dashboard</Link><Link to="/admin/products"><Package size={16} />Products</Link><button onClick={logout}><LogOut size={16} />Log out</button></> : <Link to="/admin/login"><UserRound size={16} />Admin login</Link>}</div>}</div>

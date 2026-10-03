@@ -31,9 +31,9 @@ function AdminLogin() {
   }
 
   return (
-    <div style={{ padding: '80px', maxWidth: '400px', margin: 'auto' }}>
+    <div style={{ padding: '60px 24px', maxWidth: '440px', margin: 'auto' }}>
       <h2>Admin Login</h2>
-      {error && <p style={{ color: '#e53935', marginBottom: '12px' }}>{error}</p>}
+      {error && <p style={{ color: '#62584f', marginBottom: '12px' }}>{error}</p>}
       <form onSubmit={login}>
         <input
           style={input}
@@ -63,15 +63,15 @@ const input = {
   marginBottom: '12px',
   borderRadius: '6px',
   border: '1px solid #ccc',
-  background: '#111',
-  color: 'white'
+  background: '#fff9f0',
+  color: '#302820'
 }
 
 const button = {
   width: '100%',
   padding: '12px',
-  background: '#111',
-  color: 'white',
+  background: '#b84030',
+  color: '#fff',
   border: 'none',
   borderRadius: '6px',
   cursor: 'pointer'

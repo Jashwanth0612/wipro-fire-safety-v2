@@ -9,8 +9,8 @@
 html, body, #root { height: 100%; }
 
 body {
-  background-color: #020617;
-  color: white;
+  background-color: #fff9f0;
+  color: #302820;
   font-family: 'Manrope', sans-serif;
 }
 
@@ -19,8 +19,8 @@ h1, h2, h3, h4 {
 }
 
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #0f172a; }
-::-webkit-scrollbar-thumb { background: #f97316; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #ea580c; }
+::-webkit-scrollbar-track { background: #f5ecdf; }
+::-webkit-scrollbar-thumb { background: #bf4937; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #bf4937; }
 
-::selection { background: rgba(249,115,22,0.3); color: white; }
+::selection { background: rgba(191,73,55,0.3); color: #302820; }

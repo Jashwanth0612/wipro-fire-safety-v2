@@ -4,8 +4,6 @@ import { useEffect } from 'react'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import WhatsAppButton from './components/WhatsAppButton'
-import CursorTrail from './components/CursorTrail'
-import LoadingScreen from './components/LoadingScreen'
 import Home from './pages/Home'
 import About from './pages/About'
 import Products from './pages/Products'
@@ -82,8 +80,6 @@ function App() {
       <a className="skip-link" href="#main-content">Skip to content</a>
       <RouteMetadata />
       <ScrollToTop />
-      <LoadingScreen />
-      <CursorTrail />
       <Navbar />
       <main id="main-content" tabIndex="-1"><AnimatedRoutes /></main>
       <WhatsAppButton />

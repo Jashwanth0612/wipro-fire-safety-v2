@@ -28,7 +28,7 @@ const clientsRow2 = [
 const CITY_CLIENTS = {
   hyderabad: {
     label: 'Hyderabad',
-    color: '#f97316',
+    color: '#b84030',
     clients: [
       { name: 'CMH Laboratories Pvt Ltd', status: 'Completed' },
       { name: 'Naren Projects', status: 'Completed' },
@@ -50,7 +50,7 @@ const CITY_CLIENTS = {
   },
   bengaluru: {
     label: 'Bengaluru',
-    color: '#3b82f6',
+    color: '#62584f',
     clients: [
       { name: 'MRKR Constructions & Industries Pvt Ltd', status: 'Completed' },
       { name: 'Dana Anand India Private Ltd', status: 'Completed' },
@@ -59,7 +59,7 @@ const CITY_CLIENTS = {
   },
   chennai: {
     label: 'Chennai',
-    color: '#8b5cf6',
+    color: '#62584f',
     clients: [
       { name: 'Pennar Industries Limited', status: 'Running' },
       { name: 'Hindustan Dorr Oliver Ltd', status: 'Completed' },
@@ -67,7 +67,7 @@ const CITY_CLIENTS = {
   },
   vizag: {
     label: 'Vizag',
-    color: '#10b981',
+    color: '#356345',
     clients: [
       { name: 'Ramky Infrastructure Limited', status: 'Running' },
       { name: 'Tagoor Laboratories Pvt Ltd', status: 'Completed' },
@@ -93,14 +93,14 @@ const CITY_CLIENTS = {
   },
   vijayawada: {
     label: 'Vijayawada',
-    color: '#f59e0b',
+    color: '#b84030',
     clients: [
       { name: 'D-Mart (Avenue Supermarts)', status: 'Completed' },
     ]
   },
   anantapur: {
     label: 'Anantapur',
-    color: '#ec4899',
+    color: '#62584f',
     clients: [
       { name: 'Sapthagiri Camphor Ltd', status: 'Completed' },
       { name: 'ACME Cleantech Solutions Limited', status: 'Completed' },
@@ -123,14 +123,14 @@ const CITY_CLIENTS = {
   },
   guntur: {
     label: 'Guntur',
-    color: '#84cc16',
+    color: '#356345',
     clients: [
       { name: 'APGENCO Gunadala', status: 'Completed' },
     ]
   },
   kadapa: {
     label: 'Kadapa',
-    color: '#fb923c',
+    color: '#b84030',
     clients: [
       { name: 'SMS Infrastructure Ltd', status: 'Completed' },
       { name: 'Simplex Infrastructure Limited', status: 'Completed' },
@@ -179,15 +179,15 @@ const OrbitalReach = () => {
   const onUp = () => setDragging(false)
 
   const nodes = [
-    { key: 'hyderabad',  name: 'Hyderabad',  color: '#f97316', orbit: 148, angle: 0 },
-    { key: 'bengaluru',  name: 'Bengaluru',  color: '#3b82f6', orbit: 148, angle: 120 },
-    { key: 'chennai',    name: 'Chennai',    color: '#8b5cf6', orbit: 148, angle: 240 },
-    { key: 'vizag',      name: 'Vizag',      color: '#10b981', orbit: 105, angle: 60 },
-    { key: 'vijayawada', name: 'Vijayawada', color: '#f59e0b', orbit: 105, angle: 195 },
-    { key: 'anantapur',  name: 'Anantapur',  color: '#ec4899', orbit: 105, angle: 315 },
+    { key: 'hyderabad',  name: 'Hyderabad',  color: '#b84030', orbit: 148, angle: 0 },
+    { key: 'bengaluru',  name: 'Bengaluru',  color: '#62584f', orbit: 148, angle: 120 },
+    { key: 'chennai',    name: 'Chennai',    color: '#62584f', orbit: 148, angle: 240 },
+    { key: 'vizag',      name: 'Vizag',      color: '#356345', orbit: 105, angle: 60 },
+    { key: 'vijayawada', name: 'Vijayawada', color: '#b84030', orbit: 105, angle: 195 },
+    { key: 'anantapur',  name: 'Anantapur',  color: '#62584f', orbit: 105, angle: 315 },
     { key: 'nandyal',    name: 'Nandyal',    color: '#06b6d4', orbit: 64,  angle: 30 },
-    { key: 'guntur',     name: 'Guntur',     color: '#84cc16', orbit: 64,  angle: 165 },
-    { key: 'kadapa',     name: 'Kadapa',     color: '#fb923c', orbit: 64,  angle: 285 },
+    { key: 'guntur',     name: 'Guntur',     color: '#356345', orbit: 64,  angle: 165 },
+    { key: 'kadapa',     name: 'Kadapa',     color: '#b84030', orbit: 64,  angle: 285 },
   ]
 
   return (
@@ -201,7 +201,7 @@ const OrbitalReach = () => {
 
             {/* Orbit rings — WHY: thicker, glowing rings look more premium */}
             {[148, 105, 64].map((r, i) => (
-              <div key={i} style={{ position: 'absolute', top: `calc(50% - ${r}px)`, left: `calc(50% - ${r}px)`, width: r * 2, height: r * 2, borderRadius: '50%', border: `1px solid rgba(249,115,22,${0.15 + i * 0.05})`, transformStyle: 'preserve-3d', boxShadow: `0 0 ${8 + i * 4}px rgba(249,115,22,0.05)` }} />
+              <div key={i} style={{ position: 'absolute', top: `calc(50% - ${r}px)`, left: `calc(50% - ${r}px)`, width: r * 2, height: r * 2, borderRadius: '50%', border: `1px solid rgba(191,73,55,${0.15 + i * 0.05})`, transformStyle: 'preserve-3d', boxShadow: `0 0 ${8 + i * 4}px rgba(191,73,55,0.05)` }} />
             ))}
 
             {/* Center — KURNOOL HQ clickable — fixed click detection */}
@@ -213,18 +213,18 @@ const OrbitalReach = () => {
             >
               <div style={{
                 width: 80, height: 80, borderRadius: '50%',
-                background: 'linear-gradient(135deg, #f97316, #ea580c)',
+                background: 'linear-gradient(135deg, #bf4937, #bf4937)',
                 display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                 boxShadow: hoveredNode === 'kurnool'
-                  ? '0 0 60px rgba(249,115,22,0.9), 0 0 100px rgba(249,115,22,0.4)'
-                  : '0 0 40px rgba(249,115,22,0.6), 0 0 80px rgba(249,115,22,0.2)',
-                border: '2px solid rgba(249,115,22,0.5)',
+                  ? '0 0 60px rgba(191,73,55,0.9), 0 0 100px rgba(191,73,55,0.4)'
+                  : '0 0 40px rgba(191,73,55,0.6), 0 0 80px rgba(191,73,55,0.2)',
+                border: '2px solid rgba(191,73,55,0.5)',
                 cursor: 'pointer',
                 transition: 'box-shadow 0.2s'
               }}>
-                <Shield style={{ color: 'white', width: 22, height: 22, pointerEvents: 'none' }} />
-                <span style={{ color: 'white', fontSize: '7px', fontWeight: 900, letterSpacing: '1px', textTransform: 'uppercase', marginTop: '2px', pointerEvents: 'none' }}>KURNOOL</span>
-                <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '6px', fontWeight: 700, letterSpacing: '0.5px', pointerEvents: 'none' }}>HQ</span>
+                <Shield style={{ color: '#302820', width: 22, height: 22, pointerEvents: 'none' }} />
+                <span style={{ color: '#302820', fontSize: '7px', fontWeight: 900, letterSpacing: '1px', textTransform: 'uppercase', marginTop: '2px', pointerEvents: 'none' }}>KURNOOL</span>
+                <span style={{ color: '#655b51', fontSize: '6px', fontWeight: 700, letterSpacing: '0.5px', pointerEvents: 'none' }}>HQ</span>
               </div>
             </div>
 
@@ -240,11 +240,11 @@ const OrbitalReach = () => {
                   onMouseEnter={() => setHoveredNode(n.name)}
                   onMouseLeave={() => setHoveredNode(null)}
                   onClick={(e) => { e.stopPropagation(); navigate(`/clients/${n.key}`) }}
-                  style={{ position: 'absolute', top: '50%', left: '50%', transform: `translate(-50%, -50%) translateX(${x}px) translateZ(${z}px)`, background: isHovered ? n.color : 'rgba(15,23,42,0.95)', border: `1px solid ${n.color}`, borderRadius: '999px', padding: '5px 14px', fontSize: '10px', fontWeight: 800, color: isHovered ? 'white' : n.color, whiteSpace: 'nowrap', cursor: 'pointer', boxShadow: isHovered ? `0 0 20px ${n.color}, 0 0 40px ${n.color}40` : `0 0 8px ${n.color}30`, transition: 'all 0.3s ease-out', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  style={{ position: 'absolute', top: '50%', left: '50%', transform: `translate(-50%, -50%) translateX(${x}px) translateZ(${z}px)`, background: isHovered ? n.color : 'rgba(15,23,42,0.95)', border: `1px solid ${n.color}`, borderRadius: '999px', padding: '5px 14px', fontSize: '10px', fontWeight: 800, color: isHovered ? '#302820' : n.color, whiteSpace: 'nowrap', cursor: 'pointer', boxShadow: isHovered ? `0 0 20px ${n.color}, 0 0 40px ${n.color}40` : `0 0 8px ${n.color}30`, transition: 'all 0.3s ease-out', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '5px' }}>
                   {n.name}
                   {/* WHY: Show client count on hover so user knows clicking gives real data */}
                   {isHovered && clientCount > 0 && (
-                    <span style={{ background: 'rgba(255,255,255,0.25)', borderRadius: '999px', padding: '1px 6px', fontSize: '9px', fontWeight: 900 }}>{clientCount}</span>
+                    <span style={{ background: 'rgba(160,135,111,0.25)', borderRadius: '999px', padding: '1px 6px', fontSize: '9px', fontWeight: 900 }}>{clientCount}</span>
                   )}
                 </div>
               )
@@ -253,7 +253,7 @@ const OrbitalReach = () => {
         </div>
       </div>
       {/* WHY: Small hint text so user knows they can click cities */}
-      <p style={{ color: '#334155', fontSize: '11px', fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase', textAlign: 'center' }}>
+      <p style={{ color: '#302820', fontSize: '11px', fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase', textAlign: 'center' }}>
         Click any city to view clients →
       </p>
     </div>
@@ -276,7 +276,7 @@ function TypeWriter() {
     else if (deleting && displayed.length === 0) { setDeleting(false); setIndex((index + 1) % TYPEWRITER_WORDS.length) }
     return () => clearTimeout(timeout)
   }, [displayed, deleting, index])
-  return <span className="typewriter-word" aria-label={TYPEWRITER_WORDS[0]} style={{ color: '#f97316' }}><span aria-hidden="true">{displayed}</span><span aria-hidden="true" className="typing-caret" style={{ animation: 'blink 1s step-end infinite', color: '#f97316' }}>|</span></span>
+  return <span className="typewriter-word" aria-label={TYPEWRITER_WORDS[0]} style={{ color: '#b84030' }}><span aria-hidden="true">{displayed}</span><span aria-hidden="true" className="typing-caret" style={{ animation: 'blink 1s step-end infinite', color: '#b84030' }}>|</span></span>
 }
 
 function FireParticles() {
@@ -357,12 +357,12 @@ const faqs = [
 ]
 
 const certificates = [
-  { title: 'ISO Certified', subtitle: 'Quality Management', icon: '🏆', color: '#f97316' },
-  { title: 'Fire Dept Approved', subtitle: 'Govt. of Andhra Pradesh', icon: '🔥', color: '#ef4444' },
-  { title: 'ISI Marked', subtitle: 'Bureau of Indian Standards', icon: '✅', color: '#22c55e' },
-  { title: 'GST Registered', subtitle: 'Govt. Tax Compliant', icon: '📋', color: '#eab308' },
-  { title: 'JustDial Verified', subtitle: '4.8★ Rating', icon: '⭐', color: '#f97316' },
-  { title: '18+ Years', subtitle: 'Industry Experience', icon: '🛡️', color: '#3b82f6' },
+  { title: 'ISO Certified', subtitle: 'Quality Management', icon: '🏆', color: '#b84030' },
+  { title: 'Fire Dept Approved', subtitle: 'Govt. of Andhra Pradesh', icon: '🔥', color: '#62584f' },
+  { title: 'ISI Marked', subtitle: 'Bureau of Indian Standards', icon: '✅', color: '#356345' },
+  { title: 'GST Registered', subtitle: 'Govt. Tax Compliant', icon: '📋', color: '#b84030' },
+  { title: 'JustDial Verified', subtitle: '4.8★ Rating', icon: '⭐', color: '#b84030' },
+  { title: '18+ Years', subtitle: 'Industry Experience', icon: '🛡️', color: '#62584f' },
 ]
 
 const Home = () => {
@@ -376,9 +376,9 @@ const Home = () => {
   }, [])
 
   const certifications = [
-    { icon: Award, title: 'ISO Certified', description: 'International quality standards', color: '#f97316' },
-    { icon: Shield, title: 'Fire Dept Approved', description: 'Official government certification', color: '#eab308' },
-    { icon: CheckCircle, title: 'JustDial Verified', description: 'Trusted by thousands', color: '#22c55e' },
+    { icon: Award, title: 'ISO Certified', description: 'International quality standards', color: '#b84030' },
+    { icon: Shield, title: 'Fire Dept Approved', description: 'Official government certification', color: '#b84030' },
+    { icon: CheckCircle, title: 'JustDial Verified', description: 'Trusted by thousands', color: '#356345' },
   ]
 
   const industries = [
@@ -413,7 +413,7 @@ const Home = () => {
         @keyframes marquee { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
         @keyframes pulse-border { 0%,100%{border-color:rgba(249,115,22,0.3)} 50%{border-color:rgba(249,115,22,0.8)} }
         @keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
-        @keyframes glow-pulse { 0%,100%{box-shadow:0 0 40px rgba(249,115,22,0.4)} 50%{box-shadow:0 0 80px rgba(249,115,22,0.8)} }
+        @keyframes glow-pulse { 0%,100%{box-shadow:0 0 40px rgba(191,73,55,0.4)} 50%{box-shadow:0 0 80px rgba(191,73,55,0.8)} }
       `}</style>
 
       {/* ── HERO ── */}
@@ -422,64 +422,64 @@ const Home = () => {
           <img src="https://images.unsplash.com/photo-1761933401853-09566029ed3a" alt="Industrial facility" fetchPriority="high" className="hero-image w-full h-full object-cover" />
           <div className="hero-overlay absolute inset-0 bg-gradient-to-b from-slate-950/90 via-slate-950/80 to-slate-950" />
         </div>
-        <FireParticles />
+
         <motion.div animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.4, 0.2] }} transition={{ duration: 5, repeat: Infinity }} className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-orange-500/20 rounded-full blur-3xl" style={{ zIndex: 1 }} />
         <div className="hero-content relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9 }}>
             <motion.div initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.2, type: 'spring', stiffness: 200 }} className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500/20 border border-orange-500/30 rounded-full mb-8">
-              <Flame className="w-4 h-4 text-orange-500" />
-              <span className="text-sm text-orange-400 font-semibold tracking-wider">TRUSTED SINCE 2007</span>
+              <Flame className="w-4 h-4 text-[#b84030]" />
+              <span className="text-sm text-[#b84030] font-semibold tracking-wider">TRUSTED SINCE 2007</span>
             </motion.div>
-            <h1 className="text-5xl sm:text-6xl lg:text-8xl font-black text-white uppercase tracking-tighter mb-6 leading-tight">
-              Protecting<br /><TypeWriter />
+            <h1 className="text-5xl sm:text-6xl lg:text-8xl font-black text-stone-700 uppercase tracking-tighter mb-6 leading-tight">
+              Protecting<br /><span style={{ color: '#b84030' }}>What matters.</span>
             </h1>
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="hero-intro text-lg sm:text-xl text-slate-300 max-w-2xl mx-auto mb-12 leading-relaxed">
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="hero-intro text-lg sm:text-xl text-stone-700 max-w-2xl mx-auto mb-12 leading-relaxed">
               Premium fire safety solutions for industrial and commercial spaces. ISO certified with 18+ years of excellence in Kurnool, AP.
             </motion.p>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }} className="hero-actions flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link to="/contact" className="group relative overflow-hidden bg-gradient-to-r from-orange-600 to-orange-500 text-white font-black tracking-wide uppercase px-10 py-4 hover:shadow-2xl hover:shadow-orange-500/40 transition-all duration-300" style={{ clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)' }}>
+              <Link to="/contact" className="group relative overflow-hidden bg-gradient-to-r from-[#bf4937] to-[#bf4937] text-stone-700 font-black tracking-wide uppercase px-10 py-4 hover:shadow-2xl hover:shadow-orange-500/40 transition-all duration-300" style={{ clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)' }}>
                 <span className="flex items-center gap-2">Get a Free Quote <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" /></span>
                 <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-12" />
               </Link>
-              <Link to="/services" className="border-2 border-slate-600 hover:border-orange-500 text-slate-300 hover:text-white font-bold tracking-wide uppercase px-10 py-4 transition-all duration-300" style={{ clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)' }}>
+              <Link to="/services" className="border-2 border-[#dfd0bf] hover:border-orange-500 text-stone-700 hover:text-stone-700 font-bold tracking-wide uppercase px-10 py-4 transition-all duration-300" style={{ clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)' }}>
                 Our Services
               </Link>
             </motion.div>
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }} className="hero-stats grid grid-cols-2 lg:grid-cols-4 gap-6 mt-24">
             {features.map((f, i) => (
-              <motion.div key={i} whileHover={{ y: -8, scale: 1.02 }} className="relative backdrop-blur-md bg-slate-900/60 border border-white/10 p-6 text-center hover:border-orange-500/50 transition-all duration-300 group" style={{ animation: 'pulse-border 3s ease-in-out infinite', animationDelay: `${i * 0.5}s` }}>
-                <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <h3 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-400"><CountUp target={f.title} suffix={f.suffix} /></h3>
-                <p className="text-slate-400 text-xs uppercase tracking-widest mt-2">{f.subtitle}</p>
+              <motion.div key={i} whileHover={{ y: -8, scale: 1.02 }} className="relative backdrop-blur-md bg-[#fff9f0]/60 border border-white/10 p-6 text-center hover:border-orange-500/50 transition-all duration-300 group" style={{ animation: 'pulse-border 3s ease-in-out infinite', animationDelay: `${i * 0.5}s` }}>
+                <div className="absolute inset-0 bg-gradient-to-br from-[#bf4937]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <h3 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#bf4937] to-[#bf4937]"><CountUp target={f.title} suffix={f.suffix} /></h3>
+                <p className="text-stone-700 text-xs uppercase tracking-widest mt-2">{f.subtitle}</p>
               </motion.div>
             ))}
           </motion.div>
         </div>
         <motion.div animate={{ y: [0, 10, 0] }} transition={{ duration: 2, repeat: Infinity }} className="hero-scroll absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2">
-          <span className="text-slate-500 text-xs uppercase tracking-widest">Scroll</span>
-          <div className="w-px h-12 bg-gradient-to-b from-orange-500 to-transparent" />
+          <span className="text-stone-700 text-xs uppercase tracking-widest">Scroll</span>
+          <div className="w-px h-12 bg-gradient-to-b from-[#bf4937] to-transparent" />
         </motion.div>
       </section>
 
       {/* ── TRUSTED BY — double marquee ── */}
       {/* WHY: Real brand names (IndiGo, D-Mart, Indian Oil) build instant credibility */}
       {/* Two rows in opposite directions is a premium SaaS website pattern */}
-      <section style={{ background: '#0a0f1a', borderTop: '1px solid #1e293b', borderBottom: '1px solid #1e293b', padding: '44px 0', overflow: 'hidden' }}>
+      <section style={{ background: '#fff9f0', borderTop: '1px solid #f5ecdf', borderBottom: '1px solid #f5ecdf', padding: '44px 0', overflow: 'hidden' }}>
         <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-          <span style={{ color: '#334155', fontSize: '11px', fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase' }}>Trusted By</span>
+          <span style={{ color: '#302820', fontSize: '11px', fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase' }}>Trusted By</span>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', marginTop: '8px' }}>
-            <div style={{ height: '1px', width: '80px', background: 'linear-gradient(to right, transparent, #f97316)' }} />
-            <span style={{ color: 'white', fontSize: '24px', fontWeight: 900, fontFamily: "'Barlow Condensed', sans-serif", textTransform: 'uppercase', letterSpacing: '-0.5px' }}>151+ Verified Installations</span>
-            <div style={{ height: '1px', width: '80px', background: 'linear-gradient(to left, transparent, #f97316)' }} />
+            <div style={{ height: '1px', width: '80px', background: 'linear-gradient(to right, transparent, #bf4937)' }} />
+            <span style={{ color: '#302820', fontSize: '24px', fontWeight: 900, fontFamily: "'Barlow Condensed', sans-serif", textTransform: 'uppercase', letterSpacing: '-0.5px' }}>151+ Verified Installations</span>
+            <div style={{ height: '1px', width: '80px', background: 'linear-gradient(to left, transparent, #bf4937)' }} />
           </div>
         </div>
         {/* Row 1 scrolls left */}
         <div style={{ overflow: 'hidden', marginBottom: '14px' }}>
-          <div style={{ display: 'flex', width: 'max-content', animation: 'marquee 70s linear infinite' }}>
-            {[...clientsRow1, ...clientsRow1].map((c, i) => (
+          <div style={{ display: 'flex', width: 'max-content', flexWrap: 'wrap', justifyContent: 'center', gap: '20px', maxWidth: '1200px', margin: 'auto' }}>
+            {clientsRow1.map((c, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '0 36px', whiteSpace: 'nowrap' }}>
-                <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#f97316', opacity: 0.8, flexShrink: 0 }} />
+                <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#bf4937', opacity: 0.8, flexShrink: 0 }} />
                 <span style={{ color: '#475569', fontSize: '13px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' }}>{c}</span>
               </div>
             ))}
@@ -487,10 +487,10 @@ const Home = () => {
         </div>
         {/* Row 2 scrolls right — animation: reverse keyword flips direction */}
         <div style={{ overflow: 'hidden' }}>
-          <div style={{ display: 'flex', width: 'max-content', animation: 'marquee 70s linear infinite reverse' }}>
-            {[...clientsRow2, ...clientsRow2].map((c, i) => (
+          <div style={{ display: 'flex', width: 'max-content', flexWrap: 'wrap', justifyContent: 'center', gap: '20px', maxWidth: '1200px', margin: 'auto' }}>
+            {clientsRow2.map((c, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '0 36px', whiteSpace: 'nowrap' }}>
-                <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#eab308', opacity: 0.8, flexShrink: 0 }} />
+                <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#bf4937', opacity: 0.8, flexShrink: 0 }} />
                 <span style={{ color: '#475569', fontSize: '13px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' }}>{c}</span>
               </div>
             ))}
@@ -499,30 +499,30 @@ const Home = () => {
       </section>
 
       {/* ── WHY CHOOSE US ── */}
-      <section className="py-32 bg-slate-950">
+      <section className="py-32 bg-[#fff9f0]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-20">
-            <motion.div initial={{ width: 0 }} whileInView={{ width: '80px' }} viewport={{ once: true }} transition={{ duration: 0.8 }} style={{ height: '3px', background: 'linear-gradient(90deg, #f97316, #eab308)', margin: '0 auto 20px' }} />
-            <span className="text-orange-500 text-sm font-bold uppercase tracking-widest">Why Us</span>
-            <h2 className="text-5xl lg:text-6xl font-black text-white uppercase tracking-tight mt-3 mb-4">Why Choose <span className="text-orange-500">Wipro</span></h2>
-            <p className="text-slate-400 text-lg max-w-2xl mx-auto">Trusted by leading organizations across Andhra Pradesh</p>
+            <motion.div initial={{ width: 0 }} whileInView={{ width: '80px' }} viewport={{ once: true }} transition={{ duration: 0.8 }} style={{ height: '3px', background: 'linear-gradient(90deg, #bf4937, #bf4937)', margin: '0 auto 20px' }} />
+            <span className="text-[#b84030] text-sm font-bold uppercase tracking-widest">Why Us</span>
+            <h2 className="text-5xl lg:text-6xl font-black text-stone-700 uppercase tracking-tight mt-3 mb-4">Why Choose <span className="text-[#b84030]">Wipro</span></h2>
+            <p className="text-stone-700 text-lg max-w-2xl mx-auto">Trusted by leading organizations across Andhra Pradesh</p>
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {certifications.map((cert, index) => {
               const Icon = cert.icon
               return (
-                <motion.div key={index} initial={{ opacity: 0, y: 60 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.2 }} whileHover={{ y: -16, scale: 1.02 }} className="group relative overflow-hidden bg-slate-900 border border-slate-800 p-10 hover:border-orange-500/40 transition-all duration-500">
+                <motion.div key={index} initial={{ opacity: 0, y: 60 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.2 }} whileHover={{ y: -16, scale: 1.02 }} className="group relative overflow-hidden bg-[#fff9f0] border border-[#dfd0bf] p-10 hover:border-orange-500/40 transition-all duration-500">
                   <motion.div initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }} transition={{ delay: index * 0.2 + 0.4 }} style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: `linear-gradient(90deg, ${cert.color}, transparent)`, transformOrigin: 'left' }} />
                   <div style={{ position: 'absolute', top: '20px', right: '20px', color: cert.color, fontSize: '12px', fontWeight: 800, opacity: 0.5 }}>0{index + 1}</div>
                   <div className="relative z-10">
                     <motion.div whileHover={{ rotate: 360 }} transition={{ duration: 0.6 }} style={{ width: '64px', height: '64px', borderRadius: '16px', background: `${cert.color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '28px', border: `1px solid ${cert.color}30` }}>
                       <Icon style={{ width: '28px', height: '28px', color: cert.color }} />
                     </motion.div>
-                    <h3 className="text-2xl font-black text-white mb-3 uppercase tracking-tight">{cert.title}</h3>
-                    <p className="text-slate-400 leading-relaxed text-sm">{cert.description}</p>
+                    <h3 className="text-2xl font-black text-stone-700 mb-3 uppercase tracking-tight">{cert.title}</h3>
+                    <p className="text-stone-700 leading-relaxed text-sm">{cert.description}</p>
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.03) 50%, transparent 60%)', animation: 'shimmer 3s infinite', animationDelay: `${index}s` }} />
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#bf4937]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(105deg, transparent 40%, rgba(160,135,111,0.03) 50%, transparent 60%)', animation: 'shimmer 3s infinite', animationDelay: `${index}s` }} />
                 </motion.div>
               )
             })}
@@ -531,24 +531,24 @@ const Home = () => {
       </section>
 
       {/* ── INDUSTRIES ── */}
-      <section style={{ padding: '100px 40px', background: 'linear-gradient(180deg, #020617 0%, #0f172a 50%, #020617 100%)', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(249,115,22,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(249,115,22,0.03) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
+      <section style={{ padding: '100px 40px', background: 'linear-gradient(180deg, #fff9f0 0%, #f5ecdf 50%, #fff9f0 100%)', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(191,73,55,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(191,73,55,0.03) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
         <div style={{ maxWidth: '1200px', margin: 'auto', position: 'relative', zIndex: 1 }}>
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ textAlign: 'center', marginBottom: '60px' }}>
-            <motion.div initial={{ width: 0 }} whileInView={{ width: '80px' }} viewport={{ once: true }} transition={{ duration: 0.8 }} style={{ height: '3px', background: 'linear-gradient(90deg, #f97316, #eab308)', margin: '0 auto 20px' }} />
-            <span style={{ color: '#f97316', fontSize: '13px', fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase' }}>Coverage</span>
-            <h2 style={{ fontSize: '56px', fontWeight: 900, color: 'white', textTransform: 'uppercase', letterSpacing: '-1px', margin: '12px 0' }}>Industries We <span style={{ color: '#f97316' }}>Serve</span></h2>
+            <motion.div initial={{ width: 0 }} whileInView={{ width: '80px' }} viewport={{ once: true }} transition={{ duration: 0.8 }} style={{ height: '3px', background: 'linear-gradient(90deg, #bf4937, #bf4937)', margin: '0 auto 20px' }} />
+            <span style={{ color: '#b84030', fontSize: '13px', fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase' }}>Coverage</span>
+            <h2 style={{ fontSize: '56px', fontWeight: 900, color: '#302820', textTransform: 'uppercase', letterSpacing: '-1px', margin: '12px 0' }}>Industries We <span style={{ color: '#b84030' }}>Serve</span></h2>
           </motion.div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '16px' }}>
             {industries.map((industry, index) => {
               const Icon = industry.icon
               return (
-                <motion.div key={index} initial={{ opacity: 0, y: 40, scale: 0.9 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} viewport={{ once: true }} transition={{ delay: index * 0.1, ease: 'backOut' }} whileHover={{ y: -14, scale: 1.04 }} style={{ background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '16px', padding: '28px 16px', textAlign: 'center', cursor: 'pointer', position: 'relative', overflow: 'hidden', backdropFilter: 'blur(10px)' }}>
-                  <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(249,115,22,0.15)', border: '1px solid rgba(249,115,22,0.3)', borderRadius: '999px', padding: '2px 8px', fontSize: '10px', color: '#f97316', fontWeight: 700 }}>{industry.count}</div>
-                  <motion.div whileHover={{ rotate: [0, -10, 10, 0] }} transition={{ duration: 0.4 }} style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'rgba(249,115,22,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-                    <Icon style={{ width: '28px', height: '28px', color: '#f97316' }} />
+                <motion.div key={index} initial={{ opacity: 0, y: 40, scale: 0.9 }} whileInView={{ opacity: 1, y: 0, scale: 1 }} viewport={{ once: true }} transition={{ delay: index * 0.1, ease: 'backOut' }} whileHover={{ y: -14, scale: 1.04 }} style={{ background: 'rgba(255,249,240,0.8)', border: '1px solid rgba(160,135,111,0.06)', borderRadius: '16px', padding: '28px 16px', textAlign: 'center', cursor: 'pointer', position: 'relative', overflow: 'hidden', backdropFilter: 'blur(10px)' }}>
+                  <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(191,73,55,0.15)', border: '1px solid rgba(191,73,55,0.3)', borderRadius: '999px', padding: '2px 8px', fontSize: '10px', color: '#b84030', fontWeight: 700 }}>{industry.count}</div>
+                  <motion.div whileHover={{ rotate: [0, -10, 10, 0] }} transition={{ duration: 0.4 }} style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'rgba(191,73,55,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                    <Icon style={{ width: '28px', height: '28px', color: '#b84030' }} />
                   </motion.div>
-                  <h3 style={{ color: 'white', fontWeight: 800, fontSize: '13px', textTransform: 'uppercase', letterSpacing: '1px' }}>{industry.name}</h3>
+                  <h3 style={{ color: '#302820', fontWeight: 800, fontSize: '13px', textTransform: 'uppercase', letterSpacing: '1px' }}>{industry.name}</h3>
                 </motion.div>
               )
             })}
@@ -557,8 +557,8 @@ const Home = () => {
       </section>
 
       {/* ── STATS COUNTER ── */}
-      <section style={{ background: 'linear-gradient(135deg, #f97316, #ea580c)', padding: '60px 40px', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(255,255,255,0.05) 0%, transparent 50%)' }} />
+      <section style={{ background: 'linear-gradient(135deg, #bf4937, #bf4937)', padding: '60px 40px', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(160,135,111,0.1) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(160,135,111,0.05) 0%, transparent 50%)' }} />
         <div style={{ maxWidth: '1100px', margin: 'auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', position: 'relative', zIndex: 1 }}>
           {[
             { value: 1000, suffix: '+', label: 'Happy Clients', icon: '😊' },
@@ -567,9 +567,9 @@ const Home = () => {
             { value: 100, suffix: '%', label: 'Compliance Rate', icon: '✅' },
           ].map((s, i) => (
             <motion.div key={i} initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '18px', marginBottom: '8px' }}>{s.icon}</div>
-              <div style={{ fontSize: '48px', fontWeight: 900, color: 'white', lineHeight: 1 }}><CountUp target={s.value} suffix={s.suffix} /></div>
-              <div style={{ color: 'rgba(255,255,255,0.8)', fontSize: '13px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', marginTop: '8px' }}>{s.label}</div>
+
+              <div style={{ fontSize: '48px', fontWeight: 900, color: '#302820', lineHeight: 1 }}><CountUp target={s.value} suffix={s.suffix} /></div>
+              <div style={{ color: '#655b51', fontSize: '13px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', marginTop: '8px' }}>{s.label}</div>
             </motion.div>
           ))}
         </div>
@@ -578,63 +578,63 @@ const Home = () => {
       {/* ── ORBITAL NETWORK REACH ── */}
       {/* WHY: Made it interactive — clicking a city navigates to a client page */}
       {/* Kurnool now has a labeled HQ badge in the center — makes geographic authority clear */}
-      <section className="py-32 bg-slate-950 overflow-hidden">
+      <section className="py-32 bg-[#fff9f0] overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
           <motion.div initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
-            <span className="text-orange-500 text-sm font-bold uppercase tracking-widest">Our Reach</span>
-            <h2 className="text-5xl lg:text-6xl font-black text-white uppercase mt-4 mb-8">South India's <span className="text-orange-500">Network</span></h2>
-            <p className="text-slate-400 text-lg leading-relaxed mb-8">
+            <span className="text-[#b84030] text-sm font-bold uppercase tracking-widest">Our Reach</span>
+            <h2 className="text-5xl lg:text-6xl font-black text-stone-700 uppercase mt-4 mb-8">South India's <span className="text-[#b84030]">Network</span></h2>
+            <p className="text-stone-700 text-lg leading-relaxed mb-8">
               We provide localized support and certified safety solutions across major industrial and commercial hubs. Our rapid-response network ensures your facility is always protected.
             </p>
             <div className="grid grid-cols-2 gap-4 mb-8">
               {['24/7 Support', 'Statewide AMC', 'Fire Dept Approved', 'ISO Certified'].map((text, i) => (
                 <div key={i} className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-orange-500" />
-                  <span className="text-slate-300 text-xs font-bold uppercase tracking-widest">{text}</span>
+                  <CheckCircle className="w-4 h-4 text-[#b84030]" />
+                  <span className="text-stone-700 text-xs font-bold uppercase tracking-widest">{text}</span>
                 </div>
               ))}
             </div>
             {/* WHY: Link to full clients page so users can see all 151 clients */}
-            <Link to="/clients" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '12px 24px', background: 'rgba(249,115,22,0.15)', border: '1px solid rgba(249,115,22,0.3)', borderRadius: '10px', color: '#f97316', fontWeight: 700, fontSize: '13px', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '1px', transition: 'all 0.2s' }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(249,115,22,0.25)' }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(249,115,22,0.15)' }}>
+            <Link to="/clients" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '12px 24px', background: 'rgba(191,73,55,0.15)', border: '1px solid rgba(191,73,55,0.3)', borderRadius: '10px', color: '#b84030', fontWeight: 700, fontSize: '13px', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '1px', transition: 'all 0.2s' }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(191,73,55,0.25)' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(191,73,55,0.15)' }}>
               View All 151+ Clients <ArrowRight size={14} />
             </Link>
           </motion.div>
           <div className="flex justify-center items-center">
-            <OrbitalReach />
+            <div className="city-directory">{Object.entries(CITY_CLIENTS).map(([key, city]) => <Link key={key} to={`/clients/${key}`}><span>{city.label}</span><ArrowRight size={16} /></Link>)}</div>
           </div>
         </div>
       </section>
 
       {/* ── PROJECT SHOWCASE ── */}
-      <section style={{ padding: '100px 40px', background: '#020617' }}>
+      <section style={{ padding: '100px 40px', background: '#fff9f0' }}>
         <div style={{ maxWidth: '1200px', margin: 'auto' }}>
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ textAlign: 'center', marginBottom: '60px' }}>
-            <motion.div initial={{ width: 0 }} whileInView={{ width: '80px' }} viewport={{ once: true }} transition={{ duration: 0.8 }} style={{ height: '3px', background: 'linear-gradient(90deg, #f97316, #eab308)', margin: '0 auto 20px' }} />
-            <span style={{ color: '#f97316', fontSize: '13px', fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase' }}>Our Work</span>
-            <h2 style={{ fontSize: '56px', fontWeight: 900, color: 'white', textTransform: 'uppercase', letterSpacing: '-1px', margin: '12px 0' }}>Project <span style={{ color: '#f97316' }}>Showcase</span></h2>
+            <motion.div initial={{ width: 0 }} whileInView={{ width: '80px' }} viewport={{ once: true }} transition={{ duration: 0.8 }} style={{ height: '3px', background: 'linear-gradient(90deg, #bf4937, #bf4937)', margin: '0 auto 20px' }} />
+            <span style={{ color: '#b84030', fontSize: '13px', fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase' }}>Our Work</span>
+            <h2 style={{ fontSize: '56px', fontWeight: 900, color: '#302820', textTransform: 'uppercase', letterSpacing: '-1px', margin: '12px 0' }}>Project <span style={{ color: '#b84030' }}>Showcase</span></h2>
             <p style={{ color: '#64748b', fontSize: '16px' }}>Real installations across Kurnool and Andhra Pradesh</p>
           </motion.div>
           <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '40px', flexWrap: 'wrap' }}>
             {projects.map((p, i) => (
-              <button key={i} onClick={() => setActiveProject(i)} style={{ padding: '8px 20px', borderRadius: '999px', border: activeProject === i ? 'none' : '1px solid #334155', background: activeProject === i ? 'linear-gradient(135deg, #ea580c, #f97316)' : 'transparent', color: activeProject === i ? 'white' : '#64748b', fontWeight: 700, fontSize: '13px', cursor: 'pointer', transition: 'all 0.2s' }}>
+              <button key={i} onClick={() => setActiveProject(i)} style={{ padding: '8px 20px', borderRadius: '999px', border: activeProject === i ? 'none' : '1px solid #f5ecdf', background: activeProject === i ? 'linear-gradient(135deg, #bf4937, #bf4937)' : 'transparent', color: activeProject === i ? '#302820' : '#64748b', fontWeight: 700, fontSize: '13px', cursor: 'pointer', transition: 'all 0.2s' }}>
                 {p.title}
               </button>
             ))}
           </div>
           <AnimatePresence mode="wait">
-            <motion.div className="project-grid" key={activeProject} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', alignItems: 'center', background: '#0f172a', border: '1px solid #1e293b', borderRadius: '24px', overflow: 'hidden' }}>
+            <motion.div className="project-grid" key={activeProject} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', alignItems: 'center', background: '#f5ecdf', border: '1px solid #f5ecdf', borderRadius: '24px', overflow: 'hidden' }}>
               <div style={{ height: '400px', overflow: 'hidden', position: 'relative' }}>
                 <img src={projects[activeProject].img} alt={projects[activeProject].title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(249,115,22,0.3), transparent)' }} />
-                <span style={{ position: 'absolute', top: '20px', left: '20px', padding: '6px 14px', background: 'rgba(249,115,22,0.9)', color: 'white', fontWeight: 700, fontSize: '12px', borderRadius: '999px' }}>{projects[activeProject].tag}</span>
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(191,73,55,0.3), transparent)' }} />
+                <span style={{ position: 'absolute', top: '20px', left: '20px', padding: '6px 14px', background: 'rgba(191,73,55,0.9)', color: '#302820', fontWeight: 700, fontSize: '12px', borderRadius: '999px' }}>{projects[activeProject].tag}</span>
               </div>
               <div style={{ padding: '48px' }}>
-                <span style={{ color: '#f97316', fontSize: '12px', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase' }}>{projects[activeProject].category}</span>
-                <h3 style={{ color: 'white', fontSize: '36px', fontWeight: 900, textTransform: 'uppercase', margin: '12px 0 16px', letterSpacing: '-1px' }}>{projects[activeProject].title}</h3>
-                <p style={{ color: '#94a3b8', fontSize: '16px', lineHeight: 1.8, marginBottom: '32px' }}>{projects[activeProject].desc}</p>
-                <Link to="/contact" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: 'linear-gradient(135deg, #ea580c, #f97316)', color: 'white', fontWeight: 800, textDecoration: 'none', fontSize: '14px', textTransform: 'uppercase', borderRadius: '10px' }}>
+                <span style={{ color: '#b84030', fontSize: '12px', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase' }}>{projects[activeProject].category}</span>
+                <h3 style={{ color: '#302820', fontSize: '36px', fontWeight: 900, textTransform: 'uppercase', margin: '12px 0 16px', letterSpacing: '-1px' }}>{projects[activeProject].title}</h3>
+                <p style={{ color: '#62584f', fontSize: '16px', lineHeight: 1.8, marginBottom: '32px' }}>{projects[activeProject].desc}</p>
+                <Link to="/contact" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 28px', background: 'linear-gradient(135deg, #bf4937, #bf4937)', color: '#302820', fontWeight: 800, textDecoration: 'none', fontSize: '14px', textTransform: 'uppercase', borderRadius: '10px' }}>
                   Similar Project? <ArrowRight size={16} />
                 </Link>
               </div>
@@ -644,53 +644,53 @@ const Home = () => {
       </section>
 
       {/* ── TESTIMONIALS ── */}
-      <section style={{ padding: '100px 40px', background: 'linear-gradient(180deg, #020617, #0f172a)' }}>
+      <section style={{ padding: '100px 40px', background: 'linear-gradient(180deg, #fff9f0, #f5ecdf)' }}>
         <div style={{ maxWidth: '1000px', margin: 'auto' }}>
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ textAlign: 'center', marginBottom: '60px' }}>
-            <motion.div initial={{ width: 0 }} whileInView={{ width: '80px' }} viewport={{ once: true }} transition={{ duration: 0.8 }} style={{ height: '3px', background: 'linear-gradient(90deg, #f97316, #eab308)', margin: '0 auto 20px' }} />
-            <span style={{ color: '#f97316', fontSize: '13px', fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase' }}>Client Reviews</span>
-            <h2 style={{ fontSize: '56px', fontWeight: 900, color: 'white', textTransform: 'uppercase', letterSpacing: '-1px', margin: '12px 0' }}>What Clients <span style={{ color: '#f97316' }}>Say</span></h2>
+            <motion.div initial={{ width: 0 }} whileInView={{ width: '80px' }} viewport={{ once: true }} transition={{ duration: 0.8 }} style={{ height: '3px', background: 'linear-gradient(90deg, #bf4937, #bf4937)', margin: '0 auto 20px' }} />
+            <span style={{ color: '#b84030', fontSize: '13px', fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase' }}>Client Reviews</span>
+            <h2 style={{ fontSize: '56px', fontWeight: 900, color: '#302820', textTransform: 'uppercase', letterSpacing: '-1px', margin: '12px 0' }}>What Clients <span style={{ color: '#b84030' }}>Say</span></h2>
           </motion.div>
           <AnimatePresence mode="wait">
-            <motion.div key={activeTestimonial} initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.5 }} style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: '24px', padding: '48px', position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: 'linear-gradient(90deg, #f97316, #eab308)' }} />
-              <Quote size={48} color="rgba(249,115,22,0.2)" style={{ marginBottom: '24px' }} />
-              <p style={{ color: '#e2e8f0', fontSize: '20px', lineHeight: 1.8, marginBottom: '32px', fontStyle: 'italic' }}>"{testimonials[activeTestimonial].text}"</p>
+            <motion.div key={activeTestimonial} initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} transition={{ duration: 0.5 }} style={{ background: '#f5ecdf', border: '1px solid #f5ecdf', borderRadius: '24px', padding: '48px', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: 'linear-gradient(90deg, #bf4937, #bf4937)' }} />
+              <Quote size={48} color="rgba(191,73,55,0.2)" style={{ marginBottom: '24px' }} />
+              <p style={{ color: '#62584f', fontSize: '20px', lineHeight: 1.8, marginBottom: '32px', fontStyle: 'italic' }}>"{testimonials[activeTestimonial].text}"</p>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
                 <div>
-                  <div style={{ color: 'white', fontWeight: 800, fontSize: '18px' }}>{testimonials[activeTestimonial].name}</div>
+                  <div style={{ color: '#302820', fontWeight: 800, fontSize: '18px' }}>{testimonials[activeTestimonial].name}</div>
                   <div style={{ color: '#64748b', fontSize: '14px', marginTop: '4px' }}>{testimonials[activeTestimonial].role}</div>
                 </div>
                 <div style={{ display: 'flex', gap: '4px' }}>
-                  {[...Array(testimonials[activeTestimonial].rating)].map((_, i) => <Star key={i} size={20} fill="#f97316" color="#f97316" />)}
+                  {[...Array(testimonials[activeTestimonial].rating)].map((_, i) => <Star key={i} size={20} fill="#bf4937" color="#bf4937" />)}
                 </div>
               </div>
             </motion.div>
           </AnimatePresence>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '24px' }}>
             {testimonials.map((_, i) => (
-              <button aria-label={`Show review ${i + 1}`} aria-pressed={i === activeTestimonial} key={i} onClick={() => setActiveTestimonial(i)} style={{ width: i === activeTestimonial ? '28px' : '8px', height: '8px', borderRadius: '999px', background: i === activeTestimonial ? '#f97316' : '#334155', border: 'none', cursor: 'pointer', transition: 'all 0.3s' }} />
+              <button aria-label={`Show review ${i + 1}`} aria-pressed={i === activeTestimonial} key={i} onClick={() => setActiveTestimonial(i)} style={{ width: i === activeTestimonial ? '28px' : '8px', height: '8px', borderRadius: '999px', background: i === activeTestimonial ? '#bf4937' : '#f5ecdf', border: 'none', cursor: 'pointer', transition: 'all 0.3s' }} />
             ))}
           </div>
         </div>
       </section>
 
       {/* ── CERTIFICATES ── */}
-      <section style={{ padding: '100px 40px', background: '#020617', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(249,115,22,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(249,115,22,0.02) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
+      <section style={{ padding: '100px 40px', background: '#fff9f0', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(191,73,55,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(191,73,55,0.02) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
         <div style={{ maxWidth: '1100px', margin: 'auto', position: 'relative', zIndex: 1 }}>
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ textAlign: 'center', marginBottom: '60px' }}>
-            <motion.div initial={{ width: 0 }} whileInView={{ width: '80px' }} viewport={{ once: true }} transition={{ duration: 0.8 }} style={{ height: '3px', background: 'linear-gradient(90deg, #f97316, #eab308)', margin: '0 auto 20px' }} />
-            <span style={{ color: '#f97316', fontSize: '13px', fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase' }}>Credentials</span>
-            <h2 style={{ fontSize: '56px', fontWeight: 900, color: 'white', textTransform: 'uppercase', letterSpacing: '-1px', margin: '12px 0' }}>Our <span style={{ color: '#f97316' }}>Certifications</span></h2>
+            <motion.div initial={{ width: 0 }} whileInView={{ width: '80px' }} viewport={{ once: true }} transition={{ duration: 0.8 }} style={{ height: '3px', background: 'linear-gradient(90deg, #bf4937, #bf4937)', margin: '0 auto 20px' }} />
+            <span style={{ color: '#b84030', fontSize: '13px', fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase' }}>Credentials</span>
+            <h2 style={{ fontSize: '56px', fontWeight: 900, color: '#302820', textTransform: 'uppercase', letterSpacing: '-1px', margin: '12px 0' }}>Our <span style={{ color: '#b84030' }}>Certifications</span></h2>
             <p style={{ color: '#64748b', fontSize: '16px' }}>Fully certified, compliant and government approved</p>
           </motion.div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
             {certificates.map((cert, i) => (
-              <motion.div key={i} initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.1, type: 'spring' }} whileHover={{ y: -8, scale: 1.02 }} style={{ background: '#0f172a', border: `1px solid ${cert.color}25`, borderRadius: '16px', padding: '32px 24px', textAlign: 'center', position: 'relative', overflow: 'hidden', transition: 'all 0.3s' }}>
+              <motion.div key={i} initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.1, type: 'spring' }} whileHover={{ y: -8, scale: 1.02 }} style={{ background: '#f5ecdf', border: `1px solid ${cert.color}25`, borderRadius: '16px', padding: '32px 24px', textAlign: 'center', position: 'relative', overflow: 'hidden', transition: 'all 0.3s' }}>
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: `linear-gradient(90deg, ${cert.color}, transparent)` }} />
-                <div style={{ fontSize: '40px', marginBottom: '16px' }}>{cert.icon}</div>
-                <div style={{ color: 'white', fontWeight: 800, fontSize: '18px', marginBottom: '6px' }}>{cert.title}</div>
+
+                <div style={{ color: '#302820', fontWeight: 800, fontSize: '18px', marginBottom: '6px' }}>{cert.title}</div>
                 <div style={{ color: '#64748b', fontSize: '13px' }}>{cert.subtitle}</div>
               </motion.div>
             ))}
@@ -699,26 +699,26 @@ const Home = () => {
       </section>
 
       {/* ── FAQ ── */}
-      <section style={{ padding: '100px 40px', background: 'linear-gradient(180deg, #020617, #0f172a)' }}>
+      <section style={{ padding: '100px 40px', background: 'linear-gradient(180deg, #fff9f0, #f5ecdf)' }}>
         <div style={{ maxWidth: '800px', margin: 'auto' }}>
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ textAlign: 'center', marginBottom: '60px' }}>
-            <motion.div initial={{ width: 0 }} whileInView={{ width: '80px' }} viewport={{ once: true }} transition={{ duration: 0.8 }} style={{ height: '3px', background: 'linear-gradient(90deg, #f97316, #eab308)', margin: '0 auto 20px' }} />
-            <span style={{ color: '#f97316', fontSize: '13px', fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase' }}>Got Questions?</span>
-            <h2 style={{ fontSize: '56px', fontWeight: 900, color: 'white', textTransform: 'uppercase', letterSpacing: '-1px', margin: '12px 0' }}>FAQ<span style={{ color: '#f97316' }}>s</span></h2>
+            <motion.div initial={{ width: 0 }} whileInView={{ width: '80px' }} viewport={{ once: true }} transition={{ duration: 0.8 }} style={{ height: '3px', background: 'linear-gradient(90deg, #bf4937, #bf4937)', margin: '0 auto 20px' }} />
+            <span style={{ color: '#b84030', fontSize: '13px', fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase' }}>Got Questions?</span>
+            <h2 style={{ fontSize: '56px', fontWeight: 900, color: '#302820', textTransform: 'uppercase', letterSpacing: '-1px', margin: '12px 0' }}>FAQ<span style={{ color: '#b84030' }}>s</span></h2>
           </motion.div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {faqs.map((faq, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }} style={{ background: '#0f172a', border: `1px solid ${openFaq === i ? 'rgba(249,115,22,0.4)' : '#1e293b'}`, borderRadius: '14px', overflow: 'hidden', transition: 'border-color 0.3s' }}>
-                <button aria-expanded={openFaq === i} onClick={() => setOpenFaq(openFaq === i ? null : i)} style={{ width: '100%', padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'transparent', border: 'none', color: 'white', cursor: 'pointer', gap: '16px' }}>
+              <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }} style={{ background: '#f5ecdf', border: `1px solid ${openFaq === i ? 'rgba(191,73,55,0.4)' : '#f5ecdf'}`, borderRadius: '14px', overflow: 'hidden', transition: 'border-color 0.3s' }}>
+                <button aria-expanded={openFaq === i} onClick={() => setOpenFaq(openFaq === i ? null : i)} style={{ width: '100%', padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'transparent', border: 'none', color: '#302820', cursor: 'pointer', gap: '16px' }}>
                   <span style={{ fontWeight: 700, fontSize: '16px', textAlign: 'left' }}>{faq.q}</span>
                   <motion.div animate={{ rotate: openFaq === i ? 180 : 0 }} transition={{ duration: 0.3 }} style={{ flexShrink: 0 }}>
-                    <ChevronDown size={20} color="#f97316" />
+                    <ChevronDown size={20} color="#bf4937" />
                   </motion.div>
                 </button>
                 <AnimatePresence>
                   {openFaq === i && (
                     <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3 }}>
-                      <div style={{ padding: '0 24px 24px', color: '#94a3b8', fontSize: '15px', lineHeight: 1.8, borderTop: '1px solid #1e293b' }}>
+                      <div style={{ padding: '0 24px 24px', color: '#62584f', fontSize: '15px', lineHeight: 1.8, borderTop: '1px solid #f5ecdf' }}>
                         <div style={{ paddingTop: '16px' }}>{faq.a}</div>
                       </div>
                     </motion.div>
@@ -731,30 +731,30 @@ const Home = () => {
       </section>
 
       {/* ── CTA ── */}
-      <section style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', padding: '100px 40px', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, rgba(249,115,22,0.15) 0%, transparent 70%)' }} />
-        <div style={{ position: 'absolute', top: '40px', left: '40px', width: '60px', height: '60px', borderTop: '2px solid rgba(249,115,22,0.4)', borderLeft: '2px solid rgba(249,115,22,0.4)' }} />
-        <div style={{ position: 'absolute', bottom: '40px', right: '40px', width: '60px', height: '60px', borderBottom: '2px solid rgba(249,115,22,0.4)', borderRight: '2px solid rgba(249,115,22,0.4)' }} />
+      <section style={{ background: 'linear-gradient(135deg, #f5ecdf 0%, #f5ecdf 100%)', padding: '100px 40px', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, rgba(191,73,55,0.15) 0%, transparent 70%)' }} />
+        <div style={{ position: 'absolute', top: '40px', left: '40px', width: '60px', height: '60px', borderTop: '2px solid rgba(191,73,55,0.4)', borderLeft: '2px solid rgba(191,73,55,0.4)' }} />
+        <div style={{ position: 'absolute', bottom: '40px', right: '40px', width: '60px', height: '60px', borderBottom: '2px solid rgba(191,73,55,0.4)', borderRight: '2px solid rgba(191,73,55,0.4)' }} />
         <div style={{ maxWidth: '900px', margin: 'auto', textAlign: 'center', position: 'relative', zIndex: 1 }}>
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <motion.div animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 3, repeat: Infinity }} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '8px 20px', background: 'rgba(249,115,22,0.15)', border: '1px solid rgba(249,115,22,0.4)', borderRadius: '999px', marginBottom: '24px' }}>
-              <Zap style={{ width: '14px', height: '14px', color: '#f97316' }} />
-              <span style={{ color: '#f97316', fontSize: '12px', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase' }}>Free Consultation Available</span>
+            <motion.div animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 3, repeat: Infinity }} style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '8px 20px', background: 'rgba(191,73,55,0.15)', border: '1px solid rgba(191,73,55,0.4)', borderRadius: '999px', marginBottom: '24px' }}>
+              <Zap style={{ width: '14px', height: '14px', color: '#b84030' }} />
+              <span style={{ color: '#b84030', fontSize: '12px', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase' }}>Free Consultation Available</span>
             </motion.div>
-            <h2 style={{ fontSize: '56px', fontWeight: 900, color: 'white', textTransform: 'uppercase', letterSpacing: '-1px', margin: '16px 0 20px', lineHeight: 1.1 }}>
-              Get a Free Safety<br /><span style={{ color: '#f97316' }}>Audit Today</span>
+            <h2 style={{ fontSize: '56px', fontWeight: 900, color: '#302820', textTransform: 'uppercase', letterSpacing: '-1px', margin: '16px 0 20px', lineHeight: 1.1 }}>
+              Get a Free Safety<br /><span style={{ color: '#b84030' }}>Audit Today</span>
             </h2>
-            <p style={{ color: '#94a3b8', fontSize: '18px', maxWidth: '600px', margin: '0 auto 48px', lineHeight: 1.7 }}>
+            <p style={{ color: '#62584f', fontSize: '18px', maxWidth: '600px', margin: '0 auto 48px', lineHeight: 1.7 }}>
               Our experts will assess your facility and recommend the right fire safety systems — at no cost to you.
             </p>
             <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
-                <Link to="/contact" style={{ padding: '18px 44px', background: 'linear-gradient(135deg, #ea580c, #f97316)', color: 'white', fontWeight: 800, textDecoration: 'none', fontSize: '15px', textTransform: 'uppercase', letterSpacing: '1px', clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)', display: 'inline-block', boxShadow: '0 0 40px rgba(249,115,22,0.3)' }}>
+                <Link to="/contact" style={{ padding: '18px 44px', background: 'linear-gradient(135deg, #bf4937, #bf4937)', color: '#302820', fontWeight: 800, textDecoration: 'none', fontSize: '15px', textTransform: 'uppercase', letterSpacing: '1px', clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)', display: 'inline-block', boxShadow: '0 0 40px rgba(191,73,55,0.3)' }}>
                   Book Free Audit
                 </Link>
               </motion.div>
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
-                <a href="tel:+918019918288" style={{ padding: '18px 44px', border: '2px solid #334155', color: '#e2e8f0', fontWeight: 700, textDecoration: 'none', fontSize: '15px', textTransform: 'uppercase', letterSpacing: '1px', clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)', display: 'inline-block' }}>
+                <a href="tel:+918019918288" style={{ padding: '18px 44px', border: '2px solid #f5ecdf', color: '#62584f', fontWeight: 700, textDecoration: 'none', fontSize: '15px', textTransform: 'uppercase', letterSpacing: '1px', clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)', display: 'inline-block' }}>
                   Call +91 80199 18288
                 </a>
               </motion.div>
@@ -764,11 +764,11 @@ const Home = () => {
       </section>
 
       {/* ── TRUST BAR ── */}
-      <section style={{ background: '#050d1a', borderTop: '1px solid #1e293b', padding: '28px 40px' }}>
+      <section style={{ background: '#fff9f0', borderTop: '1px solid #f5ecdf', padding: '28px 40px' }}>
         <div style={{ maxWidth: '1100px', margin: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
           {trustItems.map((item, i) => (
             <motion.div key={i} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }} whileHover={{ y: -3 }} style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'default' }}>
-              <span style={{ fontSize: '18px' }}>{item.icon}</span>
+
               <span style={{ color: '#64748b', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>{item.label}</span>
             </motion.div>
           ))}

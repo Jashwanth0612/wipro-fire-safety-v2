@@ -11,7 +11,7 @@ npm run dev
 
 Build with `npm run build`; output is in `dist`. Run catalogue checks with `node --test tests/catalog.test.mjs`.
 
-The frontend uses Vite and React. `VITE_API_URL` can override the API base URL; see `src/lib/api.js`.
+The frontend uses Vite and React. `VITE_API_BASE_URL` can override the API base URL; see `src/lib/api.js`.
 
 ## Backend
 
