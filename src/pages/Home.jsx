@@ -462,38 +462,13 @@ const Home = () => {
         </motion.div>
       </section>
 
-      {/* ── TRUSTED BY — double marquee ── */}
-      {/* WHY: Real brand names (IndiGo, D-Mart, Indian Oil) build instant credibility */}
-      {/* Two rows in opposite directions is a premium SaaS website pattern */}
-      <section style={{ background: '#fff9f0', borderTop: '1px solid #f5ecdf', borderBottom: '1px solid #f5ecdf', padding: '44px 0', overflow: 'hidden' }}>
-        <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-          <span style={{ color: '#302820', fontSize: '11px', fontWeight: 700, letterSpacing: '3px', textTransform: 'uppercase' }}>Trusted By</span>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', marginTop: '8px' }}>
-            <div style={{ height: '1px', width: '80px', background: 'linear-gradient(to right, transparent, #bf4937)' }} />
-            <span style={{ color: '#302820', fontSize: '24px', fontWeight: 900, fontFamily: "'Barlow Condensed', sans-serif", textTransform: 'uppercase', letterSpacing: '-0.5px' }}>151+ Verified Installations</span>
-            <div style={{ height: '1px', width: '80px', background: 'linear-gradient(to left, transparent, #bf4937)' }} />
-          </div>
-        </div>
-        {/* Row 1 scrolls left */}
-        <div style={{ overflow: 'hidden', marginBottom: '14px' }}>
-          <div style={{ display: 'flex', width: 'max-content', flexWrap: 'wrap', justifyContent: 'center', gap: '20px', maxWidth: '1200px', margin: 'auto' }}>
-            {clientsRow1.map((c, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '0 36px', whiteSpace: 'nowrap' }}>
-                <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#bf4937', opacity: 0.8, flexShrink: 0 }} />
-                <span style={{ color: '#475569', fontSize: '13px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' }}>{c}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        {/* Row 2 scrolls right — animation: reverse keyword flips direction */}
-        <div style={{ overflow: 'hidden' }}>
-          <div style={{ display: 'flex', width: 'max-content', flexWrap: 'wrap', justifyContent: 'center', gap: '20px', maxWidth: '1200px', margin: 'auto' }}>
-            {clientsRow2.map((c, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '0 36px', whiteSpace: 'nowrap' }}>
-                <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#bf4937', opacity: 0.8, flexShrink: 0 }} />
-                <span style={{ color: '#475569', fontSize: '13px', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' }}>{c}</span>
-              </div>
-            ))}
+      <section className="client-ribbon" aria-label="Trusted clients">
+        <div className="client-ribbon-heading">Trusted by <strong>151+ verified installations</strong></div>
+        <div className="client-ticker" tabIndex={0} aria-label="Client names. Focus or hover to pause.">
+          <div className="client-ticker-track">
+            {[0, 1].map(copy => <div className="client-ticker-group" key={copy} aria-hidden={copy === 1 ? true : undefined}>
+              {[...clientsRow1, ...clientsRow2].map((client, index) => <span key={index}>{client}</span>)}
+            </div>)}
           </div>
         </div>
       </section>
@@ -578,7 +553,7 @@ const Home = () => {
       {/* ── ORBITAL NETWORK REACH ── */}
       {/* WHY: Made it interactive — clicking a city navigates to a client page */}
       {/* Kurnool now has a labeled HQ badge in the center — makes geographic authority clear */}
-      <section className="py-32 bg-[#fff9f0] overflow-hidden">
+      <section className="reach-section py-32 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
           <motion.div initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
             <span className="text-[#b84030] text-sm font-bold uppercase tracking-widest">Our Reach</span>

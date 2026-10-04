@@ -29,11 +29,11 @@ export default function Products() {
 
   return (
     <div className="catalog-page">
-      <header className="page-heading container">
+      <div className="catalog-intro"><header className="page-heading container">
         <p className="eyebrow"><Flame size={16} /> EQUIPMENT & SOLUTIONS</p>
         <div className="heading-row"><div><h1>Protection, <span>in every detail.</span></h1><p className="lede">Stockist, suppliers and contractors for fire hydrant systems, sprinklers, FM200, fire alarms, extinguishers, industrial safety and road safety equipment.</p></div><a className="button button-secondary" href="/WIPRO_BROCHURE.pdf" download="Wipro_Fire_Safety_Brochure.pdf"><Download size={18} /> Product brochure</a></div>
         <div className="trust-line"><span><CheckCircle size={16} /> ISI Certified</span><span><CheckCircle size={16} /> Fire Dept Approved</span><span><Package size={16} /> 40 Product Categories</span><span>Supply · Install · AMC</span></div>
-      </header>
+      </header></div>
       <section className="container catalog-section" aria-label="Product catalogue">
         <div className="catalog-tools">
           <label className="search-box"><Search size={21} /><span className="sr-only">Search products or model numbers</span><input type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder="Search products, models or applications…" />{query && <button className="icon-button" onClick={() => setQuery('')} aria-label="Clear search"><X size={18} /></button>}</label>

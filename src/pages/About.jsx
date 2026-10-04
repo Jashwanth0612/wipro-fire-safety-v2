@@ -127,11 +127,11 @@ export default function About() {
         </section>
 
         {/* STATS BAR */}
-        <section style={{ borderTop: '1px solid #f5ecdf', borderBottom: '1px solid #f5ecdf', background: 'rgba(255,249,240,0.7)', backdropFilter: 'blur(10px)', padding: '40px' }}>
+        <section className="about-stats" style={{ borderTop: '1px solid #f5ecdf', borderBottom: '1px solid #f5ecdf', background: 'rgba(255,249,240,0.7)', backdropFilter: 'blur(10px)', padding: '40px' }}>
           <div style={{ maxWidth: '1100px', margin: 'auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
             {stats.map((s, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} style={{ textAlign: 'center', padding: '20px' }}>
-                <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '48px', fontWeight: 900, background: 'linear-gradient(135deg, #bf4937, #bf4937)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{s.value}</div>
+                <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '48px', fontWeight: 900, color: '#b84030' }}>{s.value}</div>
                 <div style={{ color: '#64748b', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>{s.label}</div>
               </motion.div>
             ))}
@@ -233,7 +233,7 @@ export default function About() {
         </section>
 
         {/* TIMELINE */}
-        <section style={{ padding: '80px 40px', borderTop: '1px solid #f5ecdf' }}>
+        <section className="journey-section" style={{ padding: '80px 40px', borderTop: '1px solid #f5ecdf' }}>
           <div style={{ maxWidth: '900px', margin: 'auto' }}>
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} style={{ textAlign: 'center', marginBottom: '60px' }}>
               <motion.div initial={{ width: 0 }} whileInView={{ width: '60px' }} viewport={{ once: true }} transition={{ duration: 0.8 }} style={{ height: '3px', background: 'linear-gradient(90deg, #bf4937, #bf4937)', margin: '0 auto 16px' }} />
@@ -244,7 +244,7 @@ export default function About() {
               {timeline.map((item, i) => (
                 <motion.div key={i} initial={{ opacity: 0, x: i % 2 === 0 ? -40 : 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }} style={{ display: 'flex', justifyContent: i % 2 === 0 ? 'flex-start' : 'flex-end', marginBottom: '40px', position: 'relative' }}>
                   <div style={{ position: 'absolute', left: '50%', top: '20px', width: '12px', height: '12px', borderRadius: '50%', background: '#bf4937', border: '3px solid #fff9f0', transform: 'translateX(-50%)', boxShadow: '0 0 12px rgba(191,73,55,0.6)' }} />
-                  <div style={{ width: '44%', background: 'rgba(255,249,240,0.8)', backdropFilter: 'blur(8px)', border: '1px solid #f5ecdf', borderRadius: '12px', padding: '20px 24px' }}>
+                  <div className="journey-card" style={{ width: '44%', background: 'rgba(255,249,240,0.8)', backdropFilter: 'blur(8px)', border: '1px solid #f5ecdf', borderRadius: '12px', padding: '20px 24px' }}>
                     <div style={{ color: '#b84030', fontSize: '13px', fontWeight: 800, letterSpacing: '2px', marginBottom: '6px' }}>{item.year}</div>
                     <div style={{ color: '#302820', fontSize: '16px', fontWeight: 700, marginBottom: '6px' }}>{item.title}</div>
                     <div style={{ color: '#64748b', fontSize: '13px', lineHeight: 1.6 }}>{item.desc}</div>

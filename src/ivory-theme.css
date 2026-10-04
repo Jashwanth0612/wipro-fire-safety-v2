@@ -53,3 +53,43 @@ input::placeholder,textarea::placeholder,.chat-input::placeholder{color:#786b5e!
 [role="dialog"]{color:var(--text)}
 @media(max-width:800px){.home-hero .hero-overlay{background:linear-gradient(90deg,#fff9f0f7,#fff9f0d9),linear-gradient(0deg,#fff9f0,transparent)}.city-directory{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.whatsapp-contact{bottom:14px;right:14px;padding:10px 13px;font-size:12px}.city-directory{grid-template-columns:1fr}.home-hero{min-height:650px}}
+
+/* Warm ivory balanced with deliberate charcoal sections. */
+:root{--charcoal:#252d2c;--dark-card:#333e3b;--on-dark:#f8f0e3;--on-dark-muted:#d0c8bb;--coral-light:#f09c85}
+.client-ribbon{background:var(--charcoal);color:var(--on-dark);padding:30px 0;overflow:hidden;border-block:1px solid #43504c}
+.client-ribbon-heading{display:flex;justify-content:center;align-items:baseline;gap:8px;padding:0 20px 24px;white-space:nowrap;font-size:clamp(12px,2vw,18px)}
+.client-ribbon-heading strong{color:var(--coral-light);font-weight:800}
+.client-ticker{overflow:hidden}
+.client-ticker-track{display:flex;width:max-content;animation:client-flow 80s linear infinite}
+.client-ticker-group{display:flex;flex-shrink:0;align-items:center}
+.client-ticker-group span{display:flex;align-items:center;gap:32px;padding-right:32px;white-space:nowrap;font-size:13px;letter-spacing:.06em;font-weight:600;text-transform:uppercase;color:var(--on-dark-muted)}
+.client-ticker-group span::before{content:"";width:4px;height:4px;background:var(--coral-light);border-radius:50%}
+.client-ticker:hover .client-ticker-track,.client-ticker:focus .client-ticker-track{animation-play-state:paused}
+@keyframes client-flow{to{transform:translateX(-50%)}}
+.about-stats{background:#e9dfcf!important;border-color:#d4c4af!important}
+.about-stats>div>div>div:first-child{color:#a63527!important;-webkit-text-fill-color:#a63527;background:none!important}
+.journey-section,.reach-section{background:var(--charcoal)!important;border-color:#43504c!important}
+.journey-section h2,.reach-section h2{color:var(--on-dark)!important}
+.journey-section h2 span,.reach-section h2 span,.reach-section>div>div>span,.reach-section svg{color:var(--coral-light)!important}
+.journey-card{background:var(--dark-card)!important;border-color:#56615b!important}
+.journey-card>div:first-child{color:var(--coral-light)!important}
+.journey-card>div:nth-child(2){color:var(--on-dark)!important}
+.legacy-page .journey-card>div:last-child{color:var(--on-dark-muted)!important}
+.reach-section p,.reach-section .grid span{color:var(--on-dark-muted)!important}
+.reach-section a{background:var(--dark-card)!important;color:var(--on-dark)!important;border-color:#56615b!important}
+.reach-section a:hover{background:#43534c!important;border-color:var(--coral-light)!important}
+.catalog-page{background:#eee5d7}
+.catalog-intro{background:var(--charcoal);border-bottom:4px solid #b84030;margin-bottom:36px}
+.catalog-intro h1{color:var(--on-dark)}
+.catalog-intro h1 span,.catalog-intro .eyebrow,.catalog-intro svg{color:var(--coral-light)}
+.catalog-intro .lede,.catalog-intro .trust-line>span{color:var(--on-dark-muted)}
+.catalog-intro .button-secondary,.brochure-card .button-secondary{border-color:#8d9a91;color:var(--on-dark);background:transparent}
+.catalog-intro .button-secondary:hover,.brochure-card .button-secondary:hover{background:#43534c}
+.product-card{border-color:#cbbca7;box-shadow:0 6px 20px #30282009}
+.product-body{border-top:3px solid #c16c55}
+.brochure-card{background:var(--charcoal);border-color:#43504c}
+.brochure-card h2{color:var(--on-dark)}
+.brochure-card p:not(.eyebrow){color:var(--on-dark-muted)}
+.brochure-card .eyebrow,.brochure-icon{color:var(--coral-light)}
+@media(max-width:600px){.about-stats>div{grid-template-columns:repeat(2,minmax(0,1fr))!important}.about-stats>div>div{padding:10px!important}.journey-section{padding:64px 20px!important}.journey-card{padding:18px 14px!important}.client-ribbon-heading{gap:5px}}
+@media(prefers-reduced-motion:reduce){.client-ticker-track{animation:none}.client-ticker{overflow-x:auto}.client-ticker-group[aria-hidden="true"]{display:none}}
