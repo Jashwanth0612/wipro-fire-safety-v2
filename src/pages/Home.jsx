@@ -464,6 +464,7 @@ const Home = () => {
 
       <section className="client-ribbon" aria-label="Trusted clients">
         <div className="client-ribbon-heading">Trusted by <strong>151+ verified installations</strong></div>
+        <Link className="client-ribbon-browse" to="/clients">Browse clients by city &amp; industry <ArrowRight size={14} /></Link>
         <div className="client-ticker" tabIndex={0} aria-label="Client names. Focus or hover to pause.">
           <div className="client-ticker-track">
             {[0, 1].map(copy => <div className="client-ticker-group" key={copy} aria-hidden={copy === 1 ? true : undefined}>
