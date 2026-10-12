@@ -39,3 +39,9 @@ npm run build
 Tests use an isolated fake database. Production verification must additionally confirm a marked test enquiry in the admin view and a stock write/refetch in the intended database; passing tests alone does not prove live storage connectivity.
 
 The built-in rate limiter is bounded and per process. Configure shared edge limits before scaling to multiple workers, and verify the platform's trusted-proxy settings so client IPs are identified correctly. Do not trust arbitrary forwarded headers. This release does not send email notifications or migrate/delete existing customer data.
+
+## Supabase staging
+
+The API also supports `DATA_BACKEND=supabase`. See `supabase/README.md` for the
+additive schema, RLS tests, staff provisioning and preview-first activation.
+The default remains Mongo until Supabase configuration and live access tests pass.

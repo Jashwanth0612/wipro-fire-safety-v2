@@ -15,6 +15,14 @@ import time
 from typing import Annotated, Literal
 import uuid
 
+try:
+    from . import supabase_store
+except ImportError:  # Standalone uvicorn server:app and file-based test loader.
+    try:
+        from backend import supabase_store
+    except ModuleNotFoundError:
+        import supabase_store
+
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
@@ -106,6 +114,8 @@ async def database_error(_request, _error):
 
 
 def get_database():
+    if supabase_store.enabled():
+        return None
     global _db_client
     mongo_uri = os.environ.get("MONGO_URI", "").strip()
     if not mongo_uri:
@@ -291,6 +301,8 @@ def create_access_token(data: dict):
 async def verify_token(credentials: HTTPAuthorizationCredentials | None = Depends(security)):
     if credentials is None:
         raise HTTPException(status_code=401, detail="Please sign in to continue.", headers={"WWW-Authenticate": "Bearer"})
+    if supabase_store.enabled():
+        return await supabase_store.staff(credentials.credentials)
     email, _password, secret = admin_configuration()
     try:
         payload = jwt.decode(credentials.credentials, secret, algorithms=[JWT_ALGORITHM], options={"require": ["exp", "sub"]})
@@ -310,6 +322,16 @@ async def root():
 
 @api_router.get("/health")
 async def health():
+    if supabase_store.enabled():
+        try:
+            configured_staff = await supabase_store.health()
+            ready = bool(configured_staff)
+            return JSONResponse(status_code=200 if ready else 503, content={
+                "status": "ready" if ready else "degraded", "provider": "supabase", "database": "connected",
+                "admin": "configured" if ready else "unconfigured", "assistant": "ai-configured" if os.environ.get("GEMINI_API_KEY") else "company-information",
+            })
+        except HTTPException:
+            return JSONResponse(status_code=503, content={"status": "degraded", "provider": "supabase", "database": "unavailable", "admin": "unverified"})
     database_state = "unconfigured"
     if os.environ.get("MONGO_URI", "").strip():
         try:
@@ -334,17 +356,24 @@ async def health():
 async def create_contact_inquiry(input: ContactCreate, request: Request, database=Depends(get_database)):
     enforce_rate_limit(request, "contact", 5, 600)
     inquiry = ContactInquiry(**input.model_dump())
+    if supabase_store.enabled():
+        return await supabase_store.insert("contact_inquiries", inquiry.model_dump(mode="json"))
     await database.contact_inquiries.insert_one(inquiry.model_dump(mode="json"))
     return inquiry
 
 
 @api_router.get("/contact", response_model=list[ContactInquiry])
 async def get_contact_inquiries(_email: str = Depends(verify_token), database=Depends(get_database)):
+    if supabase_store.enabled():
+        return await supabase_store.list_rows("contact_inquiries", _email)
     return await database.contact_inquiries.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
 
 
 @api_router.patch("/contact/{inquiry_id}/status")
 async def update_inquiry_status(inquiry_id: RecordId, update: InquiryStatusUpdate, _email: str = Depends(verify_token), database=Depends(get_database)):
+    if supabase_store.enabled():
+        await supabase_store.update("contact_inquiries", inquiry_id, {"status": update.status}, _email)
+        return {"message": "Status updated successfully", "status": update.status}
     result = await database.contact_inquiries.update_one({"id": inquiry_id}, {"$set": {"status": update.status}})
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Inquiry not found")
@@ -354,17 +383,23 @@ async def update_inquiry_status(inquiry_id: RecordId, update: InquiryStatusUpdat
 @api_router.post("/products", response_model=Product, status_code=201)
 async def create_product(input: ProductCreate, _email: str = Depends(verify_token), database=Depends(get_database)):
     product = Product(**input.model_dump())
+    if supabase_store.enabled():
+        return await supabase_store.insert("products", product.model_dump(mode="json"), _email)
     await database.products.insert_one(product.model_dump(mode="json"))
     return product
 
 
 @api_router.get("/products", response_model=list[Product])
 async def get_products(database=Depends(get_database)):
+    if supabase_store.enabled():
+        return await supabase_store.list_rows("products")
     return await database.products.find({}, {"_id": 0}).to_list(1000)
 
 
 @api_router.patch("/products/{product_id}", response_model=Product)
 async def update_product(product_id: RecordId, update: ProductUpdate, _email: str = Depends(verify_token), database=Depends(get_database)):
+    if supabase_store.enabled():
+        return await supabase_store.update("products", product_id, update.model_dump(exclude_unset=True), _email)
     product = await database.products.find_one_and_update(
         {"id": product_id}, {"$set": update.model_dump(exclude_unset=True)},
         projection={"_id": 0}, return_document=ReturnDocument.AFTER,
@@ -376,6 +411,9 @@ async def update_product(product_id: RecordId, update: ProductUpdate, _email: st
 
 @api_router.delete("/products/{product_id}")
 async def delete_product(product_id: RecordId, _email: str = Depends(verify_token), database=Depends(get_database)):
+    if supabase_store.enabled():
+        await supabase_store.archive_product(product_id, _email)
+        return {"message": "Product archived successfully"}
     result = await database.products.delete_one({"id": product_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Product not found")
@@ -385,6 +423,9 @@ async def delete_product(product_id: RecordId, _email: str = Depends(verify_toke
 @api_router.post("/admin/login", response_model=AdminToken)
 async def admin_login(credentials: AdminLogin, request: Request):
     enforce_rate_limit(request, "login", 10, 600)
+    if supabase_store.enabled():
+        token = await supabase_store.login(str(credentials.email), credentials.password)
+        return AdminToken(access_token=token)
     email, password, _secret = admin_configuration()
     email_matches = hmac.compare_digest(str(credentials.email).lower().encode(), email.encode())
     password_matches = hmac.compare_digest(credentials.password.encode(), password.encode())
