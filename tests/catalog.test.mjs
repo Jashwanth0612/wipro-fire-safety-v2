@@ -36,13 +36,13 @@ test('quote preserves the visitor message and includes exact product variant and
 test('enquiry sends the existing backend contract with quote details', async () => {
   const original=globalThis.fetch
   let request
-  globalThis.fetch=async(url,options)=>{request={url,options};return new Response('{}',{status:200})}
+  globalThis.fetch=async(url,options)=>{request={url,options};return new Response('{"id":"test-receipt"}',{status:200,headers:{'content-type':'application/json'}})}
   try {
     await submitInquiry({name:' Test ',email:'test@example.com',phone:'9999999999',service:'amc',message:'Quotation only'},[{...PRODUCTS[0],quantity:4}])
     assert.ok(request.url.endsWith('/api/contact'))
     assert.equal(request.options.method,'POST')
     const body=JSON.parse(request.options.body)
-    assert.deepEqual(Object.keys(body).sort(),['email','message','name','phone','service'])
+    assert.deepEqual(Object.keys(body).sort(),['email','message','name','phone','products','service'])
     assert.equal(body.name,'Test')
     assert.match(body.message,/Quantity: 4/)
   } finally {globalThis.fetch=original}
@@ -52,7 +52,7 @@ test('non-success responses and aborted requests never report success', async ()
   const form={name:'Test',email:'test@example.com',phone:'9999999999',service:'other',message:'Test'}
   try {
     globalThis.fetch=async()=>new Response('{}',{status:503})
-    await assert.rejects(submitInquiry(form,[]),/could not be saved/)
+    await assert.rejects(submitInquiry(form,[]),/could not confirm/)
     globalThis.fetch=async()=>{throw new DOMException('Aborted','AbortError')}
     await assert.rejects(submitInquiry(form,[]),{name:'AbortError'})
   } finally {globalThis.fetch=original}

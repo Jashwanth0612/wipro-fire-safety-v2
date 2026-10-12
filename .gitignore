@@ -32,3 +32,8 @@ backend/__pycache__/
 **/.env.*
 !**/.env.example
 .vercel/
+
+# Python development artifacts
+**/__pycache__/
+.pytest_cache/
+.venv/

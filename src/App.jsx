@@ -16,7 +16,6 @@ import CityClients from './pages/CityClients'
 import AllClients from './pages/AllClients'
 import { QuoteProvider } from './context/QuoteContext'
 import RouteMetadata from './components/RouteMetadata'
-import { API_BASE } from './lib/api'
 
 // WHY: Every time the route changes, scroll back to top
 // Without this, React keeps the scroll position from the previous page
@@ -65,14 +64,6 @@ function AnimatedRoutes() {
 }
 
 function App() {
-  useEffect(() => {
-    if (import.meta.env.DEV) return
-    const ping = () => fetch(`${API_BASE}/`).catch(() => {})
-    ping()
-    const interval = setInterval(ping, 14 * 60 * 1000)
-    return () => clearInterval(interval)
-  }, [])
-
   return (
     <BrowserRouter>
       <MotionConfig reducedMotion="user">

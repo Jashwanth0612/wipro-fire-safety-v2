@@ -1,30 +1,58 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { apiRequest } from '../lib/api'
 import { Package, Users, CheckCircle, Clock, TrendingUp, BarChart3, Activity } from 'lucide-react'
 
 export default function AdminDashboard() {
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [loaded, setLoaded] = useState(false)
+  const [retry, setRetry] = useState(0)
+  const [updating, setUpdating] = useState(null)
+  const saving = useRef(false)
   const navigate = useNavigate()
   const token = localStorage.getItem('admin_token')
 
   useEffect(() => {
-    if (!token) { navigate('/admin/login'); return }
-    fetch('https://wipro-backend-q5i7.onrender.com/api/contact', {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => { if (!res.ok) throw new Error(); return res.json() })
-      .then(d => { setData(d); setLoading(false) })
-      .catch(() => { setLoading(false) })
-  }, [])
+    if (!token) { navigate('/admin/login', { replace: true }); return }
+    const controller = new AbortController()
+    setLoading(true)
+    setError('')
+    apiRequest('/contact', { token, signal: controller.signal })
+      .then(records => {
+        if (!Array.isArray(records)) throw new Error('The server returned an invalid enquiry list.')
+        setData(records.map(record => ({ ...record, id: record.id || record._id })))
+        setLoaded(true)
+      })
+      .catch(err => {
+        if (controller.signal.aborted) return
+        if (err.status === 401 || err.status === 403) {
+          localStorage.removeItem('admin_token')
+          navigate('/admin/login', { replace: true, state: { message: 'Your session has expired. Please sign in again.' } })
+        } else setError(err.message || 'Could not load enquiries. Please try again.')
+      })
+      .finally(() => { if (!controller.signal.aborted) setLoading(false) })
+    return () => controller.abort()
+  }, [navigate, token, retry])
 
   const updateStatus = async (id, newStatus) => {
-    await fetch(`https://wipro-backend-q5i7.onrender.com/api/contact/${id}/status`, {
-      method: 'PATCH',
-      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: newStatus })
-    })
-    setData(data.map(d => d.id === id ? { ...d, status: newStatus } : d))
+    if (saving.current) return
+    saving.current = true
+    setUpdating(id)
+    setError('')
+    try {
+      await apiRequest(`/contact/${encodeURIComponent(id)}/status`, { method: 'PATCH', token, body: { status: newStatus } })
+      setData(current => current.map(item => item.id === id ? { ...item, status: newStatus } : item))
+    } catch (err) {
+      if (err.status === 401 || err.status === 403) {
+        localStorage.removeItem('admin_token')
+        navigate('/admin/login', { replace: true, state: { message: 'Your session has expired. Please sign in again.' } })
+      } else setError(err.message || 'Status was not saved. Please try again.')
+    } finally {
+      saving.current = false
+      setUpdating(null)
+    }
   }
 
   const logout = () => { localStorage.removeItem('admin_token'); navigate('/admin/login') }
@@ -39,6 +67,7 @@ export default function AdminDashboard() {
     const months = []
     for (let i = 5; i >= 0; i--) {
       const d = new Date()
+      d.setDate(1)
       d.setMonth(d.getMonth() - i)
       const label = d.toLocaleString('default', { month: 'short' })
       const count = data.filter(item => {
@@ -52,14 +81,13 @@ export default function AdminDashboard() {
 
   const maxCount = Math.max(...monthlyData.map(m => m.count), 1)
 
-  // Services breakdown (simulated from message content)
-  const serviceBreakdown = [
-    { label: 'Installation', count: Math.ceil(total * 0.35), color: '#b84030' },
-    { label: 'AMC', count: Math.ceil(total * 0.28), color: '#b84030' },
-    { label: 'Audit', count: Math.ceil(total * 0.20), color: '#356345' },
-    { label: 'Refilling', count: Math.ceil(total * 0.10), color: '#62584f' },
-    { label: 'Training', count: Math.ceil(total * 0.07), color: '#62584f' },
-  ]
+  const serviceLabels = { installation: 'Installation', amc: 'AMC', audit: 'Audit', refilling: 'Refilling', training: 'Training', other: 'Other' }
+  const serviceCounts = data.reduce((counts, inquiry) => {
+    const key = Object.hasOwn(serviceLabels, inquiry.service) ? inquiry.service : 'unrecorded'
+    counts[key] = (counts[key] || 0) + 1
+    return counts
+  }, {})
+  const serviceBreakdown = Object.entries(serviceCounts).map(([key, count]) => ({ label: serviceLabels[key] || 'Not recorded', count, color: key === 'unrecorded' ? '#62584f' : '#b84030' }))
 
   return (
     <div style={{ background: '#fff9f0', minHeight: '100vh', padding: '28px', color: '#302820' }}>
@@ -82,8 +110,10 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      {error && <div role="alert" className="form-error"><p>{error}</p>{!loaded && <button type="button" className="text-button" onClick={() => setRetry(value => value + 1)} disabled={loading}>Retry loading enquiries</button>}</div>}
+      {loaded && <>
       {/* Stats Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: '16px', marginBottom: '24px' }}>
         {[
           { icon: Users, label: 'Total Inquiries', value: total, color: '#b84030', bg: 'rgba(191,73,55,0.1)', border: 'rgba(191,73,55,0.2)' },
           { icon: Clock, label: 'Pending', value: pending, color: '#b84030', bg: 'rgba(191,73,55,0.1)', border: 'rgba(191,73,55,0.2)' },
@@ -106,7 +136,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Charts Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', marginBottom: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 290px), 1fr))', gap: '20px', marginBottom: '24px' }}>
 
         {/* Monthly Bar Chart */}
         <div style={{ background: '#f5ecdf', border: '1px solid #f5ecdf', borderRadius: '16px', padding: '24px' }}>
@@ -145,9 +175,9 @@ export default function AdminDashboard() {
             ))}
           </div>
 
-          {/* Conversion rate */}
+          {/* Follow-up coverage */}
           <div style={{ marginTop: '20px', padding: '12px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: '10px' }}>
-            <div style={{ color: '#64748b', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>Conversion Rate</div>
+            <div style={{ color: '#64748b', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '4px' }}>Enquiries contacted</div>
             <div style={{ color: '#356345', fontSize: '24px', fontWeight: 900, fontFamily: "'Barlow Condensed', sans-serif" }}>
               {total > 0 ? Math.round((contacted / total) * 100) : 0}%
             </div>
@@ -155,6 +185,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      </>}
       {/* Inquiries Table */}
       <div style={{ background: '#f5ecdf', border: '1px solid #f5ecdf', borderRadius: '16px', overflow: 'hidden' }}>
         <div style={{ padding: '20px 24px', borderBottom: '1px solid #f5ecdf', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -176,21 +207,23 @@ export default function AdminDashboard() {
             <tbody>
               {loading ? (
                 <tr><td colSpan={6} style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>Loading...</td></tr>
+              ) : !loaded ? (
+                <tr><td colSpan={6} style={{ padding: '40px', textAlign: 'center' }}>Enquiries could not be loaded.</td></tr>
               ) : data.length === 0 ? (
-                <tr><td colSpan={6} style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>No inquiries yet. Submit a contact form to test.</td></tr>
+                <tr><td colSpan={6} style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>No enquiries received yet.</td></tr>
               ) : data.map(i => (
                 <tr key={i.id} style={{ borderBottom: '1px solid #f5ecdf', background: i.status === 'contacted' ? 'rgba(34,197,94,0.03)' : 'transparent' }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(160,135,111,0.02)'} onMouseLeave={e => e.currentTarget.style.background = i.status === 'contacted' ? 'rgba(34,197,94,0.03)' : 'transparent'}>
                   <td style={{ padding: '14px 20px', color: '#64748b', fontSize: '13px', whiteSpace: 'nowrap' }}>{new Date(i.created_at).toLocaleDateString('en-IN')}</td>
                   <td style={{ padding: '14px 20px', color: '#302820', fontSize: '14px', fontWeight: 600 }}>{i.name}</td>
                   <td style={{ padding: '14px 20px', color: '#62584f', fontSize: '13px' }}>{i.phone}</td>
                   <td style={{ padding: '14px 20px', color: '#62584f', fontSize: '13px' }}>{i.email}</td>
-                  <td style={{ padding: '14px 20px', color: '#64748b', fontSize: '13px', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{i.message}</td>
+                  <td style={{ padding: '14px 20px', color: '#64748b', fontSize: '13px', minWidth: '200px', maxWidth: '340px', whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{i.message}</td>
                   <td style={{ padding: '14px 20px' }}>
                     {i.status === 'contacted' ? (
                       <span style={{ padding: '4px 12px', borderRadius: '20px', background: 'rgba(34,197,94,0.15)', color: '#356345', fontSize: '12px', fontWeight: 700 }}>✓ Contacted</span>
                     ) : (
-                      <button onClick={() => updateStatus(i.id, 'contacted')} style={{ padding: '6px 12px', borderRadius: '8px', border: 'none', background: '#bf4937', color: '#302820', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>
-                        Mark Contacted
+                      <button disabled={updating !== null} onClick={() => updateStatus(i.id, 'contacted')} style={{ padding: '6px 12px', borderRadius: '8px', border: 'none', background: '#bf4937', color: '#302820', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>
+                        {updating === i.id ? 'Saving…' : 'Mark Contacted'}
                       </button>
                     )}
                   </td>

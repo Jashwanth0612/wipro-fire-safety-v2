@@ -1,49 +1,59 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useRef, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { apiRequest } from '../lib/api'
 
 function AdminLogin() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const navigate = useNavigate()
+  const location = useLocation()
+  const [pending, setPending] = useState(false)
+  const submitting = useRef(false)
 
-  const login = async (e) => {
-    e.preventDefault()
+  const login = async (event) => {
+    event.preventDefault()
+    if (submitting.current) return
+    submitting.current = true
+    setPending(true)
     setError('')
-
     try {
-      const res = await fetch('https://wipro-backend-q5i7.onrender.com/api/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      })
-
-      if (res.ok) {
-        const data = await res.json()
-        localStorage.setItem('admin_token', data.access_token)
-        navigate('/admin/dashboard')
-      } else {
-        setError('Invalid email or password')
-      }
+      const data = await apiRequest('/admin/login', { method: 'POST', body: { email: email.trim(), password } })
+      const token = data?.access_token || data?.token
+      if (typeof token !== 'string' || !token) throw new Error('The server did not return a valid session. Please try again.')
+      localStorage.setItem('admin_token', token)
+      navigate('/admin/dashboard', { replace: true })
     } catch (err) {
-      setError('Server not reachable')
+      setError(err.status === 401 ? 'Invalid email or password.' : err.message || 'We could not sign you in. Please try again.')
+    } finally {
+      submitting.current = false
+      setPending(false)
     }
   }
 
   return (
     <div style={{ padding: '60px 24px', maxWidth: '440px', margin: 'auto' }}>
       <h2>Admin Login</h2>
-      {error && <p style={{ color: '#62584f', marginBottom: '12px' }}>{error}</p>}
-      <form onSubmit={login}>
+      {!error && location.state?.message && <p role="status">{location.state.message}</p>}
+      {error && <p role="alert" style={{ color: '#62584f', marginBottom: '12px' }}>{error}</p>}
+      <form onSubmit={login} aria-busy={pending}>
+        <label htmlFor="admin-email" className="sr-only">Admin email</label>
         <input
           style={input}
+          id="admin-email"
+          autoComplete="username"
+          disabled={pending}
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
+        <label htmlFor="admin-password" className="sr-only">Password</label>
         <input
+          id="admin-password"
+          autoComplete="current-password"
+          disabled={pending}
           style={input}
           type="password"
           placeholder="Password"
@@ -51,7 +61,7 @@ function AdminLogin() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button style={button} type="submit">Login</button>
+        <button style={button} type="submit" disabled={pending}>{pending ? 'Signing in…' : 'Login'}</button>
       </form>
     </div>
   )

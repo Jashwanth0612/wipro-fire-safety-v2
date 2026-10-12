@@ -1,11 +1,15 @@
 import { useState, useEffect, useRef } from 'react'
-import { API_BASE } from '../lib/api'
+import { apiRequest } from '../lib/api'
 
 function AIChat({ open, onClose }) {
-  const [messages, setMessages] = useState([])
+  const [messages, setMessages] = useState([{ from: 'bot', text: 'Hi! I am the Wipro Fire & Safety website assistant. I can help with company information and enquiries.' }])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const endRef = useRef(null)
+  const inputRef = useRef(null)
+  const controllerRef = useRef(null)
+  const sending = useRef(false)
+  const [availability, setAvailability] = useState('Company information & enquiries')
   const sessionId = useRef(null)
   if (!sessionId.current) sessionId.current = crypto.randomUUID()
 
@@ -18,57 +22,44 @@ function AIChat({ open, onClose }) {
   ]
 
   useEffect(() => {
-    if (open) {
-      setMessages([{
-        from: 'bot',
-        text: 'Hi! I am the Wipro Fire & Safety AI assistant. How can I help you today?'
-      }])
+    if (!open) return
+    const trigger = document.activeElement
+    const frame = requestAnimationFrame(() => inputRef.current?.focus())
+    return () => {
+      cancelAnimationFrame(frame)
+      if (trigger instanceof HTMLElement && trigger.isConnected) trigger.focus({ preventScroll: true })
     }
   }, [open])
 
+  useEffect(() => () => controllerRef.current?.abort(), [])
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+    if (open) endRef.current?.scrollIntoView({ behavior: 'instant', block: 'nearest' })
+  }, [messages, open])
 
   const send = async (text) => {
-    if (loading) return
-    const userMsg = text || input.trim()
+    if (sending.current) return
+    const userMsg = (text || input).trim()
     if (!userMsg) return
+    sending.current = true
     setInput('')
-
-    const newMsgs = [...messages, { from: 'user', text: userMsg }]
-    setMessages(newMsgs)
+    setMessages(current => [...current, { from: 'user', text: userMsg }])
     setLoading(true)
-
+    setAvailability('Sending your message…')
+    const controller = new AbortController()
+    controllerRef.current = controller
+    const timeout = setTimeout(() => controller.abort(), 30000)
     try {
-      const controller = new AbortController()
-      const timeout = setTimeout(() => controller.abort(), 8000)
-
-      const res = await fetch(`${API_BASE}/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: userMsg,
-          session_id: sessionId.current
-        }),
-        signal: controller.signal
-      })
-
-      clearTimeout(timeout)
-      if (!res.ok) throw new Error('Chat unavailable')
-      const data = await res.json()
-      const reply = data.response || data.reply || data.message || 'Sorry, no response received.'
-      setMessages([...newMsgs, { from: 'bot', text: reply }])
-
+      const data = await apiRequest('/chat', { method: 'POST', body: { message: userMsg, session_id: sessionId.current }, signal: controller.signal })
+      const reply = data?.response || data?.reply || data?.message
+      if (typeof reply !== 'string' || !reply.trim()) throw new Error('No reply received')
+      setMessages(current => [...current, { from: 'bot', text: reply }])
+      setAvailability('Company information & enquiries')
     } catch (err) {
-      console.error('Chat error:', err)
-      setMessages([...newMsgs, {
-        from: 'bot',
-        text: err.name === 'AbortError'
-          ? 'Response timed out. Please try again.'
-          : 'Sorry, I am unavailable. Please call +91 8019918288.'
-      }])
+      setMessages(current => [...current, { from: 'bot', text: err.name === 'AbortError' ? 'The response took too long. Please try again, or call +91 80199 18288.' : 'The assistant is temporarily unavailable. Please call +91 80199 18288 or use our contact form.' }])
+      setAvailability('Currently unavailable — please contact our team')
     } finally {
+      clearTimeout(timeout)
+      sending.current = false
       setLoading(false)
     }
   }
@@ -76,13 +67,13 @@ function AIChat({ open, onClose }) {
   if (!open) return null
 
   return (
-    <div style={panel} role="dialog" aria-label="Wipro AI assistant">
+    <div style={panel} role="dialog" aria-label="Wipro website assistant">
       <style>{`
         @keyframes bounce {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-5px); }
         }
-        .chat-input::placeholder { color: rgba(255,255,255,0.3); }
+        .chat-input::placeholder { color: #76675a; }
         .chat-input:focus { outline: none; border-color: rgba(249,115,22,0.5) !important; }
         .suggestion-chip:hover { background: rgba(191,73,55,0.25) !important; color: #62584f !important; }
       `}</style>
@@ -92,26 +83,26 @@ function AIChat({ open, onClose }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{ position: 'relative' }}>
             <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(160,135,111,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>W</div>
-            <div style={{ position: 'absolute', bottom: '0', right: '0', width: '9px', height: '9px', borderRadius: '50%', background: '#22c55e', border: '2px solid #bf4937', boxShadow: '0 0 6px #22c55e' }} />
+
           </div>
           <div>
-            <div style={{ fontWeight: 700, fontSize: '14px' }}>Wipro AI Assistant</div>
-            <div style={{ fontSize: '11px', opacity: 0.8 }}>Online — replies instantly</div>
+            <div style={{ fontWeight: 700, fontSize: '14px' }}>Wipro Website Assistant</div>
+            <div style={{ fontSize: '11px', opacity: 0.8 }}>{availability}</div>
           </div>
         </div>
-        <button type="button" aria-label="Close assistant" className="icon-button" onClick={onClose}>✕</button>
+        <button type="button" aria-label="Close assistant" className="icon-button" style={{ color: '#fffdf9' }} onClick={onClose}>✕</button>
       </div>
 
       {/* Messages */}
-      <div style={body}>
+      <div style={body} role="log" aria-live="polite" aria-relevant="additions">
         {messages.map((m, i) => (
           <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: m.from === 'user' ? 'flex-end' : 'flex-start', gap: '2px' }}>
             {m.from === 'bot' && (
-              <span style={{ fontSize: '10px', color: '#655b51', marginLeft: '4px' }}>Wipro AI</span>
+              <span style={{ fontSize: '10px', color: '#655b51', marginLeft: '4px' }}>Wipro Assistant</span>
             )}
             <div style={{
               padding: '10px 14px',
-              color: '#302820',
+              color: m.from === 'user' ? '#fffdf9' : '#302820',
               maxWidth: '85%',
               fontSize: '13px',
               lineHeight: '1.6',
@@ -128,7 +119,7 @@ function AIChat({ open, onClose }) {
 
         {loading && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px' }}>
-            <span style={{ fontSize: '10px', color: '#655b51', marginLeft: '4px' }}>Wipro AI</span>
+            <span style={{ fontSize: '10px', color: '#655b51', marginLeft: '4px' }}>Wipro Assistant</span>
             <div style={{ padding: '12px 16px', background: 'rgba(160,135,111,0.07)', border: '1px solid rgba(160,135,111,0.08)', borderRadius: '16px 16px 16px 4px' }}>
               <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
                 {[0, 1, 2].map(i => (
@@ -152,6 +143,7 @@ function AIChat({ open, onClose }) {
           <button type="button"
             key={q}
             className="suggestion-chip"
+            disabled={loading}
             onClick={() => send(q)}
             style={{ padding: '5px 10px', borderRadius: 20, background: 'rgba(191,73,55,0.1)', border: '1px solid rgba(191,73,55,0.2)', color: '#b84030', fontSize: '11px', cursor: 'pointer', transition: 'all 0.2s' }}
           >
@@ -163,6 +155,8 @@ function AIChat({ open, onClose }) {
       {/* Input */}
       <div style={{ display: 'flex', gap: '8px', padding: '10px 12px', borderTop: '1px solid rgba(160,135,111,0.06)' }}>
         <input
+          ref={inputRef}
+          maxLength={2000}
           aria-label="Message the assistant"
           className="chat-input"
           style={{ flex: 1, padding: '10px 14px', borderRadius: '12px', border: '1px solid rgba(160,135,111,0.1)', background: 'rgba(160,135,111,0.05)', color: '#302820', fontSize: '13px' }}
@@ -176,7 +170,7 @@ function AIChat({ open, onClose }) {
           aria-label="Send message"
           onClick={() => send()}
           disabled={loading}
-          style={{ padding: '10px 16px', borderRadius: '12px', border: 'none', background: loading ? 'rgba(191,73,55,0.4)' : 'linear-gradient(135deg, #bf4937, #bf4937)', color: '#302820', cursor: loading ? 'not-allowed' : 'pointer', fontSize: '15px', fontWeight: 700, transition: 'all 0.2s' }}
+          style={{ padding: '10px 16px', borderRadius: '12px', border: 'none', background: loading ? 'rgba(191,73,55,0.4)' : 'linear-gradient(135deg, #bf4937, #bf4937)', color: '#fffdf9', cursor: loading ? 'not-allowed' : 'pointer', fontSize: '15px', fontWeight: 700, transition: 'all 0.2s' }}
         >
           ➤
         </button>
@@ -204,7 +198,7 @@ const panel = {
 const header = {
   padding: '14px 18px',
   background: 'linear-gradient(135deg, #bf4937, #bf4937, #bf4937)',
-  color: '#302820',
+  color: '#fffdf9',
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center'
