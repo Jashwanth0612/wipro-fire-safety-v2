@@ -1,6 +1,6 @@
 import { quoteMessage } from './catalog.js'
 
-// Vercel proxies /api to the configured backend. Both public and admin pages
+// Vercel routes /api to the Python backend function. Both public and admin pages
 // use this one contract; never put database or admin secrets in VITE_ variables.
 export function normalizeApiBase(value = '/api') {
   const base = value.trim().replace(/\/+$/, '')

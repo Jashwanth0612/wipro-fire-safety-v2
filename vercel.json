@@ -2,9 +2,31 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
-  "headers": [{ "source": "/api/:path*", "headers": [{ "key": "Cache-Control", "value": "private, no-store" }] }],
+  "headers": [
+    {
+      "source": "/api/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    }
+  ],
   "rewrites": [
-    { "source": "/api/:path*", "destination": "https://wipro-backend-q5i7.onrender.com/api/:path*" },
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
+    {
+      "source": "/api/:path*",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+  "functions": {
+    "api/index.py": {
+      "maxDuration": 30,
+      "excludeFiles": "{node_modules/**,public/**,src/**,tests/**,backend/tests/**,dist/**,backend/node_modules/**}"
+    }
+  }
 }

@@ -23,7 +23,7 @@ Hardcoded credentials and fallback signing secrets from the supplied source were
 
 ## Deployment
 
-The frontend is configured for Vercel with an API proxy before the SPA fallback in `vercel.json`. All admin, enquiry, chat and catalogue requests share one API client. See [backend setup and verification](backend/README.md). Use the repository root as the build root, `npm run build` as the build command and `dist` as the output directory.
+The frontend is configured for Vercel with a Python API function before the SPA fallback in `vercel.json`. All admin, enquiry, chat and catalogue requests share one API client. See [backend setup and verification](backend/README.md). Use the repository root as the build root, `npm run build` as the build command and `dist` as the output directory.
 
 This repository is a separate version 2 copy. Creating it does not change the existing Vercel project's Git connection or the original repository.
 

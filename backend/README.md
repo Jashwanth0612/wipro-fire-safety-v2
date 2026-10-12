@@ -14,7 +14,7 @@ For Render with root directory `backend`, the build command is `pip install -r r
 
 Required private settings: `MONGO_URI`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, and a randomly generated `JWT_SECRET` of at least 32 bytes. `MONGO_DB` defaults to the existing `wiprofire` database. Do not change the database name without deliberately selecting the intended data. AI credentials are optional. No credentials belong in GitHub or `VITE_` variables.
 
-The Vercel frontend proxies `/api` to the existing Render hostname in `vercel.json`. Changing the backend hostname requires updating that rewrite and redeploying. During local development Vite proxies `/api` to port 8000. Both `VITE_API_BASE_URL` and the older `VITE_API_URL` remain supported as optional full-origin overrides.
+The Vercel V2 project serves `/api` through `api/index.py`, using the same FastAPI application as standalone hosting. The API rewrite precedes the frontend fallback in `vercel.json`. Set private backend variables in the V2 Vercel project environment and redeploy. The original Render service remains separate. During local development Vite proxies `/api` to port 8000. Both `VITE_API_BASE_URL` and the older `VITE_API_URL` remain supported as optional full-origin overrides.
 
 ## Data flow
 
