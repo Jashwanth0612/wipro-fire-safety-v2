@@ -72,6 +72,7 @@ function AdminProducts() {
       setForm(emptyProduct())
       setShowForm(false)
       setNotice('Product saved.')
+      window.dispatchEvent(new Event('wipro:catalogue-changed'))
       await fetchItems()
     } catch (err) { handleError(err, 'Product could not be saved. Your details are still here.') }
     finally { mutation.current = false; setAdding(false) }
@@ -87,6 +88,7 @@ function AdminProducts() {
       await apiRequest(`/products/${encodeURIComponent(id)}`, { method: 'DELETE', token })
       setItems(current => current.filter(item => item.id !== id))
       setNotice('Product deleted.')
+      window.dispatchEvent(new Event('wipro:catalogue-changed'))
     } catch (err) { handleError(err, 'Product was not deleted. Please try again.') }
     finally { mutation.current = false; setPendingId(null) }
   }
@@ -111,6 +113,7 @@ function AdminProducts() {
       setItems(current => current.map(product => product.id === item.id ? { ...product, stock: savedStock } : product))
       setDraftStock(current => { const next = { ...current }; delete next[item.id]; return next })
       setNotice(`Stock saved for ${item.title}.`)
+      window.dispatchEvent(new Event('wipro:catalogue-changed'))
     } catch (err) { handleError(err, 'Stock was not saved. Your entered quantity is still here.') }
     finally { mutation.current = false; setPendingId(null) }
   }
@@ -273,7 +276,12 @@ function AdminProducts() {
           <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: 'linear-gradient(90deg, #bf4937, #bf4937)' }} />
           <h3 style={{ color: '#302820', fontWeight: 800, fontSize: '18px', marginBottom: '20px', textTransform: 'uppercase' }}>Add New Product</h3>
           <form onSubmit={add} aria-busy={adding}><fieldset disabled={adding} style={{ border: 0, padding: 0, margin: 0 }}><legend className="sr-only">New inventory product</legend>
-            <label style={{ display: 'block', marginBottom: '14px' }}>Original catalogue product (optional)<select value={form.slug} onChange={event => setForm(current => ({ ...current, slug: event.target.value }))} style={inputStyle}><option value="">New product — no association</option>{PRODUCTS.map(product => <option key={product.id} value={`catalog-${product.id}`} disabled={items.some(item => item.slug === `catalog-${product.id}`)}>{product.title} — {product.subtitle}</option>)}</select></label>
+            <label style={{ display: 'block', marginBottom: '14px' }}>Original catalogue product (optional)<select value={form.slug} onChange={event => {
+              const slug = event.target.value
+              const product = PRODUCTS.find(product => `catalog-${product.id}` === slug)
+              const categories = { extinguishers: 'Fire Extinguishers', alarm: 'Fire Alarm Systems', hydrant: 'Hydrant Systems', safety: 'PPE Equipment', road: 'Road Safety' }
+              setForm(current => product ? { ...current, slug, title: product.title, description: product.desc, image_url: product.img, category: categories[product.category] } : { ...current, slug })
+            }} style={inputStyle}><option value="">New product — no association</option>{PRODUCTS.map(product => <option key={product.id} value={`catalog-${product.id}`} disabled={items.some(item => item.slug === `catalog-${product.id}`)}>{product.title} — {product.subtitle}</option>)}</select></label>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 230px), 1fr))', gap: '14px', marginBottom: '14px' }}>
               {[
                 { key: 'title', placeholder: 'Product Name', type: 'text' },

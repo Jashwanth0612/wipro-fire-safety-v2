@@ -25,12 +25,20 @@ export function QuoteProvider({ children }) {
   const [catalogue, setCatalogue] = useState(PRODUCTS)
   const [catalogueStatus, setCatalogueStatus] = useState('loading')
   useEffect(() => {
-    const controller = new AbortController()
-    apiRequest('/products', { signal: controller.signal }).then(records => {
-      setCatalogue(mergeCatalogue(PRODUCTS, records))
-      setCatalogueStatus('ready')
-    }).catch(() => { if (!controller.signal.aborted) setCatalogueStatus('offline') })
-    return () => controller.abort()
+    let controller
+    const refresh = () => {
+      controller?.abort()
+      const requestController = new AbortController()
+      controller = requestController
+      apiRequest('/products', { signal: requestController.signal }).then(records => {
+        if (requestController.signal.aborted) return
+        setCatalogue(mergeCatalogue(PRODUCTS, records))
+        setCatalogueStatus('ready')
+      }).catch(() => { if (!requestController.signal.aborted) setCatalogueStatus('offline') })
+    }
+    refresh()
+    window.addEventListener('wipro:catalogue-changed', refresh)
+    return () => { controller?.abort(); window.removeEventListener('wipro:catalogue-changed', refresh) }
   }, [])
   useEffect(() => {
     try { sessionStorage.setItem(KEY, JSON.stringify(items)) } catch { /* Browsing still works when storage is disabled. */ }
