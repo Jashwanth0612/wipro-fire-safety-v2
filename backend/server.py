@@ -26,6 +26,7 @@ except ImportError:  # Standalone uvicorn server:app and file-based test loader.
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import jwt
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -51,6 +52,17 @@ class LimitedBodyMiddleware:
     async def __call__(self, scope, receive, send):
         if scope["type"] != "http" or scope["method"] not in {"POST", "PUT", "PATCH"}:
             return await self.app(scope, receive, send)
+        headers = dict(scope.get("headers", []))
+        length = headers.get(b"content-length")
+        if length is not None:
+            try:
+                size_hint = int(length)
+                if size_hint < 0:
+                    raise ValueError()
+            except ValueError:
+                return await JSONResponse(status_code=400, content={"detail": "Invalid request length"})(scope, receive, send)
+            if size_hint > MAX_BODY_BYTES:
+                return await JSONResponse(status_code=413, content={"detail": "Request is too large"})(scope, receive, send)
         chunks = []
         size = 0
         while True:
@@ -104,6 +116,21 @@ app.add_middleware(
     allow_headers=["Authorization", "Content-Type"],
     expose_headers=["Retry-After"],
 )
+
+
+@app.exception_handler(RequestValidationError)
+async def invalid_request(_request, _error):
+    # Pydantic's default error body includes submitted values (including passwords).
+    return JSONResponse(status_code=422, content={"detail": "Please check the required fields and their permitted lengths."})
+
+
+@app.middleware("http")
+async def private_api_responses(request, call_next):
+    response = await call_next(request)
+    response.headers["Cache-Control"] = "private, no-store"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    return response
 
 
 @app.exception_handler(PyMongoError)

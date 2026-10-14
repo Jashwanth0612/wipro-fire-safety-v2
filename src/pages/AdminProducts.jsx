@@ -125,6 +125,8 @@ function AdminProducts() {
     setError('')
     const script = document.createElement('script')
     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
+    script.integrity = 'sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw'
+    script.crossOrigin = 'anonymous'
     script.onerror = () => { setError('The spreadsheet export could not load. Please try again.'); setExporting(false); script.remove() }
     script.onload = () => {
       try {

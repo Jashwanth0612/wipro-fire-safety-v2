@@ -135,3 +135,29 @@ def test_database_failure_never_returns_a_receipt(api):
     response = client.post('/api/contact',json={'name':'A','email':'test@example.com','phone':'9999999999','message':'Hello'})
     assert response.status_code == 503
     assert 'id' not in response.json()
+
+
+def test_invalid_login_never_echoes_submitted_password(api):
+    client, _ = api
+    secret = 'do-not-echo-this-value' * 100
+    result = client.post('/api/admin/login', json={'email':'invalid', 'password':secret})
+    assert result.status_code == 422
+    assert secret not in result.text
+    assert 'input' not in result.json()
+    assert result.headers['cache-control'] == 'private, no-store'
+
+
+def test_oversized_body_and_chunked_body_are_rejected(api):
+    client, _ = api
+    result = client.post('/api/admin/login', content=b'x' * (server.MAX_BODY_BYTES + 1))
+    assert result.status_code == 413
+    result = client.post('/api/admin/login', content=iter([b'x' * 40000, b'x' * 40000]))
+    assert result.status_code == 413
+    assert result.headers['x-content-type-options'] == 'nosniff'
+
+
+def test_untrusted_origins_are_not_granted_cors(api):
+    client, _ = api
+    result = client.options('/api/contact', headers={'Origin':'https://attacker.invalid','Access-Control-Request-Method':'POST'})
+    assert result.status_code == 400
+    assert 'access-control-allow-origin' not in result.headers
