@@ -1,8 +1,19 @@
-import { useRef, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { apiRequest } from '../lib/api'
 
 function AdminLogin() {
+  const [showPassword, setShowPassword] = useState(false)
+  const [service, setService] = useState('checking')
+  const [check, setCheck] = useState(0)
+  useEffect(() => {
+    const controller = new AbortController()
+    setService('checking')
+    apiRequest('/health', { signal: controller.signal, timeout: 15000 })
+      .then(data => setService(data.status === 'ready' ? 'ready' : 'unavailable'))
+      .catch(() => { if (!controller.signal.aborted) setService('unavailable') })
+    return () => controller.abort()
+  }, [check])
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -32,59 +43,38 @@ function AdminLogin() {
   }
 
   return (
-    <div style={{ padding: '60px 24px', maxWidth: '440px', margin: 'auto' }}>
-      <h2>Admin Login</h2>
-      {!error && location.state?.message && <p role="status">{location.state.message}</p>}
-      {error && <p role="alert" style={{ color: '#62584f', marginBottom: '12px' }}>{error}</p>}
-      <form onSubmit={login} aria-busy={pending}>
-        <label htmlFor="admin-email" className="sr-only">Admin email</label>
-        <input
-          style={input}
-          id="admin-email"
-          autoComplete="username"
-          disabled={pending}
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <label htmlFor="admin-password" className="sr-only">Password</label>
-        <input
-          id="admin-password"
-          autoComplete="current-password"
-          disabled={pending}
-          style={input}
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button style={button} type="submit" disabled={pending}>{pending ? 'Signing in…' : 'Login'}</button>
-      </form>
-    </div>
+    <section className="admin-entry container">
+      <div className="admin-entry-intro">
+        <p className="eyebrow">WIPRO FIRE & SAFETY · STAFF PORTAL</p>
+        <h1>Your business.<br />One workspace.</h1>
+        <p>Manage your product catalogue, monitor stock and keep every customer enquiry moving.</p>
+        <ul><li>Product list, categories and inventory quantities</li><li>Low-stock alerts and Excel stock reports</li><li>Customer enquiries, follow-ups and monthly overview</li></ul>
+        <Link to="/">Back to website →</Link>
+      </div>
+      <div className="admin-entry-card">
+        <p className="eyebrow">AUTHORIZED STAFF</p>
+        <h2>Admin login</h2>
+        <p>Sign in with your staff account to open the dashboard.</p>
+        <div className={`admin-service ${service}`} role="status">
+          {service === 'checking' ? 'Checking admin service…' : service === 'ready' ? 'Admin service is available.' : 'Admin service is currently unavailable. Sign-in and saved records need an active database connection.'}
+          {service === 'unavailable' && <button className="text-button" type="button" onClick={() => setCheck(value => value + 1)}>Check again</button>}
+        </div>
+        {!error && location.state?.message && <p role="status">{location.state.message}</p>}
+        {error && <p role="alert" className="form-error">{error}</p>}
+        <form onSubmit={login} aria-busy={pending}>
+          <label htmlFor="admin-email">Email address</label>
+          <input id="admin-email" autoComplete="username" disabled={pending} type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+          <label htmlFor="admin-password">Password</label>
+          <div className="admin-password-field">
+            <input id="admin-password" autoComplete="current-password" disabled={pending} type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} required />
+            <button type="button" aria-label={showPassword ? 'Hide password' : 'Show password'} aria-pressed={showPassword} onClick={() => setShowPassword(value => !value)}>{showPassword ? 'Hide' : 'Show'}</button>
+          </div>
+          <button className="button" type="submit" disabled={pending}>{pending ? 'Signing in…' : 'Sign in to dashboard'}</button>
+        </form>
+        <p className="admin-entry-note">Access is restricted to approved staff. For account access, contact your website administrator.</p>
+      </div>
+    </section>
   )
-}
-
-const input = {
-  width: '100%',
-  padding: '10px',
-  marginBottom: '12px',
-  borderRadius: '6px',
-  border: '1px solid #ccc',
-  background: '#fff9f0',
-  color: '#302820'
-}
-
-const button = {
-  width: '100%',
-  padding: '12px',
-  background: '#b84030',
-  color: '#fff',
-  border: 'none',
-  borderRadius: '6px',
-  cursor: 'pointer'
 }
 
 export default AdminLogin

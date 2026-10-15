@@ -1,3 +1,4 @@
+import AdminNavigation from '../components/AdminNavigation'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { apiRequest } from '../lib/api'
@@ -91,6 +92,7 @@ export default function AdminDashboard() {
 
   return (
     <div style={{ background: '#fff9f0', minHeight: '100vh', padding: '28px', color: '#302820' }}>
+      <AdminNavigation />
 
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
@@ -102,7 +104,7 @@ export default function AdminDashboard() {
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
           <button onClick={() => navigate('/admin/products')} style={{ padding: '10px 18px', background: 'rgba(191,73,55,0.15)', border: '1px solid rgba(191,73,55,0.3)', borderRadius: '10px', color: '#b84030', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
-            📦 Products
+            Products
           </button>
           <button onClick={logout} style={{ padding: '10px 18px', background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '10px', color: '#62584f', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
             Logout

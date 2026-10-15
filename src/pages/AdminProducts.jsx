@@ -1,3 +1,4 @@
+import AdminNavigation from '../components/AdminNavigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { apiRequest } from '../lib/api'
@@ -220,6 +221,7 @@ function AdminProducts() {
 
   return (
     <div style={{ background: '#fff9f0', minHeight: '100vh', padding: '30px', color: '#302820' }}>
+      <AdminNavigation />
 
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>

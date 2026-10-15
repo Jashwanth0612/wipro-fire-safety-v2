@@ -45,7 +45,7 @@ export default function Navbar() {
   const logout = () => { localStorage.removeItem('admin_token'); setAccountOpen(false); navigate('/') }
   return <>
     <header className="site-header">
-      <div className="utility-bar"><div className="container utility-inner"><span className="tip-label"><Flame size={14} /> SAFETY TIP</span><span className="safety-tip">{SAFETY_TIPS[tipIndex]}</span><span className="utility-location">Kurnool · Serving South India</span></div></div>
+      <div className="utility-bar"><div className="container utility-inner"><span className="tip-label"><Flame size={14} /> SAFETY TIP</span><span className="safety-tip">{SAFETY_TIPS[tipIndex]}</span><span className="utility-location">Kurnool · Serving South India</span><Link className="utility-admin" to={isLoggedIn ? "/admin/dashboard" : "/admin/login"}>{isLoggedIn ? "Admin dashboard" : "Admin login"}</Link></div></div>
       <div className="container nav-shell">
         <Link className="brand-link" to="/" aria-label="Wipro Fire and Safety home"><img className="company-logo" src="/company-logo-dark.png?v=2" alt="Wipro Fire & Safety — Consultants, Stockists, Suppliers" width="1976" height="796" /></Link>
         <nav className="desktop-nav" aria-label="Main navigation">{links.map(([to,label]) => <NavLink end={to === '/'} key={to} to={to}>{label}</NavLink>)}</nav>
@@ -57,7 +57,7 @@ export default function Navbar() {
           <button ref={menuButtonRef} className="icon-button menu-toggle" aria-label={menuOpen ? 'Close navigation' : 'Open navigation'} aria-expanded={menuOpen} aria-controls="mobile-navigation" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X size={23} /> : <Menu size={23} />}</button>
         </div>
       </div>
-      {menuOpen && <nav className="mobile-nav container" id="mobile-navigation" aria-label="Mobile navigation">{links.map(([to,label]) => <NavLink end={to === '/'} key={to} to={to} onClick={() => setMenuOpen(false)}>{label}</NavLink>)}<a href="tel:+918019918288"><Phone size={16} /> Call +91 80199 18288</a></nav>}
+      {menuOpen && <nav className="mobile-nav container" id="mobile-navigation" aria-label="Mobile navigation">{links.map(([to,label]) => <NavLink end={to === '/'} key={to} to={to} onClick={() => setMenuOpen(false)}>{label}</NavLink>)}<NavLink to="/admin/login">Admin login</NavLink><a href="tel:+918019918288"><Phone size={16} /> Call +91 80199 18288</a></nav>}
     </header>
     <AIChat open={chatOpen} onClose={() => setChatOpen(false)} />
   </>
