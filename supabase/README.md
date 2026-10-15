@@ -8,7 +8,11 @@ The existing 40-product catalogue and visual design remain intact.
 
 1. Create a **separate V2** Supabase project. Choose a region near the business.
    Review the plan and costs before accepting any paid option.
-2. Apply `migrations/202610120001_wipro_backend.sql` to the new project.
+2. Apply `migrations/202610120001_wipro_backend.sql` to the new project, then
+   `migrations/202610150001_original_catalogue.sql`. The second migration adds all
+   40 original catalogue products to the admin inventory, without inventing stock
+   or overwriting existing linked products. Regenerate it after intentional
+   catalogue changes with `node scripts/generate-catalogue-seed.mjs`.
 3. Disable public sign-ups under Authentication settings. Create the owner's Auth
    user securely through Supabase. Do not put passwords in SQL or GitHub.
    Email invitations are optional and require explicit authorization before sending.
