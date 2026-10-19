@@ -55,3 +55,11 @@ From the repository root, after installing `backend/requirements-dev.txt`:
 The Python tests use simulated Supabase responses; they do not establish that a
 hosted database is configured. SQL tests execute real role/RLS checks when a test
 project is available. Do not label deployment connected until live checks succeed.
+
+## Audited inventory (19 October 2026)
+
+Apply `migrations/202610190001_inventory_movements.sql` to V2 before releasing the matching stock UI. It keeps existing balances and records a labelled baseline for any previously recorded quantity. It creates a staff-only, append-only movement ledger. No public users gain permissions. Stock changes run through `record_stock_movement`, which validates staff membership, locks the product row, rejects negative balances, checks expected counts, and deduplicates retry IDs. Catalogue metadata remains editable; direct stock PATCH is intentionally replaced by movements.
+
+Run `tests/inventory.sql` inside `begin; ... rollback;` after migration. It creates temporary fixtures and rolls them back. Tests cover anonymous/nonstaff access, opening count, receipt retry, changed duplicate request, over-dispatch, stale count, zero balance and immutable history. Existing `tests/rls.sql` predates the stock-column restriction; its stock-update assertion should now expect denial (metadata edits remain allowed).
+
+Release recovery: do not roll back to the old stock-overwrite UI without considering the column permission change. Prefer fixing forward; customer/catalogue reads and enquiry writes are independent of inventory. Never drop the movement table to undo a UI release. Owner-run database backups/restore must be tested separately.

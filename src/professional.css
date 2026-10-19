@@ -53,3 +53,15 @@ html{scroll-behavior:smooth;scroll-padding-top:132px}body{font-size:16px;line-he
 .admin-service.unavailable{border-color:#b84030}
 .admin-service .text-button{display:block;margin-top:8px}
 @media(max-width:760px){.admin-entry{grid-template-columns:1fr;padding-top:24px;padding-bottom:32px}.admin-entry-intro{padding:28px;border-radius:12px 12px 0 0}.admin-entry-card{padding:28px;border-radius:0 0 12px 12px}.admin-entry-intro ul{margin:20px 0}.admin-entry-intro h1{font-size:38px}.utility-admin{font-size:11px}.admin-navigation a{padding:8px 10px}}
+
+/* Staff stock operations: quiet, readable and responsive. */
+.stock-workflow{margin:28px 0;padding:clamp(18px,3vw,32px);background:#fffdf8;border:1px solid #d8cbbc;border-radius:16px}
+.stock-workflow h2{font-size:clamp(24px,3vw,34px);line-height:1.15;margin:8px 0 12px}.stock-workflow p{line-height:1.6}
+.stock-workflow fieldset{border:0;margin:22px 0 0;padding:0}.stock-entry-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.stock-workflow label,.inventory-search label{display:block;font-weight:650;font-size:14px;margin-bottom:16px}
+.stock-workflow input,.stock-workflow select,.inventory-search input,.inventory-search select{display:block;width:100%;padding:12px;margin-top:7px;border:1px solid #bbad9b;border-radius:8px;background:#fffdf8;color:#302820;font:inherit;min-height:46px}
+.stock-workflow :focus-visible,.inventory-search :focus-visible{outline:3px solid #356345;outline-offset:3px}.stock-workflow button:disabled{opacity:.55;cursor:not-allowed}
+.stock-preview{padding:14px;background:#f1e8dc;border-left:3px solid #356345}.stock-history{margin-top:24px;border-top:1px solid #d8cbbc;padding-top:20px}.stock-history summary{font-weight:750;cursor:pointer;padding:10px 0}.stock-table-scroll{overflow-x:auto}.stock-history table{border-collapse:collapse;width:100%;font-size:13px}.stock-history th,.stock-history td{padding:12px;text-align:left;border-bottom:1px solid #dfd4c6;min-width:90px}.stock-history th{background:#f1e8dc}.stock-history-paging{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px}.stock-history-paging button,.inventory-search>button{padding:10px 18px;border:1px solid #bbad9b;border-radius:8px;background:#fffdf8;color:#302820}.inventory-search{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin:24px 0}.inventory-search label:first-child{flex:1;min-width:220px}.inventory-search label{margin:0}
+@media(max-width:640px){.stock-entry-grid{grid-template-columns:1fr}.stock-workflow{padding:16px}.stock-history-paging{flex-wrap:wrap}}
+
+.stock-workflow .button{background:#b84030;color:#fff}.stock-workflow .button:hover{background:#943426}

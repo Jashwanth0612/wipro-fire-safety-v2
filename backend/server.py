@@ -294,6 +294,22 @@ class ProductUpdate(RequestModel):
         return self
 
 
+class StockMovementCreate(RequestModel):
+    request_id: uuid.UUID
+    product_id: uuid.UUID
+    kind: Literal["receipt", "dispatch", "count"]
+    quantity: int = Field(ge=0, le=1000000, strict=True)
+    reference: str = Field(min_length=1, max_length=120)
+    note: str = Field(default="", max_length=500)
+    expected_stock: int | None = Field(default=None, ge=0, le=1000000, strict=True)
+
+    @model_validator(mode="after")
+    def valid_movement(self):
+        if not self.reference.strip() or (self.kind != "count" and self.quantity == 0):
+            raise ValueError("A reference and positive movement quantity are required")
+        return self
+
+
 class AdminLogin(BaseModel):
     email: EmailStr = Field(max_length=254)
     password: str = Field(min_length=1, max_length=1024)
@@ -426,6 +442,8 @@ async def get_products(database=Depends(get_database)):
 @api_router.patch("/products/{product_id}", response_model=Product)
 async def update_product(product_id: RecordId, update: ProductUpdate, _email: str = Depends(verify_token), database=Depends(get_database)):
     if supabase_store.enabled():
+        if "stock" in update.model_fields_set:
+            raise HTTPException(409, "Use Receive stock, Dispatch stock or Physical count to preserve stock history.")
         return await supabase_store.update("products", product_id, update.model_dump(exclude_unset=True), _email)
     product = await database.products.find_one_and_update(
         {"id": product_id}, {"$set": update.model_dump(exclude_unset=True)},
@@ -445,6 +463,26 @@ async def delete_product(product_id: RecordId, _email: str = Depends(verify_toke
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Product not found")
     return {"message": "Product deleted successfully"}
+
+
+@api_router.get("/inventory/movements")
+async def stock_history(product_id: uuid.UUID | None = None, offset: int = 0, _email: str = Depends(verify_token)):
+    if not supabase_store.enabled():
+        raise HTTPException(503, "Stock history requires the Supabase backend.")
+    if offset < 0 or offset > 1000000:
+        raise HTTPException(422, "Invalid history page.")
+    params = {"select": "*", "order": "created_at.desc,id.desc", "limit": "50", "offset": str(offset)}
+    if product_id:
+        params["product_id"] = "eq." + str(product_id)
+    return await supabase_store.request("GET", "/rest/v1/stock_movements", token=_email, params=params)
+
+
+@api_router.post("/inventory/movements", status_code=201)
+async def record_stock(input: StockMovementCreate, _email: str = Depends(verify_token)):
+    if not supabase_store.enabled():
+        raise HTTPException(503, "Stock movements require the Supabase backend.")
+    return await supabase_store.request("POST", "/rest/v1/rpc/record_stock_movement", token=_email,
+        body={"p_" + k: v for k, v in input.model_dump(mode="json").items()})
 
 
 @api_router.post("/admin/login", response_model=AdminToken)

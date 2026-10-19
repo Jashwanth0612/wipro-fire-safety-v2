@@ -112,5 +112,34 @@ def test_public_catalogue_no_secret_and_missing_update(api):
     assert calls[-1].headers['apikey'] == 'sb_publishable_test'
     assert 'authorization' not in calls[-1].headers
     state['missing'] = True
-    assert client.patch('/api/products/' + ITEM, json={'stock':0}, headers=AUTH).status_code == 404
-    assert client.patch('/api/products/not-a-uuid', json={'stock':0}, headers=AUTH).status_code == 404
+    assert client.patch('/api/products/' + ITEM, json={'stock':0}, headers=AUTH).status_code == 409
+    assert client.patch('/api/products/' + ITEM, json={'title':'Missing'}, headers=AUTH).status_code == 404
+    assert client.patch('/api/products/not-a-uuid', json={'title':'Missing'}, headers=AUTH).status_code == 404
+
+
+def test_inventory_uses_staff_rpc_and_validates_input(api):
+    client, calls, state = api
+    body = {'request_id': str(uuid.uuid4()), 'product_id': ITEM, 'kind':'receipt', 'quantity':4, 'reference':'TEST-DELIVERY', 'expected_stock':10}
+    assert client.post('/api/inventory/movements', json=body).status_code == 401
+    assert client.post('/api/inventory/movements', json=body, headers=AUTH).status_code == 201
+    req = calls[-1]
+    assert req.url.path == '/rest/v1/rpc/record_stock_movement'
+    assert req.headers['authorization'] == 'Bearer staff-jwt'
+    assert req.headers['apikey'] == 'sb_publishable_test'
+    assert json.loads(req.content)['p_quantity'] == 4
+    for quantity in [0, -1, 1.5, True, 1000001]:
+        assert client.post('/api/inventory/movements', json={**body,'quantity':quantity}, headers=AUTH).status_code == 422
+    assert client.post('/api/inventory/movements', json={**body,'reference':'   '}, headers=AUTH).status_code == 422
+    state['staff'] = False
+    assert client.get('/api/inventory/movements',headers=AUTH).status_code == 403
+    assert client.post('/api/inventory/movements',json=body,headers=AUTH).status_code == 403
+
+
+def test_inventory_history_is_private_and_paginated(api):
+    client, calls, _ = api
+    assert client.get('/api/inventory/movements').status_code == 401
+    assert client.get('/api/inventory/movements?offset=50&product_id='+ITEM,headers=AUTH).status_code == 200
+    assert calls[-1].url.params['limit'] == '50'
+    assert calls[-1].url.params['offset'] == '50'
+    assert calls[-1].url.params['product_id'] == 'eq.'+ITEM
+    assert client.get('/api/inventory/movements?offset=-1',headers=AUTH).status_code == 422

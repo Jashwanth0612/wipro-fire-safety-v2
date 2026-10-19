@@ -1,3 +1,4 @@
+import StockWorkflow from '../components/StockWorkflow'
 import AdminNavigation from '../components/AdminNavigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -19,7 +20,8 @@ function AdminProducts() {
   const [loaded, setLoaded] = useState(false)
   const [notice, setNotice] = useState('')
   const [pendingId, setPendingId] = useState(null)
-  const [draftStock, setDraftStock] = useState({})
+  const [search, setSearch] = useState('')
+  const [stockFilter, setStockFilter] = useState('all')
   const [exporting, setExporting] = useState(false)
   const mutation = useRef(false)
   const navigate = useNavigate()
@@ -45,7 +47,6 @@ function AdminProducts() {
         minStock: Number.isInteger(product.minStock) && product.minStock >= 0 ? product.minStock : 5,
         unit: product.unit || 'pcs',
       })))
-      setDraftStock({})
       setLoaded(true)
     } catch (err) {
       if (!signal?.aborted) handleError(err, 'Could not load inventory. Please try again.')
@@ -80,7 +81,7 @@ function AdminProducts() {
   }
 
   const del = async (id) => {
-    if (mutation.current || !confirm('Delete this inventory product?')) return
+    if (mutation.current || !confirm('Archive this product from the active catalogue? Its stock history will be retained.')) return
     mutation.current = true
     setPendingId(id)
     setError('')
@@ -88,34 +89,9 @@ function AdminProducts() {
     try {
       await apiRequest(`/products/${encodeURIComponent(id)}`, { method: 'DELETE', token })
       setItems(current => current.filter(item => item.id !== id))
-      setNotice('Product deleted.')
+      setNotice('Product archived.')
       window.dispatchEvent(new Event('wipro:catalogue-changed'))
-    } catch (err) { handleError(err, 'Product was not deleted. Please try again.') }
-    finally { mutation.current = false; setPendingId(null) }
-  }
-
-  const updateStock = (id, value) => setDraftStock(current => ({ ...current, [id]: value }))
-  const saveStock = async (item) => {
-    if (mutation.current) return
-    const value = draftStock[item.id]
-    const stock = Number(value)
-    if (value === '' || value === undefined || !Number.isSafeInteger(stock) || stock < 0) {
-      setError('Enter a whole-number stock quantity of zero or more.')
-      return
-    }
-    mutation.current = true
-    setPendingId(item.id)
-    setError('')
-    setNotice('')
-    try {
-      const updated = await apiRequest(`/products/${encodeURIComponent(item.id)}`, { method: 'PATCH', token, body: { stock } })
-      if (updated?.id !== item.id || updated?.stock !== stock) throw new Error('The server did not confirm the new stock quantity.')
-      const savedStock = updated.stock
-      setItems(current => current.map(product => product.id === item.id ? { ...product, stock: savedStock } : product))
-      setDraftStock(current => { const next = { ...current }; delete next[item.id]; return next })
-      setNotice(`Stock saved for ${item.title}.`)
-      window.dispatchEvent(new Event('wipro:catalogue-changed'))
-    } catch (err) { handleError(err, 'Stock was not saved. Your entered quantity is still here.') }
+    } catch (err) { handleError(err, 'Product was not archived. Please try again.') }
     finally { mutation.current = false; setPendingId(null) }
   }
 
@@ -210,7 +186,9 @@ function AdminProducts() {
   const lowStockCount = items.filter(p => p.stock !== null && p.stock <= (p.minStock ?? 5)).length
   const unknownStockCount = items.filter(item => item.stock === null).length
   const totalStock = items.reduce((sum, p) => sum + (p.stock || 0), 0)
-  const filtered = filter === 'All' ? items : items.filter(p => p.category === filter)
+  const filtered = items.filter(p => (filter === 'All' || p.category === filter)
+    && `${p.title} ${p.slug || ''} ${p.description}`.toLowerCase().includes(search.toLowerCase())
+    && (stockFilter === 'all' || (stockFilter === 'unknown' ? p.stock === null : p.stock !== null && p.stock <= p.minStock)))
 
   const getStockStatus = (item) => {
     if (item.stock === null) return { color: '#62584f', label: 'Not recorded', bg: 'rgba(98,88,79,0.1)' }
@@ -274,6 +252,7 @@ function AdminProducts() {
 
       {unknownStockCount > 0 && <p>{unknownStockCount} {unknownStockCount === 1 ? 'product has' : 'products have'} no recorded stock quantity. Totals include recorded quantities only.</p>}
       </>}
+      {loaded && <StockWorkflow items={items} token={token} onSaved={fetchItems} onError={handleError} />}
       {/* Add Product Form */}
       {showForm && (
         <div style={{ background: '#f5ecdf', border: '1px solid rgba(191,73,55,0.3)', borderRadius: '16px', padding: '28px', marginBottom: '24px', position: 'relative', overflow: 'hidden' }}>
@@ -329,6 +308,7 @@ function AdminProducts() {
         </div>
       )}
 
+      <div className="inventory-search"><label>Find a product<input type="search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Name, catalogue reference or description" /></label><label>Stock status<select value={stockFilter} onChange={e => setStockFilter(e.target.value)}><option value="all">All stock</option><option value="low">Needs restocking</option><option value="unknown">Opening count needed</option></select></label><button type="button" onClick={() => fetchItems()} disabled={loading}>Refresh inventory</button></div>
       {/* Category Filter */}
       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '20px' }}>
         {['All', ...CATEGORIES].map(cat => (
@@ -374,9 +354,7 @@ function AdminProducts() {
                     </td>
                     <td style={{ padding: '16px 20px' }}>
                       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px' }}>
-                        <label><span className="sr-only">Stock quantity for {item.title}</span><input type="number" value={draftStock[item.id] ?? item.stock ?? ''} placeholder="Not recorded" onChange={event => updateStock(item.id, event.target.value)} min="0" step="1" disabled={pendingId !== null || adding} style={{ width: '120px', padding: '6px 8px', background: '#fff9f0', border: '1px solid #dfd0bf', borderRadius: '6px', color: '#302820', fontSize: '13px' }} /></label>
-                        <span style={{ color: '#64748b', fontSize: '11px' }}>{item.unit || 'pcs'}</span>
-                        {Object.hasOwn(draftStock, item.id) && <button type="button" disabled={pendingId !== null || adding} onClick={() => saveStock(item)} className="text-button">{pendingId === item.id ? 'Saving…' : 'Save stock'}</button>}
+                        <strong>{item.stock ?? 'Not recorded'}</strong><span>{item.unit || 'pcs'}</span>
                       </div>
                     </td>
                     <td style={{ padding: '16px 20px', color: '#62584f', fontSize: '14px' }}>{item.minStock ?? 5} {item.unit || 'pcs'}</td>
@@ -385,7 +363,7 @@ function AdminProducts() {
                     </td>
                     <td style={{ padding: '16px 20px' }}>
                       <button disabled={pendingId !== null || adding} onClick={() => del(item.id)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '7px 14px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '8px', color: '#62584f', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>
-                        <Trash2 size={13} /> Delete
+                        <Trash2 size={13} /> Archive
                       </button>
                     </td>
                   </tr>
@@ -404,7 +382,7 @@ function AdminProducts() {
             <h3 style={{ color: '#302820', fontWeight: 800, fontSize: '16px', textTransform: 'uppercase' }}>Stock Levels</h3>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {items.map(item => {
+            {filtered.map(item => {
               const status = getStockStatus(item)
               const maxStock = Math.max(...items.map(i => i.stock || 0), 1)
               const pct = Math.round(((item.stock || 0) / maxStock) * 100)

@@ -40,6 +40,17 @@ async def request(method, path, *, token=None, privileged=False, body=None, para
         raise HTTPException(503, 'The database is temporarily unavailable. Please try again.') from None
     if path == "/auth/v1/token" and response.status_code in (400, 401, 422):
         raise HTTPException(401, "Invalid email or password.")
+    if path == '/rest/v1/rpc/record_stock_movement' and response.status_code in (404, 409, 422):
+        # Only our fixed SQL messages are safe to surface; never relay arbitrary DB details.
+        try:
+            message = response.json().get('message', '')
+        except ValueError:
+            message = ''
+        allowed = {'Invalid stock movement', 'Request reference already used',
+                   'Stock changed. Refresh before recording a count', 'Product not found',
+                   'Record an opening physical count first',
+                   'Quantity would exceed available stock or the stock limit'}
+        raise HTTPException(response.status_code, message if message in allowed else 'Stock recording is unavailable. Please refresh or contact your administrator.')
     if response.status_code == 429:
         raise HTTPException(429, "Too many requests. Please try again shortly.")
     if response.status_code in (401, 403):

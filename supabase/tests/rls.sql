@@ -31,7 +31,7 @@ do $$ begin
   update public.contact_inquiries set status='contacted' where id='20000000-0000-4000-8000-000000000001';
   if not found then raise exception 'Staff status edit denied'; end if;
   begin update public.contact_inquiries set message='Tampered'; raise exception 'Staff can overwrite enquiry'; exception when insufficient_privilege then null; end;
-  update public.products set stock=0 where id='30000000-0000-4000-8000-000000000001';
+  update public.products set "minStock"=0 where id='30000000-0000-4000-8000-000000000001';
   if not found then raise exception 'Staff inventory edit denied'; end if;
   begin delete from public.products; raise exception 'Permanent delete allowed'; exception when insufficient_privilege then null; end;
 end $$;
