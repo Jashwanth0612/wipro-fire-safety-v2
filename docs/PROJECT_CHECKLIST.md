@@ -13,12 +13,12 @@ Status: `[x]` verified completed; `[ ]` pending. Implementation awaiting live ve
 - [x] Supabase V2 connection and staff allowlist established (15 Oct: health ready; RLS transaction tests passed).
 - [x] Original 40 catalogue products seeded without invented quantities (15 Oct).
 - [x] Prominent top Admin login text removed; account icon retained (15 Oct, commit 43de28e).
-- [x] Deliver audited stock receipts, dispatches and physical counts; update balance atomically. (19 Oct: implementation and automated tests; live UI check pending below.)
-- [x] Verify duplicate submission cannot count the same movement twice. (19 Oct: implementation and automated tests; live UI check pending below.)
+- [x] Deliver audited stock receipts, dispatches and physical counts; update balance atomically. (19 Oct: deployed; automated tests passed; owner browser workflow check pending below.)
+- [x] Verify duplicate submission cannot count the same movement twice. (19 Oct: deployed; automated tests passed; owner browser workflow check pending below.)
 - [ ] Verify concurrent stock edits under simultaneous live requests. Row locks and expected-count checks implemented; stale-count and over-dispatch SQL tests passed, but parallel live stress test not run.
-- [x] Verify anonymous and ordinary users cannot read movements or mutate stock. (19 Oct: implementation and automated tests; live UI check pending below.)
-- [x] Add searchable inventory, low-stock and opening-count filters; retain Excel export. (19 Oct: implementation and automated tests; live UI check pending below.)
-- [ ] Verify owner sign-in, product creation, receipt, dispatch, count, history and export through the live browser.
+- [x] Verify anonymous and ordinary users cannot read movements or mutate stock. (19 Oct: deployed; automated tests passed; owner browser workflow check pending below.)
+- [x] Add searchable inventory, low-stock and opening-count filters; retain Excel export. (19 Oct: deployed; automated tests passed; owner browser workflow check pending below.)
+- [ ] Verify owner sign-in, product creation, receipt, dispatch, count, history and export through the live browser. **Blocked 19 Oct:** supplied sign-in was rejected as invalid email/password; do not reset credentials without user handoff.
 - [ ] Record actual opening quantities for every stocked product. **Needs business input:** physical count by owner/father; no assumed zeros.
 - [ ] Configure meaningful minimum-stock thresholds for each product. **Needs business input:** reorder quantities and lead times.
 - [ ] Create father's separate staff account. **Needs input:** his email, user-controlled password setup and explicit account grant.
@@ -50,7 +50,8 @@ Status: `[x]` verified completed; `[ ]` pending. Implementation awaiting live ve
 - [ ] Verify backup schedule/retention and perform restore drill in an isolated database. **Needs access/plan details; no paid upgrades assumed.**
 - [ ] Add health/error monitoring with useful, non-sensitive logs and alerts.
 - [ ] Test session expiry, offline responses, retries, timeout feedback and safe recovery.
-- [ ] Add CI gates for build, API tests, inventory tests and secret/dependency checks.
+- [x] Add GitHub Actions build, API and frontend/inventory tests (19 Oct, `.github/workflows/quality.yml`; local checks passed).
+- [ ] Verify Actions run and configure required branch checks plus secret/dependency scanning; deployment is not yet blocked on Actions.
 - [ ] Keep release/rollback instructions up to date; database permissions and UI must remain compatible.
 
 ## P1 — design, accessibility and performance
@@ -90,7 +91,7 @@ Status: `[x]` verified completed; `[ ]` pending. Implementation awaiting live ve
 | --- | --- | --- |
 | 15 Oct 2026 | Backend + admin setup | Live health 200, 40 products; SQL access-control tests passed. Owner browser sign-in not independently exercised. |
 | 15 Oct 2026 | Header cleanup | Production READY at 43de28e; visible header checked. |
-| 19 Oct 2026 | Inventory automation | 19 API + 18 frontend tests passed; production build passed. V2 SQL migration and rollback-only access/quantity tests passed. Owner browser workflow remains to be exercised. |
+| 19 Oct 2026 | Inventory automation | 19 API + 18 frontend tests passed; production build passed. V2 SQL migration and rollback-only access/quantity tests passed. Deployed at 93b215c; health 200, catalogue 40, anonymous movement API 401. Secure owner sign-in attempt returned invalid email/password; live authenticated browser workflow remains pending. |
 
 ## Operating guide
 
