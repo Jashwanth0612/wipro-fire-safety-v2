@@ -481,8 +481,14 @@ async def stock_history(product_id: uuid.UUID | None = None, offset: int = 0, _e
 async def record_stock(input: StockMovementCreate, _email: str = Depends(verify_token)):
     if not supabase_store.enabled():
         raise HTTPException(503, "Stock movements require the Supabase backend.")
-    return await supabase_store.request("POST", "/rest/v1/rpc/record_stock_movement", token=_email,
+    result = await supabase_store.request("POST", "/rest/v1/rpc/record_stock_movement", token=_email,
         body={"p_" + k: v for k, v in input.model_dump(mode="json").items()})
+    # PostgREST can represent a composite return value as a one-row array.
+    if isinstance(result, list) and len(result) == 1:
+        result = result[0]
+    if not isinstance(result, dict) or result.get("request_id") != str(input.request_id) or not result.get("id"):
+        raise HTTPException(503, "The database did not confirm this movement. Retry the same entry safely.")
+    return result
 
 
 @api_router.post("/admin/login", response_model=AdminToken)

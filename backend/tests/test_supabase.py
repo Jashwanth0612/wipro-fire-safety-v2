@@ -31,6 +31,9 @@ def api(monkeypatch):
             return httpx.Response(200, json={'id': USER})
         if req.url.path.endswith('staff_members'):
             return httpx.Response(200, json=[{'user_id': USER}] if state['staff'] else [])
+        if req.url.path == '/rest/v1/rpc/record_stock_movement':
+            data = json.loads(req.content)
+            return httpx.Response(200, json=[{'id':ITEM, 'request_id':data['p_request_id'], 'balance':14}])
         if req.method in ('POST', 'PATCH'):
             data = json.loads(req.content)
             return httpx.Response(200, json=[] if state['missing'] else [{'id': ITEM, **data}])
