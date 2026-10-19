@@ -8,6 +8,16 @@ At the start of every project session, read this checklist and the latest code/d
 
 Status: `[x]` verified completed; `[ ]` pending. Implementation awaiting live verification stays pending. The previous 80% estimate was a judgement, not a measured acceptance score.
 
+## Ongoing — whole-site monitoring and improvement
+
+The daily task covers the full website and backend, not only inventory. Confirmed outages, security regressions and broken customer journeys take priority over new features. Each run records timestamped evidence and unavailable checks, then fixes actionable issues.
+
+- [ ] On each run, check production availability, API/database health, deployment failures and available error logs.
+- [ ] Check key public pages/assets and confirm anonymous requests cannot access staff-only data; use non-destructive checks.
+- [ ] Review dependency advisories, security headers, authentication/authorization and database policies after relevant changes; never include secrets or customer data in reports.
+- [ ] Rotate deeper mobile, accessibility, performance, SEO and business-content reviews; add discovered issues to this queue.
+- [ ] Establish and verify dedicated uptime/error alerts, including a controlled alert test and recovery notification. Daily scheduled reviews are active; continuous real-time monitoring is not yet established.
+
 ## P0 — inventory and daily operations
 
 - [x] Supabase V2 connection and staff allowlist established (15 Oct: health ready; RLS transaction tests passed).
@@ -94,7 +104,6 @@ Status: `[x]` verified completed; `[ ]` pending. Implementation awaiting live ve
 | 15 Oct 2026 | Backend + admin setup | Live health 200, 40 products; SQL access-control tests passed. Owner browser sign-in not independently exercised. |
 | 15 Oct 2026 | Header cleanup | Production READY at 43de28e; visible header checked. |
 | 19 Oct 2026 | Inventory automation | 19 API + 18 frontend tests passed; production build passed. V2 SQL migration and rollback-only access/quantity tests passed. Deployed at 93b215c; health 200, catalogue 40, anonymous movement API 401. Secure owner sign-in attempt returned invalid email/password; live authenticated browser workflow remains pending. |
-
 | 19 Oct 2026 | Owner session verified | After user login, dashboard showed the labelled system enquiry as Contacted, with totals 1 enquiry / 0 pending / 1 contacted. Products page rendered 40 products with 40 unrecorded opening quantities; authenticated movement history loaded an empty state. No real stock altered. This resolves the earlier sign-in blocker. |
 
 ## Operating guide
