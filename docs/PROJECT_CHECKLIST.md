@@ -18,7 +18,9 @@ Status: `[x]` verified completed; `[ ]` pending. Implementation awaiting live ve
 - [ ] Verify concurrent stock edits under simultaneous live requests. Row locks and expected-count checks implemented; stale-count and over-dispatch SQL tests passed, but parallel live stress test not run.
 - [x] Verify anonymous and ordinary users cannot read movements or mutate stock. (19 Oct: deployed; automated tests passed; owner browser workflow check pending below.)
 - [x] Add searchable inventory, low-stock and opening-count filters; retain Excel export. (19 Oct: deployed; automated tests passed; owner browser workflow check pending below.)
-- [ ] Verify owner sign-in, product creation, receipt, dispatch, count, history and export through the live browser. **Blocked 19 Oct:** supplied sign-in was rejected as invalid email/password; do not reset credentials without user handoff.
+- [x] Verify owner authenticated access, product list and history loading through the live browser (19 Oct: user completed login; 40 products rendered; history showed its empty state without an error).
+- [ ] Verify product creation, receipt, dispatch, count and Excel export through the live browser. Authentication blocker resolved; mutation workflow not yet exercised in browser. Preserve real stock balances.
+- [ ] Fix category-filter coverage: existing Safety Equipment products are not represented by the hardcoded PPE Equipment category button.
 - [ ] Record actual opening quantities for every stocked product. **Needs business input:** physical count by owner/father; no assumed zeros.
 - [ ] Configure meaningful minimum-stock thresholds for each product. **Needs business input:** reorder quantities and lead times.
 - [ ] Create father's separate staff account. **Needs input:** his email, user-controlled password setup and explicit account grant.
@@ -92,6 +94,8 @@ Status: `[x]` verified completed; `[ ]` pending. Implementation awaiting live ve
 | 15 Oct 2026 | Backend + admin setup | Live health 200, 40 products; SQL access-control tests passed. Owner browser sign-in not independently exercised. |
 | 15 Oct 2026 | Header cleanup | Production READY at 43de28e; visible header checked. |
 | 19 Oct 2026 | Inventory automation | 19 API + 18 frontend tests passed; production build passed. V2 SQL migration and rollback-only access/quantity tests passed. Deployed at 93b215c; health 200, catalogue 40, anonymous movement API 401. Secure owner sign-in attempt returned invalid email/password; live authenticated browser workflow remains pending. |
+
+| 19 Oct 2026 | Owner session verified | After user login, dashboard showed the labelled system enquiry as Contacted, with totals 1 enquiry / 0 pending / 1 contacted. Products page rendered 40 products with 40 unrecorded opening quantities; authenticated movement history loaded an empty state. No real stock altered. This resolves the earlier sign-in blocker. |
 
 ## Operating guide
 
