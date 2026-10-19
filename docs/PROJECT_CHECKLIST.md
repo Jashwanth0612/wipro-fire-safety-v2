@@ -57,14 +57,17 @@ The daily task covers the full website and backend, not only inventory. Confirme
 - [x] Input/body limits, generic errors, cache/security headers and dependency updates implemented (71447ed; 15 Oct tests).
 - [ ] Recheck dependencies and access policies after each backend change.
 - [ ] Test password recovery with approved sender/redirect and enable staff MFA where supported.
+- [ ] Enable leaked-password protection when an approved Pro-or-higher plan is available. Current organization is Free; no upgrade authorized.
+- [x] Restrict internal auto-RLS event-trigger function execution to privileged roles (19 Oct migration 20261019174849). Anonymous/authenticated execution denied; owner execution, enabled event trigger and stock RPC preserved; advisor warning cleared.
 - [ ] Review browser token storage and migrate to secure HttpOnly sessions with CSRF protection.
 - [ ] Shared rate limiting / bot protection for login and enquiry endpoints; existing per-process limiter is not a global limit.
 - [ ] Verify backup schedule/retention and perform restore drill in an isolated database. **Needs access/plan details; no paid upgrades assumed.**
-- [x] Implement credential-free production smoke checks and an hourly GitHub Actions workflow with safe pass/fail summaries (19 Oct). Local live run: 13/13 passed. Hosted run verification recorded below when available.
+- [x] Implement credential-free production smoke checks and an hourly GitHub Actions workflow with safe pass/fail summaries (19 Oct). Local live run: 13/13 passed. GitHub Production health run 39297017241 succeeded.
 - [ ] Complete error monitoring, notification delivery and recovery alerts; a scheduled smoke checker alone does not satisfy this item.
 - [ ] Test session expiry, offline responses, retries, timeout feedback and safe recovery.
 - [x] Add GitHub Actions build, API and frontend/inventory tests (19 Oct, `.github/workflows/quality.yml`; local checks passed).
-- [ ] Verify Actions run and configure required branch checks plus secret/dependency scanning; deployment is not yet blocked on Actions.
+- [x] Verify hosted Actions: quality run 39297017294 and health run 39297017241 passed (19 Oct, commit 188cb3a).
+- [ ] Configure required branch checks plus secret/dependency scanning; deployment is not yet blocked on Actions.
 - [ ] Keep release/rollback instructions up to date; database permissions and UI must remain compatible.
 
 ## P1 — design, accessibility and performance
@@ -107,7 +110,9 @@ The daily task covers the full website and backend, not only inventory. Confirme
 | 19 Oct 2026 | Inventory automation | 19 API + 18 frontend tests passed; production build passed. V2 SQL migration and rollback-only access/quantity tests passed. Deployed at 93b215c; health 200, catalogue 40, anonymous movement API 401. Secure owner sign-in attempt returned invalid email/password; live authenticated browser workflow remains pending. |
 | 19 Oct 2026 | Owner session verified | After user login, dashboard showed the labelled system enquiry as Contacted, with totals 1 enquiry / 0 pending / 1 contacted. Products page rendered 40 products with 40 unrecorded opening quantities; authenticated movement history loaded an empty state. No real stock altered. This resolves the earlier sign-in blocker. |
 
-| 19 Oct 2026 | Category coverage and monitoring | 22 frontend/monitor tests and 19 API tests passed; production build passed. Live read-only checker: 13/13 passed. Added regression fixtures for degraded database, exposed admin reads, broken JS and network failure. README corrected for Supabase V2. Deployment and hosted workflow verification pending. |
+| 19 Oct 2026 | Category coverage and monitoring | 22 frontend/monitor tests and 19 API tests passed; production build passed. Live read-only checker: 13/13 passed. Added regression fixtures for degraded database, exposed admin reads, broken JS and network failure. README corrected for Supabase V2. Vercel production READY at 188cb3a; hosted quality and health workflows passed. New authenticated UI check is pending because the browser session expired. |
+
+| 19 Oct 2026 | Security review | npm production dependency audit reported 0 known vulnerabilities. Applied internal RLS trigger permission restriction and verified grants; follow-up advisors no longer flag that function. Remaining advisories: intentional authenticated stock RPC with staff check, and plan-gated leaked-password protection. |
 
 ## Operating guide
 

@@ -63,3 +63,11 @@ Apply `migrations/202610190001_inventory_movements.sql` to V2 before releasing t
 Run `tests/inventory.sql` inside `begin; ... rollback;` after migration. It creates temporary fixtures and rolls them back. Tests cover anonymous/nonstaff access, opening count, receipt retry, changed duplicate request, over-dispatch, stale count, zero balance and immutable history. The existing `tests/rls.sql` now checks an allowed minimum-stock metadata edit; direct stock-update denial is checked in `tests/inventory.sql`.
 
 Release recovery: do not roll back to the old stock-overwrite UI without considering the column permission change. Prefer fixing forward; customer/catalogue reads and enquiry writes are independent of inventory. Never drop the movement table to undo a UI release. Owner-run database backups/restore must be tested separately.
+
+## Internal RLS trigger permissions (19 October 2026)
+
+Remote migration `20261019174849_restrict_internal_rls_trigger_execution.sql` revokes direct execution of the platform-created `public.rls_auto_enable()` event-trigger function from PUBLIC, anon and authenticated. It does not alter the function body or disable automatic RLS. Run `tests/internal_trigger_permissions.sql` to verify the permission boundary and preserve the stock RPC. On an environment without that platform event-trigger function, inspect its configuration before applying this migration.
+
+This migration was applied with Supabase MCP and its exact recorded version exported to Git; the local CLI was unavailable. Earlier schema scripts were applied manually and are not all represented in remote migration history. Do not blindly run `db push` or replay the entire migrations folder against production; reconcile history first.
+
+Current advisor review retains the authenticated SECURITY DEFINER warning for `record_stock_movement`: execution is intentional, with an internal staff-membership check and anonymous execution revoked. Leaked-password protection remains disabled because it requires Pro or above; no paid upgrade was made.
