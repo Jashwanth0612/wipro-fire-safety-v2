@@ -3,10 +3,11 @@ import AdminNavigation from '../components/AdminNavigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { apiRequest } from '../lib/api'
+import { inventoryCategories } from '../lib/inventory.mjs'
 import { PRODUCTS } from '../data/products'
 import { Package, Plus, Trash2, Download, AlertTriangle, CheckCircle, TrendingUp, BarChart3 } from 'lucide-react'
 
-const CATEGORIES = ['Fire Extinguishers', 'Fire Alarm Systems', 'Hydrant Systems', 'PPE Equipment', 'Exit Systems', 'Road Safety', 'Accessories']
+const CATEGORIES = ['Fire Extinguishers', 'Fire Alarm Systems', 'Hydrant Systems', 'Safety Equipment', 'PPE Equipment', 'Exit Systems', 'Road Safety', 'Accessories']
 const emptyProduct = () => ({ title: '', description: '', category: CATEGORIES[0], image_url: '', stock: '', minStock: 5, unit: 'pcs', slug: '' })
 
 function AdminProducts() {
@@ -184,6 +185,7 @@ function AdminProducts() {
   }
 
   const lowStockCount = items.filter(p => p.stock !== null && p.stock <= (p.minStock ?? 5)).length
+  const categories = inventoryCategories(items, CATEGORIES)
   const unknownStockCount = items.filter(item => item.stock === null).length
   const totalStock = items.reduce((sum, p) => sum + (p.stock || 0), 0)
   const filtered = items.filter(p => (filter === 'All' || p.category === filter)
@@ -274,7 +276,7 @@ function AdminProducts() {
               ))}
 
               <select aria-label="Product category" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} style={inputStyle}>
-                {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                {categories.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
@@ -311,7 +313,7 @@ function AdminProducts() {
       <div className="inventory-search"><label>Find a product<input type="search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Name, catalogue reference or description" /></label><label>Stock status<select value={stockFilter} onChange={e => setStockFilter(e.target.value)}><option value="all">All stock</option><option value="low">Needs restocking</option><option value="unknown">Opening count needed</option></select></label><button type="button" onClick={() => fetchItems()} disabled={loading}>Refresh inventory</button></div>
       {/* Category Filter */}
       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '20px' }}>
-        {['All', ...CATEGORIES].map(cat => (
+        {['All', ...categories].map(cat => (
           <button key={cat} onClick={() => setFilter(cat)} style={{ padding: '6px 16px', borderRadius: '999px', border: filter === cat ? 'none' : '1px solid #f5ecdf', background: filter === cat ? 'linear-gradient(135deg, #bf4937, #bf4937)' : 'transparent', color: filter === cat ? '#302820' : '#64748b', fontWeight: 600, fontSize: '12px', cursor: 'pointer' }}>
             {cat}
           </button>

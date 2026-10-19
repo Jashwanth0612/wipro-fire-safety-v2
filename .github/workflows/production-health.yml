@@ -1,0 +1,38 @@
+name: Production health
+on:
+  schedule:
+    - cron: '23 * * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - scripts/check-production.mjs
+      - .github/workflows/production-health.yml
+permissions:
+  contents: read
+concurrency:
+  group: production-health
+  cancel-in-progress: false
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - name: Check production without credentials
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/check-production.mjs | tee health-results.txt
+      - name: Publish safe run summary
+        if: always()
+        shell: bash
+        run: |
+          if [ -f health-results.txt ]; then
+            cat health-results.txt >> "$GITHUB_STEP_SUMMARY"
+          fi

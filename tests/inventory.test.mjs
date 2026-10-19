@@ -1,6 +1,12 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { stockPreview } from '../src/lib/inventory.mjs'
+import { inventoryCategories, stockPreview } from '../src/lib/inventory.mjs'
+test('every stored category remains reachable without renaming catalogue records', () => {
+ const items = [{category:'Safety Equipment'}, {category:'Safety Equipment'}, {category:'Custom supplies'}, {category:null}]
+ const categories = inventoryCategories(items, ['PPE Equipment'])
+ assert.deepEqual(categories, ['PPE Equipment', 'Safety Equipment', 'Custom supplies'])
+ assert.equal(items[0].category, 'Safety Equipment')
+})
 test('receipts and dispatches predict balances without changing source stock', () => {
  assert.equal(stockPreview(12,'receipt','5').balance,17)
  assert.equal(stockPreview(12,'dispatch','5').balance,7)

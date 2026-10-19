@@ -30,7 +30,7 @@ The daily task covers the full website and backend, not only inventory. Confirme
 - [x] Add searchable inventory, low-stock and opening-count filters; retain Excel export. (19 Oct: deployed; automated tests passed; owner browser workflow check pending below.)
 - [x] Verify owner authenticated access, product list and history loading through the live browser (19 Oct: user completed login; 40 products rendered; history showed its empty state without an error).
 - [ ] Verify product creation, receipt, dispatch, count and Excel export through the live browser. Authentication blocker resolved; mutation workflow not yet exercised in browser. Preserve real stock balances.
-- [ ] Fix category-filter coverage: existing Safety Equipment products are not represented by the hardcoded PPE Equipment category button.
+- [x] Fix category-filter coverage: filters and add-product choices include every stored category, including Safety Equipment. Regression test preserves original category names (19 Oct).
 - [ ] Record actual opening quantities for every stocked product. **Needs business input:** physical count by owner/father; no assumed zeros.
 - [ ] Configure meaningful minimum-stock thresholds for each product. **Needs business input:** reorder quantities and lead times.
 - [ ] Create father's separate staff account. **Needs input:** his email, user-controlled password setup and explicit account grant.
@@ -60,7 +60,8 @@ The daily task covers the full website and backend, not only inventory. Confirme
 - [ ] Review browser token storage and migrate to secure HttpOnly sessions with CSRF protection.
 - [ ] Shared rate limiting / bot protection for login and enquiry endpoints; existing per-process limiter is not a global limit.
 - [ ] Verify backup schedule/retention and perform restore drill in an isolated database. **Needs access/plan details; no paid upgrades assumed.**
-- [ ] Add health/error monitoring with useful, non-sensitive logs and alerts.
+- [x] Implement credential-free production smoke checks and an hourly GitHub Actions workflow with safe pass/fail summaries (19 Oct). Local live run: 13/13 passed. Hosted run verification recorded below when available.
+- [ ] Complete error monitoring, notification delivery and recovery alerts; a scheduled smoke checker alone does not satisfy this item.
 - [ ] Test session expiry, offline responses, retries, timeout feedback and safe recovery.
 - [x] Add GitHub Actions build, API and frontend/inventory tests (19 Oct, `.github/workflows/quality.yml`; local checks passed).
 - [ ] Verify Actions run and configure required branch checks plus secret/dependency scanning; deployment is not yet blocked on Actions.
@@ -105,6 +106,8 @@ The daily task covers the full website and backend, not only inventory. Confirme
 | 15 Oct 2026 | Header cleanup | Production READY at 43de28e; visible header checked. |
 | 19 Oct 2026 | Inventory automation | 19 API + 18 frontend tests passed; production build passed. V2 SQL migration and rollback-only access/quantity tests passed. Deployed at 93b215c; health 200, catalogue 40, anonymous movement API 401. Secure owner sign-in attempt returned invalid email/password; live authenticated browser workflow remains pending. |
 | 19 Oct 2026 | Owner session verified | After user login, dashboard showed the labelled system enquiry as Contacted, with totals 1 enquiry / 0 pending / 1 contacted. Products page rendered 40 products with 40 unrecorded opening quantities; authenticated movement history loaded an empty state. No real stock altered. This resolves the earlier sign-in blocker. |
+
+| 19 Oct 2026 | Category coverage and monitoring | 22 frontend/monitor tests and 19 API tests passed; production build passed. Live read-only checker: 13/13 passed. Added regression fixtures for degraded database, exposed admin reads, broken JS and network failure. README corrected for Supabase V2. Deployment and hosted workflow verification pending. |
 
 ## Operating guide
 

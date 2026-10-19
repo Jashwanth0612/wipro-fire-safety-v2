@@ -1,6 +1,6 @@
 # Wipro Fire & Safety V2 — Supabase activation
 
-The implementation is staged. `DATA_BACKEND=mongo` preserves the current backend;
+V2 production uses Supabase. For separate environments, `DATA_BACKEND=mongo` preserves the legacy backend;
 `DATA_BACKEND=supabase` selects Supabase exclusively, with no silent database fallback.
 The existing 40-product catalogue and visual design remain intact.
 
@@ -49,7 +49,7 @@ The existing 40-product catalogue and visual design remain intact.
 
 ## Verification
 
-From the repository root, after installing `backend/requirements-dev.txt`:
+From the repository root, after installing `requirements.txt` and `pytest`:
 `python -m pytest backend/tests -q`
 
 The Python tests use simulated Supabase responses; they do not establish that a
