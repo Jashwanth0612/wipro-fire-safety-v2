@@ -1,3 +1,4 @@
+import InventoryCatalogue from '../components/InventoryCatalogue'
 import StockWorkflow from '../components/StockWorkflow'
 import AdminNavigation from '../components/AdminNavigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -5,7 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { apiRequest } from '../lib/api'
 import { inventoryCategories } from '../lib/inventory.mjs'
 import { PRODUCTS } from '../data/products'
-import { Package, Plus, Trash2, Download, AlertTriangle, CheckCircle, TrendingUp, BarChart3 } from 'lucide-react'
+import { Package, Plus, Download, AlertTriangle, CheckCircle, TrendingUp } from 'lucide-react'
 
 const CATEGORIES = ['Fire Extinguishers', 'Fire Alarm Systems', 'Hydrant Systems', 'Safety Equipment', 'PPE Equipment', 'Exit Systems', 'Road Safety', 'Accessories']
 const emptyProduct = () => ({ title: '', description: '', category: CATEGORIES[0], image_url: '', stock: '', minStock: 5, unit: 'pcs', slug: '' })
@@ -16,13 +17,10 @@ function AdminProducts() {
   const [loading, setLoading] = useState(true)
   const [adding, setAdding] = useState(false)
   const [showForm, setShowForm] = useState(false)
-  const [filter, setFilter] = useState('All')
   const [error, setError] = useState('')
   const [loaded, setLoaded] = useState(false)
   const [notice, setNotice] = useState('')
   const [pendingId, setPendingId] = useState(null)
-  const [search, setSearch] = useState('')
-  const [stockFilter, setStockFilter] = useState('all')
   const [exporting, setExporting] = useState(false)
   const mutation = useRef(false)
   const navigate = useNavigate()
@@ -188,17 +186,6 @@ function AdminProducts() {
   const categories = inventoryCategories(items, CATEGORIES)
   const unknownStockCount = items.filter(item => item.stock === null).length
   const totalStock = items.reduce((sum, p) => sum + (p.stock || 0), 0)
-  const filtered = items.filter(p => (filter === 'All' || p.category === filter)
-    && `${p.title} ${p.slug || ''} ${p.description}`.toLowerCase().includes(search.toLowerCase())
-    && (stockFilter === 'all' || (stockFilter === 'unknown' ? p.stock === null : p.stock !== null && p.stock <= p.minStock)))
-
-  const getStockStatus = (item) => {
-    if (item.stock === null) return { color: '#62584f', label: 'Not recorded', bg: 'rgba(98,88,79,0.1)' }
-    if (item.stock === 0) return { color: '#62584f', label: 'Out of Stock', bg: 'rgba(239,68,68,0.1)' }
-    if (item.stock <= (item.minStock ?? 5)) return { color: '#b84030', label: 'Low Stock', bg: 'rgba(191,73,55,0.1)' }
-    return { color: '#356345', label: 'In Stock', bg: 'rgba(34,197,94,0.1)' }
-  }
-
   return (
     <div style={{ background: '#fff9f0', minHeight: '100vh', padding: '30px', color: '#302820' }}>
       <AdminNavigation />
@@ -300,109 +287,8 @@ function AdminProducts() {
         </div>
       )}
 
-      {/* Low Stock Alert Banner */}
-      {lowStockCount > 0 && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 20px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '12px', marginBottom: '20px' }}>
-          <AlertTriangle size={18} color="#ef4444" />
-          <span style={{ color: '#62584f', fontWeight: 700, fontSize: '14px' }}>
-            {lowStockCount} product{lowStockCount > 1 ? 's' : ''} need restocking! Export the Excel report for details.
-          </span>
-        </div>
-      )}
-
-      <div className="inventory-search"><label>Find a product<input type="search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Name, catalogue reference or description" /></label><label>Stock status<select value={stockFilter} onChange={e => setStockFilter(e.target.value)}><option value="all">All stock</option><option value="low">Needs restocking</option><option value="unknown">Opening count needed</option></select></label><button type="button" onClick={() => fetchItems()} disabled={loading}>Refresh inventory</button></div>
-      {/* Category Filter */}
-      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '20px' }}>
-        {['All', ...categories].map(cat => (
-          <button key={cat} onClick={() => setFilter(cat)} style={{ padding: '6px 16px', borderRadius: '999px', border: filter === cat ? 'none' : '1px solid #f5ecdf', background: filter === cat ? 'linear-gradient(135deg, #bf4937, #bf4937)' : 'transparent', color: filter === cat ? '#302820' : '#64748b', fontWeight: 600, fontSize: '12px', cursor: 'pointer' }}>
-            {cat}
-          </button>
-        ))}
-      </div>
-
-      {/* Products Table */}
-      <div style={{ background: '#f5ecdf', border: '1px solid #f5ecdf', borderRadius: '16px', overflow: 'hidden' }}>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid #f5ecdf' }}>
-                {['Product', 'Category', 'Stock', 'Min Stock', 'Status', 'Actions'].map(h => (
-                  <th key={h} style={{ padding: '14px 20px', color: '#64748b', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.8px', textAlign: 'left', fontWeight: 700 }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr><td colSpan={6} style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>Loading products...</td></tr>
-              ) : !loaded ? (
-                <tr><td colSpan={6} style={{ padding: '40px', textAlign: 'center' }}>Inventory could not be loaded.</td></tr>
-              ) : filtered.length === 0 ? (
-                <tr><td colSpan={6} style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>No products found. Add your first product above!</td></tr>
-              ) : filtered.map(item => {
-                const status = getStockStatus(item)
-                return (
-                  <tr key={item.id} style={{ borderBottom: '1px solid #f5ecdf', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(160,135,111,0.02)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                    <td style={{ padding: '16px 20px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        {item.image_url && <img src={item.image_url} alt={item.title} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #f5ecdf' }} onError={e => e.target.style.display = 'none'} />}
-                        <div>
-                          <div style={{ color: '#302820', fontWeight: 700, fontSize: '14px' }}>{item.title}</div>
-                          <div style={{ color: '#64748b', fontSize: '12px', marginTop: '2px', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.description}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td style={{ padding: '16px 20px' }}>
-                      <span style={{ padding: '4px 10px', background: 'rgba(191,73,55,0.12)', border: '1px solid rgba(191,73,55,0.2)', borderRadius: '999px', color: '#b84030', fontSize: '11px', fontWeight: 700 }}>{item.category}</span>
-                    </td>
-                    <td style={{ padding: '16px 20px' }}>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px' }}>
-                        <strong>{item.stock ?? 'Not recorded'}</strong><span>{item.unit || 'pcs'}</span>
-                      </div>
-                    </td>
-                    <td style={{ padding: '16px 20px', color: '#62584f', fontSize: '14px' }}>{item.minStock ?? 5} {item.unit || 'pcs'}</td>
-                    <td style={{ padding: '16px 20px' }}>
-                      <span style={{ padding: '4px 12px', borderRadius: '999px', background: status.bg, color: status.color, fontSize: '12px', fontWeight: 700 }}>{status.label}</span>
-                    </td>
-                    <td style={{ padding: '16px 20px' }}>
-                      <button disabled={pendingId !== null || adding} onClick={() => del(item.id)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '7px 14px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '8px', color: '#62584f', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>
-                        <Trash2 size={13} /> Archive
-                      </button>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Stock bar chart */}
-      {items.length > 0 && (
-        <div style={{ background: '#f5ecdf', border: '1px solid #f5ecdf', borderRadius: '16px', padding: '24px', marginTop: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-            <BarChart3 size={18} color="#bf4937" />
-            <h3 style={{ color: '#302820', fontWeight: 800, fontSize: '16px', textTransform: 'uppercase' }}>Stock Levels</h3>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {filtered.map(item => {
-              const status = getStockStatus(item)
-              const maxStock = Math.max(...items.map(i => i.stock || 0), 1)
-              const pct = Math.round(((item.stock || 0) / maxStock) * 100)
-              return (
-                <div key={item.id}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                    <span style={{ color: '#62584f', fontSize: '13px', fontWeight: 600 }}>{item.title}</span>
-                    <span style={{ color: status.color, fontSize: '13px', fontWeight: 700 }}>{item.stock === null ? 'Not recorded' : `${item.stock} ${item.unit || 'pcs'}`}</span>
-                  </div>
-                  <div style={{ height: '8px', background: '#f5ecdf', borderRadius: '999px', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', width: `${pct}%`, background: `linear-gradient(90deg, ${status.color}, ${status.color}99)`, borderRadius: '999px', transition: 'width 0.5s ease' }} />
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      )}
+      <InventoryCatalogue items={items} loading={loading} loaded={loaded}
+        onRefresh={() => fetchItems()} onArchive={del} busy={pendingId !== null || adding} />
 
     </div>
   )

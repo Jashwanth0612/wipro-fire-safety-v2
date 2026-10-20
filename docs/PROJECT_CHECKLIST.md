@@ -1,6 +1,6 @@
 # Wipro Fire & Safety V2 — delivery checklist
 
-Last reviewed: 19 October 2026. Owner: Jashwanth. Scope: V2 only; preserve V1.
+Last reviewed: 20 October 2026. Owner: Jashwanth. Scope: V2 only; preserve V1.
 
 ## How to use this document
 
@@ -34,6 +34,7 @@ The daily task covers the full website and backend, not only inventory. Confirme
 - [ ] Record actual opening quantities for every stocked product. **Needs business input:** physical count by owner/father; no assumed zeros.
 - [ ] Configure meaningful minimum-stock thresholds for each product. **Needs business input:** reorder quantities and lead times.
 - [ ] Create father's separate staff account. **Needs input:** his email, user-controlled password setup and explicit account grant.
+- [x] Compact admin catalogue: 8 products per page by default, full-inventory search/category/status filters, separate stock-level cards, and expandable descriptions. Stock-entry workflow and full Excel export retained (20 Oct; tests/build passed, release verification pending).
 - [ ] Multi-item delivery entry and CSV import with preview, validation and duplicate-document detection.
 - [ ] Product variant/SKU and barcode strategy based on real manufacturer codes (do not invent scan codes).
 - [ ] Supplier register, purchase orders and reorder suggestions; orders must be reviewed before sending.
@@ -113,6 +114,8 @@ The daily task covers the full website and backend, not only inventory. Confirme
 | 19 Oct 2026 | Category coverage and monitoring | 22 frontend/monitor tests and 19 API tests passed; production build passed. Live read-only checker: 13/13 passed. Added regression fixtures for degraded database, exposed admin reads, broken JS and network failure. README corrected for Supabase V2. Vercel production READY at 188cb3a; hosted quality and health workflows passed. New authenticated UI check is pending because the browser session expired. |
 
 | 19 Oct 2026 | Security review | npm production dependency audit reported 0 known vulnerabilities. Applied internal RLS trigger permission restriction and verified grants; follow-up advisors no longer flag that function. Remaining advisories: intentional authenticated stock RPC with staff check, and plan-gated leaked-password protection. |
+
+| 20 Oct 2026 | Compact inventory UI | 24 frontend tests passed; server-render check confirmed 8 displayed rows / 40 results / 5 pages with no duplicate stock list. Production credential metadata verified without decrypting values; see docs/CREDENTIALS.md. Deployment verification pending. |
 
 ## Operating guide
 

@@ -11,6 +11,7 @@ Professional B2B catalogue and enquiry website, with a private staff dashboard f
 | Need | Document |
 | --- | --- |
 | Verified progress, remaining tasks and business inputs | [Delivery checklist](docs/PROJECT_CHECKLIST.md) |
+| Credential names and storage boundaries | [Credentials guide](docs/CREDENTIALS.md) |
 | Production checks and incident response | [Monitoring guide](docs/MONITORING.md) |
 | Database migrations, staff permissions and stock ledger | [Supabase setup](supabase/README.md) |
 | API setup and verification | [Backend guide](backend/README.md) |
