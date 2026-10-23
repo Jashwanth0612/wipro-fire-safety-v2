@@ -1,6 +1,6 @@
 # Wipro Fire & Safety V2 — delivery checklist
 
-Last reviewed: 20 October 2026. Owner: Jashwanth. Scope: V2 only; preserve V1.
+Last reviewed: 23 October 2026. Owner: Jashwanth. Scope: V2 only; preserve V1.
 
 ## How to use this document
 
@@ -65,7 +65,9 @@ The daily task covers the full website and backend, not only inventory. Confirme
 - [ ] Verify backup schedule/retention and perform restore drill in an isolated database. **Needs access/plan details; no paid upgrades assumed.**
 - [x] Implement credential-free production smoke checks and an hourly GitHub Actions workflow with safe pass/fail summaries (19 Oct). Local live run: 13/13 passed. GitHub Production health run 39297017241 succeeded.
 - [ ] Complete error monitoring, notification delivery and recovery alerts; a scheduled smoke checker alone does not satisfy this item.
-- [ ] Test session expiry, offline responses, retries, timeout feedback and safe recovery.
+- [x] Preserve unconfirmed stock requests across refresh and same-account sign-in in the same tab; verify replay and storage-failure behavior with automated tests (23 Oct). See docs/STOCK_RECOVERY.md. Live authenticated browser verification remains pending.
+- [ ] Test session expiry, offline responses, retries, timeout feedback and safe recovery end-to-end in the authenticated browser.
+- [ ] Extend uncertain-stock recovery across closed tabs/devices with server-side draft reconciliation; current recovery is deliberately limited to the original browser tab.
 - [x] Add GitHub Actions build, API and frontend/inventory tests (19 Oct, `.github/workflows/quality.yml`; local checks passed).
 - [x] Verify hosted Actions: quality run 39297017294 and health run 39297017241 passed (19 Oct, commit 188cb3a).
 - [ ] Configure required branch checks plus secret/dependency scanning; deployment is not yet blocked on Actions.
@@ -78,8 +80,8 @@ The daily task covers the full website and backend, not only inventory. Confirme
 - [ ] Keyboard navigation, visible focus, labels, contrast, reduced motion and form-error review.
 - [ ] Verify catalogue/contact links, images, brochure, phone and WhatsApp actions.
 - [ ] Check loading, empty, failure and no-results states for every backend screen.
-- [ ] Measure performance and optimize image sizes, loading and JavaScript based on results.
-- [ ] Keep client list compact and searchable; verify all records remain reachable.
+- [ ] Measure performance and optimize image sizes, loading and JavaScript based on results. 23 Oct build: main JS approximately 554 kB uncompressed; investigate route splitting and measure public-page load performance.
+- [x] Keep client list compact and searchable; automated traversal covers every stored record. 23 Oct live browser: 9 cards/page; final page shows records 82–86 of 86; searching ACME from page 10 resets to the single matching record. This verifies the directory, not the separate 151+ marketing claim.
 
 ## P1 — authentic business content
 
@@ -117,6 +119,17 @@ The daily task covers the full website and backend, not only inventory. Confirme
 
 | 20 Oct 2026 | Compact inventory UI | 24 frontend tests passed; server-render check confirmed 8 displayed rows / 40 results / 5 pages with no duplicate stock list. Production credential metadata verified without decrypting values; see docs/CREDENTIALS.md. Vercel production READY at 4aec98b; hosted quality workflow 39356766498 passed (24 frontend + 19 API tests and build). Authenticated browser visual verification remains pending; no active staff session available. |
 
+| 23 Oct 2026 | Production and security review | At 05:16:11 UTC (10:46 IST), read-only checker passed 13/13: /, /about, /products, /services, /contact, /clients, /admin/login, both hashed JS/CSS assets, /api/health, /api/products, and anonymous denial on /api/contact and /api/inventory/movements. Header checks passed; Supabase reports connected. Latest three Vercel deployments READY, main 16edae6. Recent 30-minute error/fatal log query returned no groups (not proof of an error-free day). Latest scheduled health run 39885399358 passed; observed runs have multi-hour gaps despite an hourly schedule. All four public tables have RLS; staff membership policies remain in place. npm production audit: 0 known vulnerabilities. Supabase advisories remain the intentional staff-checked stock RPC and disabled leaked-password protection; see links below. |
+| 23 Oct 2026 | Stock retry recovery | Recovered the previously uncommitted implementation and completed validation. 30 frontend tests and 19 API tests passed; production build passed. Tests simulate lost response after commit, reload/re-login, malformed responses, definitive rejection, blocked storage, account separation and failed cleanup. No production stock mutation performed. Release SHA and deployment evidence will be recorded after deployment. Live authenticated workflow is unavailable because there is no active staff browser session. |
+| 23 Oct 2026 | Client directory interaction | Live browser verified page 10 (82–86 of 86), disabled Next on final page, and search from page 10 returning ACME as 1 of 1. Existing traversal tests verify all stored records are reachable. Mobile widths and visual accessibility audit remain pending. |
+
+### Remaining monitoring and security limits (23 October)
+
+- GitHub's scheduled health checks are arriving several hours apart. Add an independent heartbeat/uptime monitor and verify notification delivery; do not describe the current checks as continuous monitoring.
+- [Stock RPC advisory](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable): execution is intentional for signed-in staff and the function checks staff membership; privileged code needs continued review.
+- [Leaked-password protection](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection): still disabled; the approved project plan has not changed.
+- Current browser session has no authenticated staff login; live receipt/dispatch/count/export testing remains unverified. Opening stock and thresholds still require real business figures.
+
 ## Operating guide
 
 1. Count existing stock once and record **Physical count / correction**, with a reference.
@@ -124,7 +137,7 @@ The daily task covers the full website and backend, not only inventory. Confirme
 3. When goods leave, choose **Dispatch stock**, enter quantity and delivery reference. Do not deduct for an enquiry alone.
 4. Totals and low-stock status follow the saved balance. Review history for who recorded each change and when.
 5. Use **Physical count / correction** for a reconciliation, with a clear reason. Never delete history to hide a mistake.
-6. A request with an uncertain network result should be retried with the same entry, not entered again as a new delivery.
+6. A request with an uncertain network result should be retried in the same browser tab with **Retry same entry safely**. Refreshing or signing back in with the same account restores that request. Do not repeat it in a different tab or device. Closing the tab can remove recovery details; check history before creating another entry.
 
 Automation cannot detect physical deliveries on its own. Staff still identify the product, quantity and reference; a future barcode/invoice integration requires real identifiers and review before changing stock.
 
