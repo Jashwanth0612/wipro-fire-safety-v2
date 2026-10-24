@@ -138,7 +138,7 @@ The daily task covers the full website and backend, not only inventory. Confirme
 - All four public database tables still have RLS enabled. Security advisors unchanged: staff-checked stock RPC and disabled leaked-password protection (remediation links above). No database, policy or credential change in this release. Full authenticated policy retesting not performed today.
 - npm production audit: zero known vulnerabilities. Local verification: 33 frontend tests, 19 API tests and production build passed. New tests cover timeout during response-body reading, connection loss without duplicate submission, and navigation cancellation. Real business records were not mutated.
 - SEO source review corrected the product description's inaccurate “40 categories” wording. Complete canonical/indexing review remains pending. Build main JavaScript remains approximately 554 kB; route splitting is still queued.
-- Release: pending deployment verification. Authenticated browser mutation checks, real opening counts, cross-device stock recovery and independent alerts remain outstanding.
+- Release: commit [92c0add](https://github.com/Jashwanth0612/wipro-fire-safety-v2/commit/92c0add83adb191c422a7cbe738b5e448a3daacc), Vercel production dpl_D3pJ9Qp4Ad4zjFy8eGVMstGkPSe5 READY. Hosted quality run [40066331198](https://github.com/Jashwanth0612/wipro-fire-safety-v2/actions/runs/40066331198) passed. Post-release check at 05:28:56 UTC (10:58 IST): 13/13 passed including new asset index-VakLcSLK.js. Latest preceding scheduled health run 40051185701 also passed. Authenticated browser mutation checks, real opening counts, cross-device stock recovery and independent alerts remain outstanding.
 
 ## Operating guide
 
