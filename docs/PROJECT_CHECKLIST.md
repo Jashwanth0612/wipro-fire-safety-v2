@@ -1,6 +1,6 @@
 # Wipro Fire & Safety V2 — delivery checklist
 
-Last reviewed: 23 October 2026. Owner: Jashwanth. Scope: V2 only; preserve V1.
+Last reviewed: 24 October 2026. Owner: Jashwanth. Scope: V2 only; preserve V1.
 
 ## How to use this document
 
@@ -66,6 +66,7 @@ The daily task covers the full website and backend, not only inventory. Confirme
 - [x] Implement credential-free production smoke checks and an hourly GitHub Actions workflow with safe pass/fail summaries (19 Oct). Local live run: 13/13 passed. GitHub Production health run 39297017241 succeeded.
 - [ ] Complete error monitoring, notification delivery and recovery alerts; a scheduled smoke checker alone does not satisfy this item.
 - [x] Preserve unconfirmed stock requests across refresh and same-account sign-in in the same tab; verify replay and storage-failure behavior with automated tests (23 Oct). See docs/STOCK_RECOVERY.md. Live authenticated browser verification remains pending.
+- [x] Add readable timeout and connection-loss feedback without automatic write retries; distinguish caller cancellation and preserve uncertain stock requests (24 Oct, automated request tests).
 - [ ] Test session expiry, offline responses, retries, timeout feedback and safe recovery end-to-end in the authenticated browser.
 - [ ] Extend uncertain-stock recovery across closed tabs/devices with server-side draft reconciliation; current recovery is deliberately limited to the original browser tab.
 - [x] Add GitHub Actions build, API and frontend/inventory tests (19 Oct, `.github/workflows/quality.yml`; local checks passed).
@@ -129,6 +130,15 @@ The daily task covers the full website and backend, not only inventory. Confirme
 - [Stock RPC advisory](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable): execution is intentional for signed-in staff and the function checks staff membership; privileged code needs continued review.
 - [Leaked-password protection](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection): still disabled; the approved project plan has not changed.
 - Current browser session has no authenticated staff login; live receipt/dispatch/count/export testing remains unverified. Opening stock and thresholds still require real business figures.
+
+## 24 October 2026 verification
+
+- Pre-release production smoke check at 05:25:37 UTC (10:55 IST): 13/13 passed. Routes: /, /about, /products, /services, /contact, /clients, /admin/login; hashed JS/CSS assets; /api/health and /api/products; anonymous reads denied for /api/contact and /api/inventory/movements. Header assertions passed. Supabase health connected.
+- Latest two Vercel deployments READY (main bc390fa); recent 30-minute error/fatal log query returned no groups. This does not cover the full day or prove no errors occurred.
+- All four public database tables still have RLS enabled. Security advisors unchanged: staff-checked stock RPC and disabled leaked-password protection (remediation links above). No database, policy or credential change in this release. Full authenticated policy retesting not performed today.
+- npm production audit: zero known vulnerabilities. Local verification: 33 frontend tests, 19 API tests and production build passed. New tests cover timeout during response-body reading, connection loss without duplicate submission, and navigation cancellation. Real business records were not mutated.
+- SEO source review corrected the product description's inaccurate “40 categories” wording. Complete canonical/indexing review remains pending. Build main JavaScript remains approximately 554 kB; route splitting is still queued.
+- Release: pending deployment verification. Authenticated browser mutation checks, real opening counts, cross-device stock recovery and independent alerts remain outstanding.
 
 ## Operating guide
 

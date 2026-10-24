@@ -31,3 +31,32 @@ test('authenticated requests preserve token and propagate rejected status saves'
     await assert.rejects(apiRequest('/contact/123/status', {method:'PATCH',token:'test-token',body:{status:'contacted'}}), error => error.status === 401)
   } finally { globalThis.fetch = original }
 })
+
+test('timeout covers response-body reading and explains uncertain stock writes', async () => {
+ const original=globalThis.fetch
+ try {
+  globalThis.fetch=async (_url,{signal})=>({ok:true,status:200,headers:new Headers({'content-type':'application/json'}),json:()=>new Promise((_resolve,reject)=>signal.addEventListener('abort',()=>reject(new DOMException('Aborted','AbortError')),{once:true}))})
+  await assert.rejects(apiRequest('/inventory/movements',{method:'POST',body:{},timeout:5}),error=>error.code==='REQUEST_TIMEOUT' && error.status===undefined && error.message.includes('may already be saved') && error.message.includes('Retry same entry safely'))
+ } finally {globalThis.fetch=original}
+})
+
+test('network failures are readable and never automatically resubmit writes', async () => {
+ const original=globalThis.fetch
+ let calls=0
+ try {
+  globalThis.fetch=async()=>{calls++;throw new TypeError('Failed to fetch')}
+  await assert.rejects(apiRequest('/contact',{method:'POST',body:{}}),error=>error.code==='NETWORK_ERROR' && error.message.includes('Check the result before submitting again') && error.status===undefined)
+  assert.equal(calls,1)
+  await assert.rejects(apiRequest('/products'),error=>error.code==='NETWORK_ERROR' && error.message.includes('check your connection'))
+ } finally {globalThis.fetch=original}
+})
+
+test('caller cancellation remains distinct from service timeouts', async () => {
+ const original=globalThis.fetch, controller=new AbortController()
+ try {
+  globalThis.fetch=async(_url,{signal})=>new Promise((_resolve,reject)=>signal.addEventListener('abort',()=>reject(new DOMException('Aborted','AbortError')),{once:true}))
+  const request=apiRequest('/products',{signal:controller.signal,timeout:100})
+  controller.abort()
+  await assert.rejects(request,error=>error.name==='AbortError' && error.code!=='REQUEST_TIMEOUT')
+ } finally {globalThis.fetch=original}
+})

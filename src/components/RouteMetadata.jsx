@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 const pages = {
   '/': ['Fire Safety Solutions in Kurnool, South India','Fire protection, installation, AMC, refilling and safety training from Wipro Fire & Safety in Kurnool.'],
-  '/products': ['Fire & Safety Product Catalogue','Explore 40 fire and safety product categories. Search models, view specifications and build a quote shortlist.'],
+  '/products': ['Fire & Safety Product Catalogue','Explore fire and safety products. Search models, view specifications and build a quote shortlist.'],
   '/services': ['Fire Safety Services','Explore installation, maintenance, extinguisher refilling, audits and fire safety training.'],
   '/about': ['About Us','Learn about Wipro Fire & Safety and our work across South India.'],
   '/clients': ['Our Clients','Explore Wipro Fire & Safety installations and clients across South India.'],

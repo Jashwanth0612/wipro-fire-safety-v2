@@ -13,7 +13,13 @@ export async function apiRequest(path, { method = 'GET', body, token, signal, ti
   const abort = () => controller.abort()
   if (signal?.aborted) abort()
   else signal?.addEventListener('abort', abort, { once: true })
-  const timer = setTimeout(abort, timeout)
+  let timedOut = false
+  const timer = setTimeout(() => { timedOut = true; abort() }, timeout)
+  const recovery = method === 'GET' || method === 'HEAD'
+    ? 'Please check your connection and try again.'
+    : path.replace(/^\/+/, '') === 'inventory/movements'
+      ? 'Your stock update may already be saved. Use “Retry same entry safely” in this tab to confirm it.'
+      : 'We could not confirm whether your changes were saved. Check the result before submitting again.'
   try {
     const response = await fetch(`${API_BASE}/${path.replace(/^\/+/, '')}`, {
       method, signal: controller.signal, cache: 'no-store',
@@ -32,6 +38,16 @@ export async function apiRequest(path, { method = 'GET', body, token, signal, ti
       throw error
     }
     return data
+  } catch (error) {
+    // Navigation/unmount cancellation is not a service failure.
+    if (signal?.aborted) throw error
+    if (timedOut || error instanceof TypeError) {
+      const failure = new Error(`${timedOut ? 'The request took too long.' : 'Could not connect to the service.'} ${recovery}`)
+      failure.code = timedOut ? 'REQUEST_TIMEOUT' : 'NETWORK_ERROR'
+      // No HTTP status: a failed transport cannot prove a mutation was rejected.
+      throw failure
+    }
+    throw error
   } finally {
     clearTimeout(timer)
     signal?.removeEventListener('abort', abort)
