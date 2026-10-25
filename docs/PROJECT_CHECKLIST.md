@@ -1,6 +1,6 @@
 # Wipro Fire & Safety V2 — delivery checklist
 
-Last reviewed: 24 October 2026. Owner: Jashwanth. Scope: V2 only; preserve V1.
+Last reviewed: 25 October 2026. Owner: Jashwanth. Scope: V2 only; preserve V1.
 
 ## How to use this document
 
@@ -40,6 +40,8 @@ The daily task covers the full website and backend, not only inventory. Confirme
 - [ ] Supplier register, purchase orders and reorder suggestions; orders must be reviewed before sending.
 - [ ] Returns/damage movements and stock reconciliation report.
 - [ ] Archived product view and restore action.
+- [x] Correct exported category summaries: unknown stock is not zero, mixed units are separated, and partial count coverage is explicit (25 Oct; calculation tests passed). Actual authenticated Excel download remains pending.
+- [ ] Review dashboard aggregate stock totals for mixed units; do not present unlike units as a meaningful combined quantity.
 
 ## P0 — enquiries and workflow verification
 
@@ -139,6 +141,14 @@ The daily task covers the full website and backend, not only inventory. Confirme
 - npm production audit: zero known vulnerabilities. Local verification: 33 frontend tests, 19 API tests and production build passed. New tests cover timeout during response-body reading, connection loss without duplicate submission, and navigation cancellation. Real business records were not mutated.
 - SEO source review corrected the product description's inaccurate “40 categories” wording. Complete canonical/indexing review remains pending. Build main JavaScript remains approximately 554 kB; route splitting is still queued.
 - Release: commit [92c0add](https://github.com/Jashwanth0612/wipro-fire-safety-v2/commit/92c0add83adb191c422a7cbe738b5e448a3daacc), Vercel production dpl_D3pJ9Qp4Ad4zjFy8eGVMstGkPSe5 READY. Hosted quality run [40066331198](https://github.com/Jashwanth0612/wipro-fire-safety-v2/actions/runs/40066331198) passed. Post-release check at 05:28:56 UTC (10:58 IST): 13/13 passed including new asset index-VakLcSLK.js. Latest preceding scheduled health run 40051185701 also passed. Authenticated browser mutation checks, real opening counts, cross-device stock recovery and independent alerts remain outstanding.
+
+## 25 October 2026 verification
+
+- Production read-only checks at 05:19:36 UTC (10:49 IST): 13/13 passed across /, /about, /products, /services, /contact, /clients, /admin/login, JS/CSS assets, /api/health, /api/products and anonymous-denied /api/contact and /api/inventory/movements. Required security-header assertions passed. Latest two deployments READY (main 7b7171b). Recent 30-minute error/fatal log query returned no groups; longer periods were not verified.
+- Supabase reports the same two documented advisories (staff-checked stock RPC and disabled leaked-password protection; remediation links above). All four public tables retain RLS. No access policies or business records changed. npm production audit reported zero known vulnerabilities.
+- Admin report review found category summaries treating entirely unrecorded stock as zero and combining different units. The exported summary now groups by category and unit, shows counted/awaiting-count product counts, labels incomplete coverage, and retains actual zero quantities. Map-based grouping also handles category names such as constructor safely. Original stock overview and low-stock sheets remain intact.
+- Validation: 36 frontend tests, 19 API tests, production build and whitespace check passed. New synthetic tests cover unknown/zero/partial stock, mixed units, unusual category names, invalid quantities, empty inventory and non-mutation. No live authenticated Excel download was performed; an active staff browser session remains unavailable. Main-bundle size remains approximately 554 kB, with performance work still open.
+- Release: pending verification. Independent uptime alerts, real stock counts and authenticated workflow verification remain open.
 
 ## Operating guide
 

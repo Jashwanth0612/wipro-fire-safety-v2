@@ -28,3 +28,21 @@ export function stockPreview(stock, kind, value) {
   if (balance > 1000000) return { error: 'Balance exceeds the supported stock limit.' }
   return { balance }
 }
+
+// Keep missing counts distinct from zero and never add unlike stock units.
+export function inventorySummary(items) {
+  const groups = new Map()
+  for (const item of items) {
+    const category = item.category || 'Uncategorised'
+    const unit = item.unit || 'pcs'
+    const key = JSON.stringify([category, unit])
+    if (!groups.has(key)) groups.set(key, { category, unit, products: 0, recorded: 0, unknown: 0, total: 0 })
+    const group = groups.get(key)
+    group.products++
+    if (Number.isSafeInteger(item.stock) && item.stock >= 0) {
+      group.recorded++
+      group.total += item.stock
+    } else group.unknown++
+  }
+  return [...groups.values()].map(group => ({ ...group, total: group.recorded ? group.total : null }))
+}

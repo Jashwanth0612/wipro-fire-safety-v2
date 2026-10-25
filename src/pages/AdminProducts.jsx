@@ -4,7 +4,7 @@ import AdminNavigation from '../components/AdminNavigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { apiRequest } from '../lib/api'
-import { inventoryCategories } from '../lib/inventory.mjs'
+import { inventoryCategories, inventorySummary } from '../lib/inventory.mjs'
 import { PRODUCTS } from '../data/products'
 import { Package, Plus, Download, AlertTriangle, CheckCircle, TrendingUp } from 'lucide-react'
 
@@ -153,26 +153,19 @@ function AdminProducts() {
       XLSX.utils.book_append_sheet(wb, ws2, 'Low Stock Alerts')
 
       // Sheet 3: Category Summary
-      const catSummary = {}
-      items.forEach(p => {
-        if (!catSummary[p.category]) catSummary[p.category] = { count: 0, recorded: 0, totalStock: 0 }
-        catSummary[p.category].count++
-        catSummary[p.category].totalStock += p.stock ?? 0
-        if (p.stock !== null) catSummary[p.category].recorded++
-      })
       const summaryData = [
         ['CATEGORY SUMMARY'],
+        ['Recorded totals exclude products without a count. Units are reported separately.'],
         [],
-        ['Category', 'Total Products', 'Recorded Stock', 'Avg per Recorded Product'],
-        ...Object.entries(catSummary).map(([cat, data]) => [
-          cat,
-          data.count,
-          data.totalStock,
-          data.recorded ? Math.round(data.totalStock / data.recorded) : 'Not recorded'
+        ['Category', 'Unit', 'Total Products', 'Counted Products', 'Awaiting Count', 'Recorded Stock', 'Coverage'],
+        ...inventorySummary(items).map(group => [
+          group.category, group.unit, group.products, group.recorded, group.unknown,
+          group.total ?? 'Not recorded',
+          group.recorded === 0 ? 'NOT RECORDED' : group.unknown ? 'PARTIAL' : 'COMPLETE'
         ])
       ]
       const ws3 = XLSX.utils.aoa_to_sheet(summaryData)
-      ws3['!cols'] = [{ wch: 25 }, { wch: 16 }, { wch: 14 }, { wch: 24 }]
+      ws3['!cols'] = [{ wch: 25 }, { wch: 12 }, { wch: 16 }, { wch: 18 }, { wch: 18 }, { wch: 16 }, { wch: 16 }]
       XLSX.utils.book_append_sheet(wb, ws3, 'Category Summary')
 
       XLSX.writeFile(wb, `Wipro_Stock_Report_${new Date().toISOString().split('T')[0]}.xlsx`)

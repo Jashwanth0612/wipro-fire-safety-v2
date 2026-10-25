@@ -43,3 +43,22 @@ test('inventory search and stock filters run before pagination without mutating 
  assert.equal(empty.total,0); assert.equal(empty.start,0); assert.equal(empty.end,0); assert.equal(empty.page,1)
  assert.equal(items.length,3)
 })
+
+test('category summaries distinguish unknown stock, real zero and partial counts', async () => {
+ const { inventorySummary } = await import('../src/lib/inventory.mjs')
+ const items = [{category:'Unknown',stock:null},{category:'Zero',stock:0},{category:'Partial',stock:3},{category:'Partial',stock:null}]
+ const groups=inventorySummary(items)
+ assert.deepEqual(groups.map(g=>[g.category,g.recorded,g.unknown,g.total]),[['Unknown',0,1,null],['Zero',1,0,0],['Partial',1,1,3]])
+ assert.equal(items[0].stock,null)
+ assert.deepEqual(inventorySummary([]),[])
+})
+test('summary separates units and accepts category names that collide with object prototypes', async () => {
+ const { inventorySummary } = await import('../src/lib/inventory.mjs')
+ const groups=inventorySummary([{category:'constructor',unit:'pcs',stock:2},{category:'constructor',unit:'kg',stock:7},{category:'__proto__',stock:5},{category:'constructor',unit:'pcs',stock:3}])
+ assert.deepEqual(groups.map(g=>[g.category,g.unit,g.products,g.total]),[['constructor','pcs',2,5],['constructor','kg',1,7],['__proto__','pcs',1,5]])
+})
+test('invalid counts are not silently included in report totals', async () => {
+ const { inventorySummary } = await import('../src/lib/inventory.mjs')
+ const [group]=inventorySummary([null,undefined,-1,1.5,NaN,'4'].map(stock=>({category:'Safety',stock})))
+ assert.equal(group.total,null); assert.equal(group.unknown,6); assert.equal(group.recorded,0)
+})
