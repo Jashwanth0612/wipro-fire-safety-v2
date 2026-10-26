@@ -62,3 +62,18 @@ test('invalid counts are not silently included in report totals', async () => {
  const [group]=inventorySummary([null,undefined,-1,1.5,NaN,'4'].map(stock=>({category:'Safety',stock})))
  assert.equal(group.total,null); assert.equal(group.unknown,6); assert.equal(group.recorded,0)
 })
+
+test('dashboard unit totals combine categories without combining unlike units', async () => {
+ const { inventoryUnitSummary } = await import('../src/lib/inventory.mjs')
+ const items = [{category:'Fire',unit:'pcs',stock:3},{category:'Safety',unit:'pcs',stock:4},{category:'Safety',unit:'kg',stock:6},{category:'Fire',unit:'pcs',stock:null}]
+ assert.deepEqual(inventoryUnitSummary(items),[
+  {unit:'pcs',products:3,recorded:2,unknown:1,total:7},
+  {unit:'kg',products:1,recorded:1,unknown:0,total:6}
+ ])
+ assert.equal(items[3].stock,null)
+})
+test('dashboard keeps uncounted units distinct from a counted zero', async () => {
+ const { inventoryUnitSummary } = await import('../src/lib/inventory.mjs')
+ assert.deepEqual(inventoryUnitSummary([{unit:'pcs',stock:null},{unit:'kg',stock:0}]).map(g=>[g.unit,g.total,g.recorded]),[['pcs',null,0],['kg',0,1]])
+ assert.deepEqual(inventoryUnitSummary([]),[])
+})

@@ -1,3 +1,4 @@
+import InventoryTotals from '../components/InventoryTotals'
 import InventoryCatalogue from '../components/InventoryCatalogue'
 import StockWorkflow from '../components/StockWorkflow'
 import AdminNavigation from '../components/AdminNavigation'
@@ -178,7 +179,6 @@ function AdminProducts() {
   const lowStockCount = items.filter(p => p.stock !== null && p.stock <= (p.minStock ?? 5)).length
   const categories = inventoryCategories(items, CATEGORIES)
   const unknownStockCount = items.filter(item => item.stock === null).length
-  const totalStock = items.reduce((sum, p) => sum + (p.stock || 0), 0)
   return (
     <div style={{ background: '#fff9f0', minHeight: '100vh', padding: '30px', color: '#302820' }}>
       <AdminNavigation />
@@ -211,7 +211,7 @@ function AdminProducts() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', marginBottom: '24px' }}>
         {[
           { icon: Package, label: 'Total Products', value: items.length, color: '#b84030' },
-          { icon: TrendingUp, label: 'Recorded Stock Units', value: totalStock, color: '#b84030' },
+          { icon: TrendingUp, label: 'Products Counted', value: `${items.length - unknownStockCount} / ${items.length}`, color: '#b84030' },
           { icon: AlertTriangle, label: 'Low Stock Alerts', value: lowStockCount, color: '#62584f' },
           { icon: CheckCircle, label: 'Healthy Stock', value: items.length - lowStockCount - unknownStockCount, color: '#356345' },
         ].map((s, i) => {
@@ -233,6 +233,7 @@ function AdminProducts() {
       </div>
 
       {unknownStockCount > 0 && <p>{unknownStockCount} {unknownStockCount === 1 ? 'product has' : 'products have'} no recorded stock quantity. Totals include recorded quantities only.</p>}
+      <InventoryTotals items={items} />
       </>}
       {loaded && <StockWorkflow items={items} token={token} onSaved={fetchItems} onError={handleError} />}
       {/* Add Product Form */}

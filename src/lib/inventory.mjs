@@ -46,3 +46,16 @@ export function inventorySummary(items) {
   }
   return [...groups.values()].map(group => ({ ...group, total: group.recorded ? group.total : null }))
 }
+
+export function inventoryUnitSummary(items) {
+  const units = new Map()
+  for (const group of inventorySummary(items)) {
+    if (!units.has(group.unit)) units.set(group.unit, { unit: group.unit, products: 0, recorded: 0, unknown: 0, total: 0 })
+    const unit = units.get(group.unit)
+    unit.products += group.products
+    unit.recorded += group.recorded
+    unit.unknown += group.unknown
+    unit.total += group.total ?? 0
+  }
+  return [...units.values()].map(unit => ({ ...unit, total: unit.recorded ? unit.total : null }))
+}

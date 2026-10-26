@@ -1,6 +1,6 @@
 # Wipro Fire & Safety V2 — delivery checklist
 
-Last reviewed: 25 October 2026. Owner: Jashwanth. Scope: V2 only; preserve V1.
+Last reviewed: 26 October 2026. Owner: Jashwanth. Scope: V2 only; preserve V1.
 
 ## How to use this document
 
@@ -41,7 +41,7 @@ The daily task covers the full website and backend, not only inventory. Confirme
 - [ ] Returns/damage movements and stock reconciliation report.
 - [ ] Archived product view and restore action.
 - [x] Correct exported category summaries: unknown stock is not zero, mixed units are separated, and partial count coverage is explicit (25 Oct; calculation tests passed). Actual authenticated Excel download remains pending.
-- [ ] Review dashboard aggregate stock totals for mixed units; do not present unlike units as a meaningful combined quantity.
+- [x] Replace the stock-manager mixed-unit aggregate with Products Counted and a collapsed unit-by-unit summary (26 Oct; calculation and server-render checks passed). Live authenticated visual verification remains pending.
 
 ## P0 — enquiries and workflow verification
 
@@ -149,6 +149,14 @@ The daily task covers the full website and backend, not only inventory. Confirme
 - Admin report review found category summaries treating entirely unrecorded stock as zero and combining different units. The exported summary now groups by category and unit, shows counted/awaiting-count product counts, labels incomplete coverage, and retains actual zero quantities. Map-based grouping also handles category names such as constructor safely. Original stock overview and low-stock sheets remain intact.
 - Validation: 36 frontend tests, 19 API tests, production build and whitespace check passed. New synthetic tests cover unknown/zero/partial stock, mixed units, unusual category names, invalid quantities, empty inventory and non-mutation. No live authenticated Excel download was performed; an active staff browser session remains unavailable. Main-bundle size remains approximately 554 kB, with performance work still open.
 - Release: [4290696](https://github.com/Jashwanth0612/wipro-fire-safety-v2/commit/42906968fad9b003bf96be6feb0ba9f93a386796), Vercel production dpl_A7gmqBzyYUSc8X3PzVUwKtAeBcvp READY. Hosted quality run [40165231374](https://github.com/Jashwanth0612/wipro-fire-safety-v2/actions/runs/40165231374) passed. Post-release smoke check at 05:23:01 UTC (10:53 IST): 13/13 passed including new asset index-pvLPzi75.js. Latest preceding scheduled health run 40150275427 passed. Independent uptime alerts, real stock counts and authenticated workflow verification remain open.
+
+## 26 October 2026 verification
+
+- Pre-release production check at 04:43:30 UTC (10:13 IST): 13/13 passed. Tested /, /about, /products, /services, /contact, /clients, /admin/login, hashed JS/CSS assets, /api/health, /api/products, and anonymous denial of /api/contact and /api/inventory/movements. Security-header assertions passed; Supabase health connected. Latest two deployments READY at ca2cab5 and 4290696. Recent 30-minute Vercel error/fatal query returned no groups; longer retention not checked.
+- npm production audit: zero known vulnerabilities. All four public tables retain RLS; Supabase advisories remain the documented staff-checked stock RPC and disabled leaked-password protection (links above). Full authenticated access-policy retesting was not performed; no policies, credentials or database records changed.
+- Corrected stock-manager usability and accuracy: mixed-unit total replaced with Products Counted (recorded / total). Collapsed Recorded stock by unit section separates units across categories, distinguishes unrecorded totals from real zero, shows awaiting-count coverage, wraps long unit names and limits expanded height to avoid another long page.
+- Local verification: 38 frontend tests, 19 API tests, build and whitespace checks passed. React server-render assertions verified separate units, zero and unknown labels, collapsed default and empty inventory. This is not a live authenticated browser or mobile visual test; those remain pending. Main JS is 555.53 kB uncompressed; route splitting remains queued.
+- Release: pending verification. Actual opening quantities, authenticated stock mutations/download, independent alerts and cross-device recovery remain outstanding.
 
 ## Operating guide
 
