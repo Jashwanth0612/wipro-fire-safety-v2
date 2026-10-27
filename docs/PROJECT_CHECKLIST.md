@@ -1,6 +1,6 @@
 # Wipro Fire & Safety V2 — delivery checklist
 
-Last reviewed: 26 October 2026. Owner: Jashwanth. Scope: V2 only; preserve V1.
+Last reviewed: 27 October 2026. Owner: Jashwanth. Scope: V2 only; preserve V1.
 
 ## How to use this document
 
@@ -83,7 +83,8 @@ The daily task covers the full website and backend, not only inventory. Confirme
 - [ ] Keyboard navigation, visible focus, labels, contrast, reduced motion and form-error review.
 - [ ] Verify catalogue/contact links, images, brochure, phone and WhatsApp actions.
 - [ ] Check loading, empty, failure and no-results states for every backend screen.
-- [ ] Measure performance and optimize image sizes, loading and JavaScript based on results. 23 Oct build: main JS approximately 554 kB uncompressed; investigate route splitting and measure public-page load performance.
+- [ ] Measure performance and optimize image sizes, loading and JavaScript based on results. 27 Oct: secondary routes split into on-demand chunks; initial JS reduced from 555.53 kB to 449.00 kB (gzip 168.05 to 143.27 kB). Image review and measured real-user loading metrics remain pending.
+- [x] Load secondary public/admin pages on demand, with loading/error recovery and delayed enquiry-anchor support (27 Oct; local browser regression checks passed; release evidence below).
 - [x] Keep client list compact and searchable; automated traversal covers every stored record. 23 Oct live browser: 9 cards/page; final page shows records 82–86 of 86; searching ACME from page 10 resets to the single matching record. This verifies the directory, not the separate 151+ marketing claim.
 
 ## P1 — authentic business content
@@ -157,6 +158,13 @@ The daily task covers the full website and backend, not only inventory. Confirme
 - Corrected stock-manager usability and accuracy: mixed-unit total replaced with Products Counted (recorded / total). Collapsed Recorded stock by unit section separates units across categories, distinguishes unrecorded totals from real zero, shows awaiting-count coverage, wraps long unit names and limits expanded height to avoid another long page.
 - Local verification: 38 frontend tests, 19 API tests, build and whitespace checks passed. React server-render assertions verified separate units, zero and unknown labels, collapsed default and empty inventory. This is not a live authenticated browser or mobile visual test; those remain pending. Main JS is 555.53 kB uncompressed; route splitting remains queued.
 - Release: [a32eb44](https://github.com/Jashwanth0612/wipro-fire-safety-v2/commit/a32eb44948a9468791b7c0802038a0047bb00c76), Vercel production dpl_HntPo3SZXvQVcu9EuH68eqzne1By READY. Hosted quality run [40270667091](https://github.com/Jashwanth0612/wipro-fire-safety-v2/actions/runs/40270667091) passed. Post-release smoke check at 04:46:42 UTC (10:16 IST): 13/13 passed including index-DtAfLe5g.js. Latest preceding scheduled health run 40254092848 passed. Actual opening quantities, authenticated stock mutations/download, independent alerts and cross-device recovery remain outstanding.
+
+## 27 October 2026 verification
+
+- Initial read-only production checks at 05:28:47 UTC (10:58 IST): 13/13 passed. Routes: /, /about, /products, /services, /contact, /clients, /admin/login, hashed JS/CSS assets, /api/health, /api/products, anonymous-denied /api/contact and /api/inventory/movements. Required security headers passed; database connected. Latest two deployments READY at 9e1a53b and a32eb44. Recent 30-minute error/fatal log query returned no groups, not a full-day guarantee.
+- npm production audit: zero known vulnerabilities. All four public tables retain RLS. Supabase advisories unchanged: intentional staff-checked stock RPC and disabled leaked-password protection (remediation links above). No schema, policies, credentials or real business records changed. Full authenticated access-policy retesting remains pending.
+- Performance change: Home remains eager; nine secondary public/admin screens load on demand. Route-level loading feedback and an error boundary preserve navigation after a failed page download, with explicit reload rather than automatic reload. Hash scrolling starts only after the page is ready and respects reduced-motion preference. Existing content, catalogue and branding preserved.
+- Local validation: 38 frontend tests, 19 API tests, production build and whitespace checks passed. Fifteen local Chromium browser checks passed using synthetic API fixtures: deferred downloads, navigation/direct entries including 404, anonymous admin redirects, slow enquiry hash navigation, failed-download home recovery and 390px Contact overflow. These are not authenticated stock tests. Latest preceding scheduled Production health run 40427637505 passed; schedule gaps remain. Production release evidence will be recorded after deployment. See docs/ROUTE_LOADING.md for reproduction and limitations. New follow-up: extend production monitoring to verify dynamically imported route chunks, not only the entry JS/CSS. Dedicated independent uptime alerts, authenticated stock workflow verification, actual stock counts and cross-device recovery remain pending.
 
 ## Operating guide
 
