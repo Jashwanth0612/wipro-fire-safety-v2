@@ -44,9 +44,28 @@ try {
   }
   for (const route of ['/admin', '/admin/dashboard', '/admin/products']) {
     await check(`anonymous redirect ${route}`, async page => {
+      const scripts = []
+      page.on('request', request => { if (request.resourceType() === 'script') scripts.push(request.url()) })
       await page.goto(origin + route)
       await page.waitForURL('**/admin/login')
       await page.locator('input[type="password"]').waitFor()
+      assert.ok(!scripts.some(url => /\/Admin(Dashboard|Products)-/.test(url)), 'Signed-out visitors must not download or mount staff screens')
+    })
+  }
+  for (const [route, heading] of [['/admin/dashboard', 'Admin Dashboard'], ['/admin/products', 'Product & Stock Manager']]) {
+    await check(`local synthetic session can open ${route}`, async page => {
+      await page.addInitScript(() => localStorage.setItem('admin_token', 'local-test-only'))
+      await page.goto(origin + route)
+      await page.getByRole('heading', { name: heading, exact: true }).waitFor()
+      assert.equal(new URL(page.url()).pathname, route)
+    })
+    await check(`server rejection still redirects ${route}`, async page => {
+      await page.addInitScript(() => localStorage.setItem('admin_token', 'local-test-only'))
+      await page.route('**/api/' + (route.endsWith('products') ? 'products' : 'contact'), route => route.fulfill({status:403, contentType:'application/json', body:'{"detail":"Forbidden"}'}))
+      await page.goto(origin + route)
+      await page.waitForURL('**/admin/login')
+      await page.locator('input[type="password"]').waitFor()
+      assert.equal(await page.evaluate(() => localStorage.getItem('admin_token')), null)
     })
   }
   await check('slow Contact chunk shows feedback and preserves enquiry hash scrolling', async page => {
