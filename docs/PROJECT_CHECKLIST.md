@@ -1,6 +1,6 @@
 # Wipro Fire & Safety V2 — delivery checklist
 
-Last reviewed: 28 October 2026. Owner: Jashwanth. Scope: V2 only; preserve V1.
+Last reviewed: 29 October 2026. Owner: Jashwanth. Scope: V2 only; preserve V1.
 
 ## How to use this document
 
@@ -67,6 +67,8 @@ The daily task covers the full website and backend, not only inventory. Confirme
 - [ ] Verify backup schedule/retention and perform restore drill in an isolated database. **Needs access/plan details; no paid upgrades assumed.**
 - [x] Implement credential-free production smoke checks and an hourly GitHub Actions workflow with safe pass/fail summaries (19 Oct). Local live run: 13/13 passed. GitHub Production health run 39297017241 succeeded.
 - [ ] Complete error monitoring, notification delivery and recovery alerts; a scheduled smoke checker alone does not satisfy this item.
+- [ ] Extend production smoke coverage to dynamically imported route chunks; current HTTP checks validate entry JS/CSS, while route rendering is checked separately.
+- [ ] Make the local browser regression suite reproducible in hosted CI with pinned browser installation; current quality workflow runs frontend/API tests and build, but not Chromium checks.
 - [x] Preserve unconfirmed stock requests across refresh and same-account sign-in in the same tab; verify replay and storage-failure behavior with automated tests (23 Oct). See docs/STOCK_RECOVERY.md. Live authenticated browser verification remains pending.
 - [x] Add readable timeout and connection-loss feedback without automatic write retries; distinguish caller cancellation and preserve uncertain stock requests (24 Oct, automated request tests).
 - [ ] Test session expiry, offline responses, retries, timeout feedback and safe recovery end-to-end in the authenticated browser.
@@ -83,7 +85,7 @@ The daily task covers the full website and backend, not only inventory. Confirme
 - [ ] Keyboard navigation, visible focus, labels, contrast, reduced motion and form-error review.
 - [ ] Verify catalogue/contact links, images, brochure, phone and WhatsApp actions.
 - [ ] Check loading, empty, failure and no-results states for every backend screen.
-- [ ] Prevent brief signed-out admin-shell display before redirect. Observed on 27 Oct; the final state was the login form and staff API denial remains intact. No staff data was observed.
+- [x] Prevent brief signed-out admin-shell display before redirect (29 Oct, 87e53d3). Route guard avoids mounting/downloading admin screens without a token; local browser checks and live anonymous redirects passed. Server authorization and rejected-session handling remain intact; token presence alone does not authorize access.
 - [ ] Measure performance and optimize image sizes, loading and JavaScript based on results. 27 Oct: secondary routes split into on-demand chunks; initial JS reduced from 555.53 kB to 449.00 kB (gzip 168.05 to 143.27 kB). Image review and measured real-user loading metrics remain pending.
 - [x] Load secondary public/admin pages on demand, with loading/error recovery and delayed enquiry-anchor support (27 Oct; local browser regression checks passed; release evidence below).
 - [x] Keep client list compact and searchable; automated traversal covers every stored record. 23 Oct live browser: 9 cards/page; final page shows records 82–86 of 86; searching ACME from page 10 resets to the single matching record. This verifies the directory, not the separate 151+ marketing claim.
@@ -174,6 +176,15 @@ The daily task covers the full website and backend, not only inventory. Confirme
 - Prepared the signed-out admin-flash fix in [draft PR #1](https://github.com/Jashwanth0612/wipro-fire-safety-v2/pull/1), commit [6b57612](https://github.com/Jashwanth0612/wipro-fire-safety-v2/commit/6b57612125d27a37d7e601c7fa0b2fe57d554506). A route-level presence check prevents mounting/downloading staff screens when there is no token. It is a UX gate, not authorization; server checks and 401/403 handling remain unchanged.
 - Local validation passed: 38 frontend tests, 19 API tests, production build and whitespace checks. Added browser cases for anonymous chunk exclusion, synthetic local sessions and server rejection. These browser cases have NOT run: temporary Playwright tooling was missing, then the execution environment became unavailable before reinstall. This is an execution blocker, not a production outage. No application change deployed to production; only this evidence document is updated on main.
 - Next run: resume PR #1, run the optional local browser suite (including its new cases), inspect hosted CI, then merge/deploy only after verification. Follow with live anonymous route checks. Authenticated business workflows, real stock figures and independent uptime/error alerts remain outstanding. Quotation/follow-up workspace remains a proposed next business feature, not implemented.
+
+## 29 October 2026 verification
+
+- Resumed PR #1 after reading AGENTS.md, current main checklist and source. Pre-release production smoke at 04:41:40 UTC (10:11 IST): 13/13 passed across /, /about, /products, /services, /contact, /clients, /admin/login, entry JS/CSS, /api/health, /api/products, and anonymous-denied /api/contact and /api/inventory/movements. Required security-header assertions passed; database connected.
+- Latest two pre-release Vercel deployments were READY (main cf477be and preview 6b57612). Recent 30-minute production error/fatal query returned no groups; this is not full-day error coverage. npm production audit: zero known vulnerabilities. All four public database tables retain RLS. Supabase advisors unchanged: intentional staff-checked stock RPC and disabled plan-gated leaked-password protection (links above). No database, policy, credential or real business data changes.
+- Restored missing temporary Python/Playwright tooling and completed previously blocked validation: 38 frontend tests, 19 API tests, production build and all 19 local Chromium checks passed. Browser tests use synthetic API fixtures; they cover anonymous admin chunk exclusion, synthetic local sessions, rejected-session redirects, deferred route downloads, delayed hash navigation, download-failure recovery and narrow Contact layout. They are not real authenticated stock transactions. Hosted PR quality run 40637497502 passed.
+- Merged [PR #1](https://github.com/Jashwanth0612/wipro-fire-safety-v2/pull/1) at [87e53d3](https://github.com/Jashwanth0612/wipro-fire-safety-v2/commit/87e53d309d6cd8ab3be5035a5c287b33d99a405f). Production deployment dpl_FQMrk7absp1HeJByLGW4QYDrYC81 is READY. Hosted main quality run [40819313117](https://github.com/Jashwanth0612/wipro-fire-safety-v2/actions/runs/40819313117) passed frontend tests, API tests and build.
+- Post-release production smoke at 04:45:27 UTC (10:15 IST): 13/13 passed, including new entry index-D1ccl0pr.js and CSS index-DYvJZRkK.css. Live cloud-browser checks completed by 04:46 UTC: both /admin/products and /admin/dashboard redirected to /admin/login and rendered the sign-in form; public /products rendered all 40 catalogue products and five category filters. Browser DOM confirmed the new entry asset. No login attempt, customer submission or stock mutation was made.
+- Remaining limits: no active staff session for real receipt/dispatch/count/Excel verification; real opening quantities and reorder thresholds need business figures. Independent uptime/error/recovery alerts, closed-tab stock recovery, full mobile/accessibility checks, backup restore verification and content certification evidence remain pending. Next actionable reliability work: include deferred route assets in production monitoring and run the browser regression suite in hosted CI. Preserve real catalogue data while reviewing unsupported marketing claims.
 
 ## Operating guide
 
