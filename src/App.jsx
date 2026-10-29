@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import { AnimatePresence, motion, MotionConfig } from 'framer-motion'
 import { lazy, Suspense, useEffect } from 'react'
 import RouteErrorBoundary from './components/RouteErrorBoundary'
+import RequireAdminSession from './components/RequireAdminSession'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import WhatsAppButton from './components/WhatsAppButton'
@@ -63,8 +64,8 @@ function AnimatedRoutes() {
         <Route path="*" element={<PageWrapper><div className="container catalog-cta"><h1>Page not found</h1><p>This page may have moved.</p><a className="button" href="/">Back to home</a></div></PageWrapper>} />
         <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="/admin/login" element={<PageWrapper><AdminLogin /></PageWrapper>} />
-        <Route path="/admin/dashboard" element={<PageWrapper><AdminDashboard /></PageWrapper>} />
-        <Route path="/admin/products" element={<PageWrapper><AdminProducts /></PageWrapper>} />
+        <Route path="/admin/dashboard" element={<RequireAdminSession><PageWrapper><AdminDashboard /></PageWrapper></RequireAdminSession>} />
+        <Route path="/admin/products" element={<RequireAdminSession><PageWrapper><AdminProducts /></PageWrapper></RequireAdminSession>} />
       </Routes>
     </AnimatePresence>
   )
