@@ -7,8 +7,10 @@ export function normalizeApiBase(value = '/api') {
   return base.endsWith('/api') ? base : `${base}/api`
 }
 export const API_BASE = normalizeApiBase(import.meta.env?.VITE_API_BASE_URL || import.meta.env?.VITE_API_URL || '/api')
+let adminCsrf = null
+export const setAdminCsrf = value => { adminCsrf = value }
 
-export async function apiRequest(path, { method = 'GET', body, token, signal, timeout = 30000 } = {}) {
+export async function apiRequest(path, { method = 'GET', body, signal, timeout = 30000 } = {}) {
   const controller = new AbortController()
   const abort = () => controller.abort()
   if (signal?.aborted) abort()
@@ -22,8 +24,8 @@ export async function apiRequest(path, { method = 'GET', body, token, signal, ti
       : 'We could not confirm whether your changes were saved. Check the result before submitting again.'
   try {
     const response = await fetch(`${API_BASE}/${path.replace(/^\/+/, '')}`, {
-      method, signal: controller.signal, cache: 'no-store',
-      headers: { Accept: 'application/json', ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}), ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      method, signal: controller.signal, cache: 'no-store', credentials: 'same-origin',
+      headers: { Accept: 'application/json', ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}), ...(adminCsrf && !['GET', 'HEAD'].includes(method) ? { 'X-CSRF-Token': adminCsrf } : {}) },
       ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
     })
     const isJson = response.headers.get('content-type')?.includes('application/json')

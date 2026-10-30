@@ -8,6 +8,7 @@ from contextlib import asynccontextmanager
 from datetime import datetime, timezone, timedelta
 import asyncio
 import hmac
+import hashlib
 import logging
 import os
 from pathlib import Path
@@ -24,7 +25,7 @@ except ImportError:  # Standalone uvicorn server:app and file-based test loader.
         import supabase_store
 
 from dotenv import load_dotenv
-from fastapi import APIRouter, Depends, FastAPI, HTTPException, Request
+from fastapi import APIRouter, Depends, FastAPI, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -34,6 +35,7 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field, StringConstraints, 
 from pymongo import ReturnDocument
 from pymongo.errors import PyMongoError
 from starlette.middleware.cors import CORSMiddleware
+from backend import web_security
 
 load_dotenv(Path(__file__).parent / ".env")
 logger = logging.getLogger(__name__)
@@ -102,18 +104,17 @@ async def lifespan(_app):
         _ai_client = None
 
 
-app = FastAPI(title="Wipro Fire & Safety API", lifespan=lifespan)
+app = FastAPI(title="Wipro Fire & Safety API", lifespan=lifespan, debug=False,
+              docs_url=None, redoc_url=None, openapi_url=None)
 api_router = APIRouter(prefix="/api")
 app.add_middleware(LimitedBodyMiddleware)
-_origins = [origin.strip().rstrip("/") for origin in os.environ.get(
-    "CORS_ORIGINS", "http://localhost:5173,https://wipro-fire-safety-v2.vercel.app"
-).split(",") if origin.strip() and origin.strip() != "*"]
+_origins = list(web_security.origins())
 app.add_middleware(
     CORSMiddleware,
-    allow_credentials=False,  # Admin sessions use explicit bearer tokens, not cookies.
+    allow_credentials=False,  # Staff cookies are same-origin only.
     allow_origins=_origins,
     allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-    allow_headers=["Authorization", "Content-Type"],
+    allow_headers=["Content-Type", "X-CSRF-Token"],
     expose_headers=["Retry-After"],
 )
 
@@ -126,10 +127,23 @@ async def invalid_request(_request, _error):
 
 @app.middleware("http")
 async def private_api_responses(request, call_next):
-    response = await call_next(request)
+    try:
+        limits = {'/api/admin/login': ('login', 10, 600), '/api/contact': ('contact', 5, 600), '/api/chat': ('chat', 20, 60)}
+        if request.method == 'POST' and request.url.path in limits:
+            if request.headers.get('content-type', '').split(';')[0].lower() != 'application/json':
+                raise HTTPException(415, 'Send a JSON request.')
+            if request.url.path == '/api/admin/login':
+                web_security.check_origin(request)
+            await web_security.shared_limit(request, *limits[request.url.path])
+        response = await call_next(request)
+    except HTTPException as error:
+        response = JSONResponse(status_code=error.status_code, content={'detail': error.detail}, headers=error.headers)
     response.headers["Cache-Control"] = "private, no-store"
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
+    response.headers['X-Request-ID'] = str(uuid.uuid4())
+    if response.status_code in {401, 403, 429}:
+        logger.warning('security_event=request_denied status=%s request_id=%s', response.status_code, response.headers['X-Request-ID'])
     return response
 
 
@@ -159,8 +173,10 @@ def get_database():
 
 
 def admin_configuration():
+    if os.getenv('VERCEL'):
+        raise HTTPException(503, 'Hosted staff access requires Supabase authentication.')
     email = os.environ.get("ADMIN_EMAIL", "").strip().lower()
-    password = os.environ.get("ADMIN_PASSWORD", "")
+    password = os.environ.get("ADMIN_PASSWORD_HASH", "")
     secret = os.environ.get("JWT_SECRET", "")
     if not email or not password or len(secret.encode()) < 32:
         raise HTTPException(status_code=503, detail="Admin access has not been configured yet.")
@@ -173,6 +189,8 @@ _rate_windows = OrderedDict()
 
 
 def enforce_rate_limit(request: Request, scope: str, limit: int, seconds: int):
+    if supabase_store.enabled():
+        return  # Shared guard runs before body parsing in the middleware.
     now = time.monotonic()
     # Only the ASGI server's trusted client address; do not trust arbitrary headers.
     address = request.client.host if request.client else "unknown"
@@ -271,6 +289,17 @@ class Product(RequestModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
+class PublicProduct(RequestModel):
+    id: str
+    title: str
+    description: str
+    category: str
+    image_url: str = ''
+    slug: str | None = None
+    unit: str = 'pcs'
+    created_at: datetime
+
+
 class ProductUpdate(RequestModel):
     title: ShortText | None = None
     description: str | None = Field(default=None, min_length=1, max_length=5000)
@@ -315,11 +344,6 @@ class AdminLogin(BaseModel):
     password: str = Field(min_length=1, max_length=1024)
 
 
-class AdminToken(BaseModel):
-    access_token: str
-    token_type: str = "bearer"
-
-
 class ChatMessage(RequestModel):
     message: str = Field(min_length=1, max_length=2000)
     session_id: str = Field(default="", max_length=120)
@@ -341,14 +365,18 @@ def create_access_token(data: dict):
     return jwt.encode(payload, secret, algorithm=JWT_ALGORITHM)
 
 
-async def verify_token(credentials: HTTPAuthorizationCredentials | None = Depends(security)):
-    if credentials is None:
+async def verify_token(request: Request):
+    if not request.cookies.get(web_security.COOKIE):
         raise HTTPException(status_code=401, detail="Please sign in to continue.", headers={"WWW-Authenticate": "Bearer"})
+    if request.method not in {'GET', 'HEAD', 'OPTIONS'}:
+        web_security.check_csrf(request)
+    _cookie, session = await web_security.session(request)
+    token = session['upstream']
     if supabase_store.enabled():
-        return await supabase_store.staff(credentials.credentials)
+        return await supabase_store.staff(token)
     email, _password, secret = admin_configuration()
     try:
-        payload = jwt.decode(credentials.credentials, secret, algorithms=[JWT_ALGORITHM], options={"require": ["exp", "sub"]})
+        payload = jwt.decode(token, secret, algorithms=[JWT_ALGORITHM], options={"require": ["exp", "sub"]})
         if not isinstance(payload.get("sub"), str) or not hmac.compare_digest(payload["sub"].encode(), email.encode()):
             raise jwt.InvalidTokenError()
         return email
@@ -432,11 +460,20 @@ async def create_product(input: ProductCreate, _email: str = Depends(verify_toke
     return product
 
 
-@api_router.get("/products", response_model=list[Product])
+@api_router.get("/products", response_model=list[PublicProduct])
 async def get_products(database=Depends(get_database)):
     if supabase_store.enabled():
-        return await supabase_store.list_rows("products")
+        return await supabase_store.request('GET', '/rest/v1/products', params={
+            'select': 'id,title,description,category,image_url,slug,unit,created_at',
+            'order': 'created_at.desc', 'limit': '1000'})
     return await database.products.find({}, {"_id": 0}).to_list(1000)
+
+
+@api_router.get('/admin/products', response_model=list[Product])
+async def admin_products(_token=Depends(verify_token), database=Depends(get_database)):
+    if supabase_store.enabled():
+        return await supabase_store.list_rows('products', _token)
+    return await database.products.find({}, {'_id': 0}).to_list(1000)
 
 
 @api_router.patch("/products/{product_id}", response_model=Product)
@@ -491,18 +528,42 @@ async def record_stock(input: StockMovementCreate, _email: str = Depends(verify_
     return result
 
 
-@api_router.post("/admin/login", response_model=AdminToken)
-async def admin_login(credentials: AdminLogin, request: Request):
+@api_router.post("/admin/login")
+async def admin_login(credentials: AdminLogin, request: Request, response: Response):
     enforce_rate_limit(request, "login", 10, 600)
     if supabase_store.enabled():
         token = await supabase_store.login(str(credentials.email), credentials.password)
-        return AdminToken(access_token=token)
+        # login() has verified the user with Supabase, then checked staff membership.
+        claims = jwt.decode(token, options={'verify_signature': False})
+        return await web_security.issue(response, token, claims['sub'], claims['exp'])
     email, password, _secret = admin_configuration()
     email_matches = hmac.compare_digest(str(credentials.email).lower().encode(), email.encode())
-    password_matches = hmac.compare_digest(credentials.password.encode(), password.encode())
+    try:
+        scheme, rounds, salt, expected = password.split('$')
+        iterations = int(rounds)
+        if scheme != 'pbkdf2_sha256' or not 600000 <= iterations <= 2000000:
+            raise ValueError()
+        actual = hashlib.pbkdf2_hmac('sha256', credentials.password.encode(), bytes.fromhex(salt), iterations).hex()
+        password_matches = hmac.compare_digest(actual, expected)
+    except (ValueError, TypeError):
+        raise HTTPException(503, 'Admin password hashing has not been configured.') from None
     if not (email_matches and password_matches):
         raise HTTPException(status_code=401, detail="Invalid email or password")
-    return AdminToken(access_token=create_access_token({"sub": email}))
+    return await web_security.issue(response, create_access_token({"sub": email}), email, int(time.time()) + 3600)
+
+
+@api_router.get('/admin/session')
+async def admin_session(request: Request, _token=Depends(verify_token)):
+    cookie, payload = web_security.decode_cookie(request)
+    return {'user_id': payload['sub'], 'csrf_token': web_security.csrf(cookie), 'expires_at': payload['exp']}
+
+
+@api_router.post('/admin/logout')
+async def admin_logout(request: Request, response: Response):
+    web_security.check_csrf(request)
+    await web_security.logout(request)
+    response.delete_cookie(web_security.COOKIE, path='/', secure=True, httponly=True, samesite='strict')
+    return {'message': 'Signed out.'}
 
 
 COMPANY_CONTEXT = """You assist customers of Wipro Fire & Safety in Kurnool, Andhra Pradesh, India.

@@ -1,6 +1,6 @@
 """Supabase transport. Staff operations always use the user's token and RLS.
 
-The server secret is confined to validated enquiry insertion and readiness checks.
+The server secret is confined to enquiry insertion, readiness and private security RPCs.
 Never return upstream error bodies (they can contain customer data).
 """
 import os
@@ -83,7 +83,7 @@ async def login(email, password):
     if not token:
         raise HTTPException(401, 'Invalid email or password.')
     await staff(token)
-    # No refresh token is stored in the browser. Expiry requires a fresh staff login.
+    # The API wraps this in a secure HttpOnly session. Refresh tokens are discarded.
     return token
 
 

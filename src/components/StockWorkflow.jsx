@@ -3,9 +3,9 @@ import { apiRequest } from '../lib/api'
 import { stockPreview } from '../lib/inventory.mjs'
 import { loadPendingStock, recordRecoverableMovement } from '../lib/stock-recovery.mjs'
 
-export default function StockWorkflow({ items, token, onSaved, onError }) {
+export default function StockWorkflow({ items, userId, onSaved, onError }) {
   const [recovery] = useState(() => {
-    try { return { body: loadPendingStock(token), error: '' } }
+    try { return { body: loadPendingStock(userId), error: '' } }
     catch (error) { return { body: null, error: error.message } }
   })
   const [recoveryError, setRecoveryError] = useState(recovery.error)
@@ -28,12 +28,12 @@ export default function StockWorkflow({ items, token, onSaved, onError }) {
     setHistoryBusy(true); setHistoryError('')
     const query = new URLSearchParams({ offset: String(offset) })
     if (form.product_id) query.set('product_id', form.product_id)
-    apiRequest(`/inventory/movements?${query}`, { token, signal: controller.signal })
+    apiRequest(`/inventory/movements?${query}`, { signal: controller.signal })
       .then(rows => { if (!Array.isArray(rows)) throw new Error('Invalid stock history response.'); setHistory(rows) })
       .catch(error => { if (!controller.signal.aborted) { setHistoryError(error.message); if (error.status === 401 || error.status === 403) onError(error) } })
       .finally(() => { if (!controller.signal.aborted) setHistoryBusy(false) })
     return () => controller.abort()
-  }, [token, offset, form.product_id, revision, onError])
+  }, [userId, offset, form.product_id, revision, onError])
 
   useEffect(() => {
     if (!retryBody) return
@@ -50,7 +50,7 @@ export default function StockWorkflow({ items, token, onSaved, onError }) {
     // Retain the exact request after an uncertain network result; retry cannot double-count it.
     setRetryBody(body)
     try {
-      const result = await recordRecoverableMovement({ token, body, request: payload => apiRequest('/inventory/movements', { method: 'POST', token, body: payload }) })
+      const result = await recordRecoverableMovement({ userId, body, request: payload => apiRequest('/inventory/movements', { method: 'POST', body: payload }) })
       setRetryBody(null)
       setNotice(`Recorded. Balance after this movement: ${result.balance} ${item?.unit || 'units'}.`)
       setForm(current => ({ ...current, quantity: '', reference: '', note: '' }))
@@ -58,7 +58,7 @@ export default function StockWorkflow({ items, token, onSaved, onError }) {
       window.dispatchEvent(new Event('wipro:catalogue-changed'))
       await onSaved()
     } catch (error) {
-      try { setRetryBody(loadPendingStock(token)) }
+      try { setRetryBody(loadPendingStock(userId)) }
       catch (recoveryFailure) { setRecoveryError(recoveryFailure.message) }
       onError(error, 'Could not confirm the stock movement. Retry the same entry safely.')
     } finally { lock.current = false; setBusy(false) }

@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { apiRequest } from '../lib/api'
+import { useAdminSession } from '../components/AdminSession'
 
 function AdminLogin() {
+  const { accept } = useAdminSession()
   const [showPassword, setShowPassword] = useState(false)
   const [service, setService] = useState('checking')
   const [check, setCheck] = useState(0)
@@ -30,9 +32,8 @@ function AdminLogin() {
     setError('')
     try {
       const data = await apiRequest('/admin/login', { method: 'POST', body: { email: email.trim(), password } })
-      const token = data?.access_token || data?.token
-      if (typeof token !== 'string' || !token) throw new Error('The server did not return a valid session. Please try again.')
-      localStorage.setItem('admin_token', token)
+      accept(data)
+      setPassword('')
       navigate('/admin/dashboard', { replace: true })
     } catch (err) {
       setError(err.status === 401 ? 'Invalid email or password.' : err.message || 'We could not sign you in. Please try again.')
