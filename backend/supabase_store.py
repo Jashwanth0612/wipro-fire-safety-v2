@@ -95,8 +95,11 @@ def record_id(value):
 
 
 async def list_rows(table, token=None):
+    params = {'select': '*', 'order': 'created_at.desc', 'limit': '1000'}
+    if table == 'products':
+        params['archived'] = 'eq.false'
     return await request('GET', '/rest/v1/' + table, token=token,
-                         params={'select': '*', 'order': 'created_at.desc', 'limit': '1000'})
+                         params=params)
 
 
 async def insert(table, data, token=None):

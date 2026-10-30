@@ -133,6 +133,10 @@ def test_public_catalogue_no_secret_and_missing_update(api):
     assert client.get('/api/products').status_code == 200
     assert calls[-1].headers['apikey'] == 'sb_publishable_test'
     assert 'authorization' not in calls[-1].headers
+    assert 'stock' not in calls[-1].url.params['select']
+    assert client.get('/api/admin/products', headers=auth(client)).status_code == 200
+    assert calls[-1].url.params['archived'] == 'eq.false'
+    assert calls[-1].headers['authorization'] == 'Bearer '+TOKEN
     state['missing'] = True
     assert client.patch('/api/products/' + ITEM, json={'stock':0}, headers=auth(client)).status_code == 409
     assert client.patch('/api/products/' + ITEM, json={'title':'Missing'}, headers=auth(client)).status_code == 404
