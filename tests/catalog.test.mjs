@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { PRODUCTS, CATEGORIES } from '../src/data/products.js'
-import { filterProducts, quoteMessage } from '../src/lib/catalog.js'
+import { browseProducts, filterProducts, quoteMessage } from '../src/lib/catalog.js'
 import { submitInquiry } from '../src/lib/api.js'
 import { existsSync } from 'node:fs'
 
@@ -32,6 +32,28 @@ test('quote preserves the visitor message and includes exact product variant and
   assert.match(message,/Cartridge Type \| Quantity: 2/)
   assert.match(message,/VFPA4/)
   assert.equal(quoteMessage(' Hello ',[]),'Hello')
+})
+test('paged public catalogue reaches every product exactly once in alphabetical order', () => {
+  const originalIds = PRODUCTS.map(product => product.id)
+  const first = browseProducts(PRODUCTS)
+  assert.equal(first.items.length, 9)
+  assert.equal(first.pages, 5)
+  const seen = Array.from({ length: first.pages }, (_, index) => browseProducts(PRODUCTS, { page: index + 1 })).flatMap(result => result.items)
+  assert.equal(new Set(seen.map(product => product.id)).size, PRODUCTS.length)
+  assert.deepEqual(seen.map(product => product.id).sort((a, b) => a - b), [...originalIds].sort((a, b) => a - b))
+  assert.ok(seen.every((product, index) => index === 0 || seen[index - 1].title.localeCompare(product.title) <= 0))
+  assert.deepEqual(PRODUCTS.map(product => product.id), originalIds)
+})
+test('product search and categories operate on the full range and clamp stale pages', () => {
+  const category = browseProducts(PRODUCTS, { category: 'extinguishers', page: 5 })
+  assert.deepEqual([category.total, category.page, category.start, category.end], [12, 2, 10, 12])
+  assert.ok(category.items.every(product => product.category === 'extinguishers'))
+  const model = browseProducts(PRODUCTS, { query: 'VFPA4', page: 5 })
+  assert.equal(model.page, 1)
+  assert.ok(model.items.some(product => product.id === 1))
+  const empty = browseProducts(PRODUCTS, { query: 'no-match-9382', page: 5 })
+  assert.deepEqual([empty.total, empty.page, empty.start, empty.end], [0, 1, 0, 0])
+  assert.deepEqual(browseProducts(PRODUCTS, { sort: 'featured' }).items, PRODUCTS.slice(0, 9))
 })
 test('enquiry sends the existing backend contract with quote details', async () => {
   const original=globalThis.fetch
