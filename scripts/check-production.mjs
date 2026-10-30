@@ -42,13 +42,30 @@ export async function checkProduction(fetcher = fetch) {
   if (!assets.some(path => path.endsWith('.js')) || !assets.some(path => path.endsWith('.css'))) {
     results.push({ path: 'entry bundles', ok: false })
   }
-  for (const path of assets.slice(0, 10)) {
+  // Traverse only literal build-asset references, never arbitrary URLs or API paths.
+  // Vite emits relative imports and root-relative preload dependency lists.
+  const queued = new Set(assets)
+  const queue = [...queued]
+  const limit = 64
+  for (let index = 0; index < queue.length && index < limit; index++) {
+    const path = queue[index]
     await check(path, async response => {
       const type = response.headers.get('content-type') || ''
       require(response.status === 200 && (path.endsWith('.css') ? type.includes('text/css') : /javascript/.test(type)))
-      require((await response.text()).length > 0)
+      const body = await response.text()
+      require(body.trim().length > 0 && !/^\s*</.test(body))
+      if (path.endsWith('.js')) {
+        for (const match of body.matchAll(/["']((?:\.\/|\/assets\/|assets\/)[A-Za-z0-9_.-]+\.(?:js|css))["']/g)) {
+          const reference = match[1]
+          const asset = reference.startsWith('assets/') ? `/${reference}` : new URL(reference, `${PRODUCTION}${path}`).pathname
+          if (!/^\/assets\/[A-Za-z0-9_-][A-Za-z0-9_.-]*\.(?:js|css)$/.test(asset) || queued.has(asset)) continue
+          queued.add(asset)
+          queue.push(asset)
+        }
+      }
     })
   }
+  if (queue.length > limit) results.push({ path: 'asset traversal limit', ok: false })
   await check('/api/health', async response => {
     require(response.status === 200)
     const data = await response.json()
