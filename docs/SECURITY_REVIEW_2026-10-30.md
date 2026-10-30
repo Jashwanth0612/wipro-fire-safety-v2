@@ -43,11 +43,12 @@ The security change replaces local-storage bearer sessions with server-verified,
 
 ## Verification
 
-- API/security tests: 26 passed against isolated fake data and mock upstream transport.
+- API/security tests: 27 passed against isolated fake data and mock upstream transport.
 - Frontend/calculation/recovery/monitor tests: 43 passed, including catalogue privacy detection.
 - Chromium route/XSS/export checks: 20 passed using synthetic API fixtures.
 - Additional integrated browser → actual Python API → synthetic Supabase transport check passed: login, HttpOnly cookie, no token in local storage/document.cookie, refresh persistence, denied missing CSRF, accepted staff status update, logout and replay rejection.
 - Supabase transaction tests passed for anonymous/nonstaff/staff access, stock idempotency/quantity guards, and new session/rate privileges; all synthetic business fixtures rolled back.
+- Live shared-counter concurrency test: 12 simultaneous calls allowed exactly 5 and denied 7; synthetic rate rows were then removed.
 - Production build and whitespace checks passed. Gitleaks history and working-tree scans: zero matching findings. npm and Python audits: zero known vulnerabilities.
 - Pre-release credential-free production smoke: 29/29 passed. Expanded post-release results and migration IDs are recorded below.
 
@@ -61,6 +62,8 @@ The integrated browser used synthetic identities, not the owner's account. Real 
 4. Recheck live health, catalogue, protected endpoints, headers, exposed-file responses and advisors.
 
 A frontend rollback to the old local-storage release is not a safe standalone rollback. Revert the anonymous column restriction first if an older API requires SELECT `*`, then deliberately restore the matching old API/UI only as an emergency rollback. The preferred repair preserves the stricter permissions and cookie session design. No stock-history migration is reverted and no real inventory records are modified.
+
+The two new private security tables intentionally have RLS enabled with no public policies (default deny), so the advisor emits two informational notices. The existing stock RPC warning is intentional and covered by staff/nonstaff tests; leaked-password protection remains disabled.
 
 ## Remaining actions
 

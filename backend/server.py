@@ -28,7 +28,6 @@ from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import jwt
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, StringConstraints, field_validator, model_validator
@@ -39,7 +38,6 @@ from backend import web_security
 
 load_dotenv(Path(__file__).parent / ".env")
 logger = logging.getLogger(__name__)
-security = HTTPBearer(auto_error=False)
 _db_client = None
 _ai_client = None
 JWT_ALGORITHM = "HS256"
@@ -361,7 +359,7 @@ class InquiryStatusUpdate(BaseModel):
 def create_access_token(data: dict):
     _email, _password, secret = admin_configuration()
     payload = data.copy()
-    payload.update({"exp": datetime.now(timezone.utc) + timedelta(hours=8), "iat": datetime.now(timezone.utc)})
+    payload.update({"exp": datetime.now(timezone.utc) + timedelta(hours=1), "iat": datetime.now(timezone.utc)})
     return jwt.encode(payload, secret, algorithm=JWT_ALGORITHM)
 
 
@@ -394,6 +392,11 @@ async def root():
 @api_router.get("/health")
 async def health():
     if supabase_store.enabled():
+        try:
+            web_security.secret()
+        except HTTPException:
+            return JSONResponse(status_code=503, content={'status': 'degraded', 'provider': 'supabase',
+                'database': 'unverified', 'admin': 'unconfigured'})
         try:
             configured_staff = await supabase_store.health()
             ready = bool(configured_staff)

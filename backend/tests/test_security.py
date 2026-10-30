@@ -86,3 +86,11 @@ def test_client_ip_only_trusts_vercel_managed_forwarding(api, monkeypatch):
     monkeypatch.setenv('VERCEL','1')
     assert web_security.client_key(request)!=direct
     assert len(direct)==64 and '8.8.8.8' not in direct
+
+
+def test_health_does_not_claim_ready_without_cookie_signing_configuration(api, monkeypatch):
+    client, _, _=api
+    monkeypatch.setenv('JWT_SECRET','too-short')
+    result=client.get('/api/health')
+    assert result.status_code==503 and result.json()['admin']=='unconfigured'
+    assert 'too-short' not in result.text
