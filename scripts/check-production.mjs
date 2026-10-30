@@ -76,8 +76,9 @@ export async function checkProduction(fetcher = fetch) {
     const data = await response.json()
     require(Array.isArray(data) && data.length > 0)
     require(data.every(item => item.id && typeof item.title === 'string' && item.title.trim() && typeof item.category === 'string'))
+    require(data.every(item => !Object.hasOwn(item, 'stock') && !Object.hasOwn(item, 'minStock')))
   })
-  for (const path of ['/api/contact', '/api/inventory/movements']) {
+  for (const path of ['/api/contact', '/api/inventory/movements', '/api/admin/products', '/api/admin/session']) {
     await check(path, async response => {
       require(response.status === 401 || response.status === 403)
       require(response.headers.get('cache-control')?.includes('no-store'))

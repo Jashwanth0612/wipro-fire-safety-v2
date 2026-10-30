@@ -22,7 +22,7 @@ do $$ begin
   if exists(select 1 from public.staff_members) then raise exception 'Staff membership leaked'; end if;
   begin insert into public.staff_members(user_id) values ('10000000-0000-4000-8000-000000000002'); raise exception 'Self promotion allowed'; exception when insufficient_privilege then null; end;
   begin insert into public.products(title,description,category) values ('Attack','Attack','Attack'); raise exception 'Nonstaff product insert allowed'; exception when insufficient_privilege then null; end;
-  update public.products set stock=999 where id='30000000-0000-4000-8000-000000000001';
+  update public.products set title='Tampered' where id='30000000-0000-4000-8000-000000000001';
   if found then raise exception 'Nonstaff product edit allowed'; end if;
 end $$;
 select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000001',true);

@@ -6,7 +6,7 @@ function healthy(url) {
  const path = new URL(url).pathname
  if (path === '/api/health') return Response.json({status:'ready',provider:'supabase',database:'connected',admin:'configured'})
  if (path === '/api/products') return Response.json([{id:'fixture', title:'Fixture', category:'Safety Equipment'}])
- if (path === '/api/contact' || path === '/api/inventory/movements') return new Response(null,{status:401,headers:{'cache-control':'private, no-store'}})
+ if (['/api/contact','/api/inventory/movements','/api/admin/products','/api/admin/session'].includes(path)) return new Response(null,{status:401,headers:{'cache-control':'private, no-store'}})
  if (path.endsWith('.js')) return new Response('/* fixture */',{headers:{'content-type':'application/javascript'}})
  if (path.endsWith('.css')) return new Response('body{}',{headers:{'content-type':'text/css'}})
  return new Response('<div id="root"></div><script src="/assets/test.js"></script><link href="/assets/test.css">', {headers:{'content-type':'text/html','x-content-type-options':'nosniff','x-frame-options':'DENY','strict-transport-security':'max-age=31536000','content-security-policy':"object-src 'none'; frame-ancestors 'none'"}})
@@ -18,7 +18,7 @@ test('healthy site passes without credentials or write requests', async () => {
    assert.equal(options.headers.Authorization,undefined)
    return healthy(url)
  })
- assert.equal(results.length,13)
+ assert.equal(results.length,15)
  assert.ok(results.every(result => result.ok))
 })
 test('monitor detects degraded DB, exposed admin API and HTML masquerading as JS',async () => {
@@ -76,7 +76,7 @@ test('asset discovery ignores external, traversal, query and non-asset reference
    if(url.endsWith('/test.js')) return new Response('import("https://other.test/secret.js"); import("../api/private.js"); const x=["/assets/../private.js","/assets/key.js?token=private","/api/private.js"];',{headers:{'content-type':'application/javascript'}})
    return healthy(url)
  })
- assert.equal(seen.length,13)
+ assert.equal(seen.length,15)
  assert.ok(results.every(r=>r.ok))
 })
 
@@ -90,4 +90,9 @@ test('excessive chunk graph fails explicitly rather than silently passing incomp
  assert.equal(assets,64)
  assert.deepEqual(results.filter(r=>!r.ok),[{path:'asset traversal limit',ok:false}])
  assert.ok(results.find(r=>r.path==='/api/health').ok)
+})
+
+test('monitor detects stock data leaking into the public catalogue', async () => {
+ const results=await checkProduction(async url => url.endsWith('/api/products') ? Response.json([{id:'fixture',title:'Fixture',category:'Safety',stock:10,minStock:5}]) : healthy(url))
+ assert.deepEqual(results.filter(r=>!r.ok),[{path:'/api/products',ok:false}])
 })

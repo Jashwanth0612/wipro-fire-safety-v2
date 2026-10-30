@@ -2,6 +2,7 @@ import InventoryTotals from '../components/InventoryTotals'
 import InventoryCatalogue from '../components/InventoryCatalogue'
 import StockWorkflow from '../components/StockWorkflow'
 import AdminNavigation from '../components/AdminNavigation'
+import { useAdminSession } from '../components/AdminSession'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { apiRequest } from '../lib/api'
@@ -25,11 +26,12 @@ function AdminProducts() {
   const [exporting, setExporting] = useState(false)
   const mutation = useRef(false)
   const navigate = useNavigate()
-  const token = localStorage.getItem('admin_token')
+  const { session, clear, logout: closeSession } = useAdminSession()
+  const userId = session?.user_id
 
   const handleError = useCallback((err, fallback) => {
     if (err.status === 401 || err.status === 403) {
-      localStorage.removeItem('admin_token')
+      clear()
       navigate('/admin/login', { replace: true, state: { message: 'Your session has expired. Please sign in again.' } })
     } else setError(err.message || fallback)
   }, [navigate])
@@ -38,7 +40,7 @@ function AdminProducts() {
     setLoading(true)
     setError('')
     try {
-      const records = await apiRequest('/products', { token, signal })
+      const records = await apiRequest('/admin/products', { signal })
       if (!Array.isArray(records)) throw new Error('The server returned an invalid inventory list.')
       setItems(records.map(product => ({
         ...product,
@@ -51,14 +53,14 @@ function AdminProducts() {
     } catch (err) {
       if (!signal?.aborted) handleError(err, 'Could not load inventory. Please try again.')
     } finally { if (!signal?.aborted) setLoading(false) }
-  }, [handleError, token])
+  }, [handleError, userId])
 
   useEffect(() => {
-    if (!token) { navigate('/admin/login', { replace: true }); return }
+    if (!userId) { navigate('/admin/login', { replace: true }); return }
     const controller = new AbortController()
     fetchItems(controller.signal)
     return () => controller.abort()
-  }, [fetchItems, navigate, token])
+  }, [fetchItems, navigate, userId])
 
   const add = async (event) => {
     event.preventDefault()
@@ -69,7 +71,7 @@ function AdminProducts() {
     setNotice('')
     try {
       const { slug, ...fields } = form
-      const saved = await apiRequest('/products', { method: 'POST', token, body: { ...fields, stock: fields.stock === '' ? null : Number(fields.stock), ...(slug ? { slug } : {}) } })
+      const saved = await apiRequest('/products', { method: 'POST', body: { ...fields, stock: fields.stock === '' ? null : Number(fields.stock), ...(slug ? { slug } : {}) } })
       if (!saved?.id) throw new Error('The server did not confirm that this product was saved.')
       setForm(emptyProduct())
       setShowForm(false)
@@ -87,7 +89,7 @@ function AdminProducts() {
     setError('')
     setNotice('')
     try {
-      await apiRequest(`/products/${encodeURIComponent(id)}`, { method: 'DELETE', token })
+      await apiRequest(`/products/${encodeURIComponent(id)}`, { method: 'DELETE' })
       setItems(current => current.filter(item => item.id !== id))
       setNotice('Product archived.')
       window.dispatchEvent(new Event('wipro:catalogue-changed'))
@@ -95,19 +97,13 @@ function AdminProducts() {
     finally { mutation.current = false; setPendingId(null) }
   }
 
-  // Export to Excel using SheetJS (loaded from CDN dynamically)
-  const exportToExcel = () => {
+  // Load the pinned, locally bundled export library only when needed.
+  const exportToExcel = async () => {
     if (exporting) return
     setExporting(true)
     setError('')
-    const script = document.createElement('script')
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'
-    script.integrity = 'sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw'
-    script.crossOrigin = 'anonymous'
-    script.onerror = () => { setError('The spreadsheet export could not load. Please try again.'); setExporting(false); script.remove() }
-    script.onload = () => {
-      try {
-      const XLSX = window.XLSX
+    try {
+      const XLSX = await import('xlsx')
 
       const wb = XLSX.utils.book_new()
 
@@ -171,9 +167,7 @@ function AdminProducts() {
 
       XLSX.writeFile(wb, `Wipro_Stock_Report_${new Date().toISOString().split('T')[0]}.xlsx`)
       } catch { setError('The spreadsheet export failed. Please try again.') }
-      finally { setExporting(false); script.remove() }
-    }
-    document.head.appendChild(script)
+      finally { setExporting(false) }
   }
 
   const lowStockCount = items.filter(p => p.stock !== null && p.stock <= (p.minStock ?? 5)).length
@@ -198,7 +192,7 @@ function AdminProducts() {
           <button disabled={adding || pendingId !== null} onClick={() => setShowForm(!showForm)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: 'linear-gradient(135deg, #bf4937, #bf4937)', border: 'none', borderRadius: '10px', color: '#302820', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
             <Plus size={16} /> Add Product
           </button>
-          <button onClick={() => { localStorage.removeItem('admin_token'); navigate('/admin/login') }} style={{ padding: '10px 20px', background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '10px', color: '#62584f', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
+          <button onClick={async () => { try { await closeSession(); navigate('/admin/login') } catch (err) { setError(err.message) } }} style={{ padding: '10px 20px', background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '10px', color: '#62584f', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}>
             Logout
           </button>
         </div>
@@ -235,7 +229,7 @@ function AdminProducts() {
       {unknownStockCount > 0 && <p>{unknownStockCount} {unknownStockCount === 1 ? 'product has' : 'products have'} no recorded stock quantity. Totals include recorded quantities only.</p>}
       <InventoryTotals items={items} />
       </>}
-      {loaded && <StockWorkflow items={items} token={token} onSaved={fetchItems} onError={handleError} />}
+      {loaded && <StockWorkflow items={items} userId={userId} onSaved={fetchItems} onError={handleError} />}
       {/* Add Product Form */}
       {showForm && (
         <div style={{ background: '#f5ecdf', border: '1px solid rgba(191,73,55,0.3)', borderRadius: '16px', padding: '28px', marginBottom: '24px', position: 'relative', overflow: 'hidden' }}>

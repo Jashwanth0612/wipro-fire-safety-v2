@@ -1,4 +1,5 @@
 import AdminNavigation from '../components/AdminNavigation'
+import { useAdminSession } from '../components/AdminSession'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { apiRequest } from '../lib/api'
@@ -13,14 +14,15 @@ export default function AdminDashboard() {
   const [updating, setUpdating] = useState(null)
   const saving = useRef(false)
   const navigate = useNavigate()
-  const token = localStorage.getItem('admin_token')
+  const { session, clear, logout: closeSession } = useAdminSession()
+  const userId = session?.user_id
 
   useEffect(() => {
-    if (!token) { navigate('/admin/login', { replace: true }); return }
+    if (!userId) { navigate('/admin/login', { replace: true }); return }
     const controller = new AbortController()
     setLoading(true)
     setError('')
-    apiRequest('/contact', { token, signal: controller.signal })
+    apiRequest('/contact', { signal: controller.signal })
       .then(records => {
         if (!Array.isArray(records)) throw new Error('The server returned an invalid enquiry list.')
         setData(records.map(record => ({ ...record, id: record.id || record._id })))
@@ -29,13 +31,13 @@ export default function AdminDashboard() {
       .catch(err => {
         if (controller.signal.aborted) return
         if (err.status === 401 || err.status === 403) {
-          localStorage.removeItem('admin_token')
+          clear()
           navigate('/admin/login', { replace: true, state: { message: 'Your session has expired. Please sign in again.' } })
         } else setError(err.message || 'Could not load enquiries. Please try again.')
       })
       .finally(() => { if (!controller.signal.aborted) setLoading(false) })
     return () => controller.abort()
-  }, [navigate, token, retry])
+  }, [navigate, userId, retry])
 
   const updateStatus = async (id, newStatus) => {
     if (saving.current) return
@@ -43,11 +45,11 @@ export default function AdminDashboard() {
     setUpdating(id)
     setError('')
     try {
-      await apiRequest(`/contact/${encodeURIComponent(id)}/status`, { method: 'PATCH', token, body: { status: newStatus } })
+      await apiRequest(`/contact/${encodeURIComponent(id)}/status`, { method: 'PATCH', body: { status: newStatus } })
       setData(current => current.map(item => item.id === id ? { ...item, status: newStatus } : item))
     } catch (err) {
       if (err.status === 401 || err.status === 403) {
-        localStorage.removeItem('admin_token')
+        clear()
         navigate('/admin/login', { replace: true, state: { message: 'Your session has expired. Please sign in again.' } })
       } else setError(err.message || 'Status was not saved. Please try again.')
     } finally {
@@ -56,7 +58,7 @@ export default function AdminDashboard() {
     }
   }
 
-  const logout = () => { localStorage.removeItem('admin_token'); navigate('/admin/login') }
+  const logout = async () => { try { await closeSession(); navigate('/admin/login') } catch (err) { setError(err.message) } }
 
   const total = data.length
   const pending = data.filter(d => d.status === 'pending').length

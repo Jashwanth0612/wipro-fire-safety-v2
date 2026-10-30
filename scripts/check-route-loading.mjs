@@ -12,6 +12,7 @@ async function check(name, run) {
   await context.route('**/api/**', route => {
     assert.equal(route.request().method(), 'GET', 'Browser checks must not write business data')
     const path = new URL(route.request().url()).pathname
+    if (path.endsWith('/admin/session')) return route.fulfill({status:401,contentType:'application/json',body:'{"detail":"Sign in"}'})
     return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(path.endsWith('/health') ? { status: 'ready', provider: 'supabase', database: 'connected', admin: 'configured' } : []) })
   })
   const page = await context.newPage()
@@ -54,20 +55,35 @@ try {
   }
   for (const [route, heading] of [['/admin/dashboard', 'Admin Dashboard'], ['/admin/products', 'Product & Stock Manager']]) {
     await check(`local synthetic session can open ${route}`, async page => {
-      await page.addInitScript(() => localStorage.setItem('admin_token', 'local-test-only'))
+      await page.route('**/api/admin/session', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({user_id:'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa',csrf_token:'synthetic-csrf',expires_at:Math.floor(Date.now()/1000)+3600})}))
       await page.goto(origin + route)
       await page.getByRole('heading', { name: heading, exact: true }).waitFor()
       assert.equal(new URL(page.url()).pathname, route)
     })
     await check(`server rejection still redirects ${route}`, async page => {
-      await page.addInitScript(() => localStorage.setItem('admin_token', 'local-test-only'))
-      await page.route('**/api/' + (route.endsWith('products') ? 'products' : 'contact'), route => route.fulfill({status:403, contentType:'application/json', body:'{"detail":"Forbidden"}'}))
+      await page.route('**/api/admin/session', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({user_id:'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa',csrf_token:'synthetic-csrf',expires_at:Math.floor(Date.now()/1000)+3600})}))
+      await page.route('**/api/' + (route.endsWith('products') ? 'admin/products' : 'contact'), route => route.fulfill({status:403, contentType:'application/json', body:'{"detail":"Forbidden"}'}))
       await page.goto(origin + route)
       await page.waitForURL('**/admin/login')
       await page.locator('input[type="password"]').waitFor()
       assert.equal(await page.evaluate(() => localStorage.getItem('admin_token')), null)
     })
   }
+  await check('stored injection renders as text and bundled export downloads', async page => {
+    await page.route('**/api/admin/session', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({user_id:'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa',csrf_token:'synthetic-csrf',expires_at:Math.floor(Date.now()/1000)+3600})}))
+    const malicious='<img src=x onerror=window.injected=true>'
+    await page.route('**/api/contact', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify([{id:'test',name:malicious,message:malicious,email:'test@example.invalid',phone:'9999999999',status:'pending',created_at:new Date().toISOString()}])}))
+    await page.goto(origin+'/admin/dashboard')
+    await page.getByText(malicious,{exact:true}).first().waitFor()
+    assert.equal(await page.evaluate(()=>window.injected),undefined)
+    assert.equal(await page.locator('table img').count(),0)
+    await page.goto(origin+'/admin/products')
+    await page.getByRole('heading',{name:'Product & Stock Manager'}).waitFor()
+    const download=page.waitForEvent('download')
+    await page.getByRole('button',{name:/Export Excel/}).click()
+    assert.match((await download).suggestedFilename(),/Wipro_Stock_Report_.*\.xlsx/)
+    assert.equal(await page.locator('script[src*=cdnjs]').count(),0)
+  })
   await check('slow Contact chunk shows feedback and preserves enquiry hash scrolling', async page => {
     let release
     const gate = new Promise(resolve => { release = resolve })

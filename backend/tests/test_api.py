@@ -40,14 +40,17 @@ class Collection:
 @pytest.fixture
 def api(monkeypatch):
     monkeypatch.setenv('ADMIN_EMAIL', 'admin@example.com')
-    monkeypatch.setenv('ADMIN_PASSWORD', 'test-only-password')
+    import hashlib
+    salt = '0123456789abcdef0123456789abcdef'
+    digest = hashlib.pbkdf2_hmac('sha256', b'test-only-password', bytes.fromhex(salt), 600000).hex()
+    monkeypatch.setenv('ADMIN_PASSWORD_HASH', 'pbkdf2_sha256$600000$'+salt+'$'+digest)
     monkeypatch.setenv('JWT_SECRET', 'isolated-test-signing-key-never-use-in-production-123')
     monkeypatch.delenv('GEMINI_API_KEY', raising=False)
     monkeypatch.delenv('MONGO_URI', raising=False)
     database = SimpleNamespace(contact_inquiries=Collection(), products=Collection())
     server.app.dependency_overrides[server.get_database] = lambda: database
     server._rate_windows.clear()
-    with TestClient(server.app) as client:
+    with TestClient(server.app, base_url='https://testserver', headers={'Origin':'https://testserver'}) as client:
         yield client, database
     server.app.dependency_overrides.clear()
 
@@ -55,7 +58,7 @@ def api(monkeypatch):
 def auth(client):
     result = client.post('/api/admin/login', json={'email':'admin@example.com','password':'test-only-password'})
     assert result.status_code == 200
-    return {'Authorization': 'Bearer ' + result.json()['access_token']}
+    return {'X-CSRF-Token': result.json()['csrf_token']}
 
 
 def test_enquiry_persists_service_quote_and_can_be_read_by_admin(api):
@@ -67,6 +70,7 @@ def test_enquiry_persists_service_quote_and_can_be_read_by_admin(api):
     records = client.get('/api/contact', headers=auth(client)).json()
     assert records[0]['id'] == saved.json()['id']
     assert records[0]['products'][0]['quantity'] == 2
+    client.cookies.clear()
     assert client.get('/api/contact').status_code == 401
 
 
@@ -89,9 +93,9 @@ def test_stock_persists_and_survives_refetch_without_invented_quantities(api):
     record_id = saved.json()['id']
     updated = client.patch('/api/products/'+record_id, json={'stock':0}, headers=headers)
     assert updated.status_code == 200
-    assert client.get('/api/products').json()[0]['stock'] == 0
+    assert client.get('/api/admin/products', headers=headers).json()[0]['stock'] == 0
     assert client.patch('/api/products/'+record_id, json={'stock':-1},headers=headers).status_code == 422
-    assert client.patch('/api/products/'+record_id, json={'stock':2}).status_code == 401
+    assert client.patch('/api/products/'+record_id, json={'stock':2}).status_code == 403
     assert client.delete('/api/products/'+record_id, headers=headers).status_code == 200
     assert client.get('/api/products').json() == []
 
@@ -149,9 +153,9 @@ def test_invalid_login_never_echoes_submitted_password(api):
 
 def test_oversized_body_and_chunked_body_are_rejected(api):
     client, _ = api
-    result = client.post('/api/admin/login', content=b'x' * (server.MAX_BODY_BYTES + 1))
+    result = client.post('/api/admin/login', content=b'x' * (server.MAX_BODY_BYTES + 1),headers={'Content-Type':'application/json'})
     assert result.status_code == 413
-    result = client.post('/api/admin/login', content=iter([b'x' * 40000, b'x' * 40000]))
+    result = client.post('/api/admin/login', content=iter([b'x' * 40000, b'x' * 40000]),headers={'Content-Type':'application/json'})
     assert result.status_code == 413
     assert result.headers['x-content-type-options'] == 'nosniff'
 

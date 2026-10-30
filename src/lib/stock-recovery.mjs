@@ -1,15 +1,11 @@
 // A tab-scoped outbox for uncertain stock writes. Contains no credentials.
-// JWT subject is only a storage namespace: API/RLS still authorize every request.
+// The verified staff user ID is only a namespace; API/RLS authorize every request.
 const PREFIX = 'wipro:pending-stock:v1:'
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const storageError = () => new Error('Stock recovery is unavailable in this tab. Enable browser session storage and reload before recording stock. Check movement history before repeating an earlier entry.')
 
-function storageKey(token) {
-  try {
-    const encoded = token.split('.')[1].replaceAll('-', '+').replaceAll('_', '/')
-    const { sub } = JSON.parse(atob(encoded))
-    if (UUID.test(sub)) return PREFIX + sub.toLowerCase()
-  } catch { /* Invalid sessions must not share an outbox. */ }
+function storageKey(userId) {
+  if (typeof userId === 'string' && UUID.test(userId)) return PREFIX + userId.toLowerCase()
   throw new Error('Sign in again before recording stock; the staff session could not be identified.')
 }
 function validBody(body) {
@@ -23,8 +19,8 @@ function validBody(body) {
 }
 const browserStorage = () => window.sessionStorage
 
-export function loadPendingStock(token, getStorage = browserStorage) {
-  const key = storageKey(token)
+export function loadPendingStock(userId, getStorage = browserStorage) {
+  const key = storageKey(userId)
   try {
     const raw = getStorage().getItem(key)
     if (raw === null) return null
@@ -34,32 +30,32 @@ export function loadPendingStock(token, getStorage = browserStorage) {
   } catch { throw storageError() }
 }
 
-function persist(token, body, getStorage) {
+function persist(userId, body, getStorage) {
   if (!validBody(body)) throw new Error('Stock entry is incomplete. Review the quantity and reference before recording.')
-  const pending = loadPendingStock(token, getStorage)
+  const pending = loadPendingStock(userId, getStorage)
   if (pending && JSON.stringify(pending) !== JSON.stringify(body)) {
     throw new Error('An earlier stock entry still needs confirmation. Reload this page to recover it before recording another.')
   }
   try {
     const store = getStorage()
     const serialized = JSON.stringify({ version: 1, body })
-    store.setItem(storageKey(token), serialized)
-    if (store.getItem(storageKey(token)) !== serialized) throw storageError()
+    store.setItem(storageKey(userId), serialized)
+    if (store.getItem(storageKey(userId)) !== serialized) throw storageError()
   } catch { throw storageError() }
 }
-function clear(token, body, getStorage) {
-  const pending = loadPendingStock(token, getStorage)
+function clear(userId, body, getStorage) {
+  const pending = loadPendingStock(userId, getStorage)
   if (pending && pending.request_id !== body.request_id) throw storageError()
   try {
     const store = getStorage()
-    store.removeItem(storageKey(token))
-    if (store.getItem(storageKey(token)) !== null) throw storageError()
+    store.removeItem(storageKey(userId))
+    if (store.getItem(storageKey(userId)) !== null) throw storageError()
   } catch { throw storageError() }
 }
 
-export async function recordRecoverableMovement({ token, body, request, getStorage = browserStorage }) {
+export async function recordRecoverableMovement({ userId, body, request, getStorage = browserStorage }) {
   // Persist and verify before sending: storage failure must not cause a stock write.
-  persist(token, body, getStorage)
+  persist(userId, body, getStorage)
   let result
   try {
     result = await request(body)
@@ -69,9 +65,9 @@ export async function recordRecoverableMovement({ token, body, request, getStora
   } catch (error) {
     // These responses conclusively reject this attempt. Timeouts, auth expiry,
     // rate limits, server errors and malformed responses retain the exact request.
-    if ([400, 404, 409, 422].includes(error.status)) clear(token, body, getStorage)
+    if ([400, 404, 409, 422].includes(error.status)) clear(userId, body, getStorage)
     throw error
   }
-  clear(token, body, getStorage)
+  clear(userId, body, getStorage)
   return result
 }
