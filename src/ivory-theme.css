@@ -105,6 +105,7 @@ input::placeholder,textarea::placeholder,.chat-input::placeholder{color:#786b5e!
 .client-summary strong{font-size:20px;margin-right:5px;color:var(--on-dark)}
 .directory-back{display:inline-block;color:var(--on-dark-muted);font-size:13px;margin-bottom:16px}
 .client-directory{margin-top:26px}
+.catalog-directory-title{padding-top:26px}
 .directory-title-row{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:18px}
 .directory-title-row h2{font-family:Manrope,Arial,sans-serif;font-size:23px;font-weight:800;letter-spacing:-.04em;scroll-margin-top:155px}
 .directory-title-row>span{font-size:12px;color:var(--muted)}
@@ -138,5 +139,7 @@ input::placeholder,textarea::placeholder,.chat-input::placeholder{color:#786b5e!
 .client-ribbon-browse:hover{color:var(--coral-light)}
 @media(max-width:900px){.directory-filters{flex-wrap:wrap}.directory-filters>label.directory-search{flex-basis:100%}.directory-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.client-page-header{padding:28px 0 22px}.client-page-header h1{font-size:38px}.client-summary{gap:9px 16px}.client-summary strong{font-size:17px}.directory-title-row{gap:8px}.directory-title-row h2{font-size:20px}.directory-title-row>span{font-size:10px}.directory-filters{padding:12px;gap:10px}.directory-filters>label{flex:1 1 40%}.directory-grid{grid-template-columns:1fr;gap:8px}.directory-card{padding:12px 15px}.directory-card h3{margin:6px 0;font-size:13px}.directory-pagination{gap:6px}.directory-pagination button{padding:9px;font-size:12px}.directory-pagination button svg{display:none}.directory-pagination label{gap:5px;font-size:11px}.directory-cta{align-items:start;flex-direction:column}.directory-title-row h2{scroll-margin-top:130px}}
+/* The page already has 132px scroll padding for its sticky header. */
+.catalog-directory-title h2{scroll-margin-top:16px}
 /* Keep the contact shortcut clear of directory pagination. */
-body:has(.client-page) .whatsapp-contact{position:static;width:fit-content;margin:0 auto 24px}
+body:has(.client-page,.catalog-page) .whatsapp-contact{position:static;width:fit-content;margin:0 auto 24px}

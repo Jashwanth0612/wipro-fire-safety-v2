@@ -2,6 +2,7 @@
 // Install Playwright in a temporary directory, then set PLAYWRIGHT_MODULE to its
 // index.mjs. Only localhost is accepted; API responses below are synthetic.
 import assert from 'node:assert/strict'
+import { PRODUCTS } from '../src/data/products.js'
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright')
 const origin = process.env.PREVIEW_URL || 'http://127.0.0.1:4173'
 assert.ok(['127.0.0.1', 'localhost'].includes(new URL(origin).hostname), 'Use a local preview, never production')
@@ -53,6 +54,73 @@ try {
       assert.ok(!scripts.some(url => /\/Admin(Dashboard|Products)-/.test(url)), 'Signed-out visitors must not download or mount staff screens')
     })
   }
+  await check('public products page through every item once, with Previous and final-page limits', async page => {
+    await page.goto(origin + '/products')
+    const pager = page.getByRole('navigation', { name: 'Product catalogue pages' })
+    await pager.waitFor()
+    assert.equal(await page.getByRole('combobox', { name: 'Sort products' }).inputValue(), 'name')
+    assert.equal(await pager.getByRole('button', { name: 'Previous' }).isEnabled(), false)
+    const seen = []
+    for (let number = 1; number <= 5; number++) {
+      await page.getByRole('status').filter({ hasText: `Showing ${(number - 1) * 9 + 1}–${Math.min(number * 9, 40)} of 40 products` }).waitFor()
+      const names = await page.locator('.product-card .product-image').evaluateAll(elements => elements.map(element => element.getAttribute('aria-label')))
+      assert.equal(names.length, number === 5 ? 4 : 9)
+      seen.push(...names)
+      if (number < 5) await pager.getByRole('button', { name: 'Next' }).click()
+    }
+    assert.equal(await pager.getByRole('button', { name: 'Next' }).isEnabled(), false)
+    assert.equal(new Set(seen).size, 40)
+    assert.deepEqual([...seen].sort(), PRODUCTS.map(product => `View ${product.title}, ${product.subtitle}`).sort())
+    await pager.getByRole('button', { name: 'Previous' }).click()
+    await page.getByRole('status').filter({ hasText: 'Showing 28–36 of 40 products' }).waitFor()
+    assert.equal(await page.getByRole('combobox', { name: 'Product page', exact: true }).inputValue(), '4')
+    assert.equal(await page.evaluate(() => document.activeElement.textContent), 'Browse products')
+  })
+  await check('product search, category and sort changes reset a later page; shortlist survives paging', async page => {
+    await page.goto(origin + '/products')
+    const picker = page.getByRole('combobox', { name: 'Product page', exact: true })
+    await picker.selectOption('5')
+    const chosen = page.locator('.product-card').first()
+    const title = await chosen.locator('h2').innerText()
+    await chosen.getByRole('button', { name: 'Details', exact: true }).click()
+    await page.getByRole('dialog').getByRole('heading', { name: title, exact: true }).waitFor()
+    await page.getByRole('button', { name: 'Close product details' }).click()
+    await chosen.getByRole('button', { name: /^Add to quote:/ }).click()
+    await picker.selectOption('1')
+    await picker.selectOption('5')
+    assert.equal(await page.locator('.product-card').first().getByRole('button', { name: /^Added to quote:/ }).isEnabled(), false)
+    await page.getByRole('searchbox', { name: 'Search products or model numbers' }).fill('VFPA4')
+    await page.getByRole('status').filter({ hasText: 'Showing 1–1 of 1 product' }).waitFor()
+    assert.equal(await page.getByRole('navigation', { name: 'Product catalogue pages' }).count(), 0)
+    await page.getByRole('button', { name: 'Clear search', exact: true }).click()
+    await picker.selectOption('5')
+    await page.getByRole('button', { name: /^Fire Extinguishers/ }).click()
+    await page.getByRole('status').filter({ hasText: 'Showing 1–9 of 12 products' }).waitFor()
+    assert.equal(await picker.inputValue(), '1')
+    await picker.selectOption('2')
+    await page.getByRole('combobox', { name: 'Sort products' }).selectOption('featured')
+    assert.equal(await picker.inputValue(), '1')
+    await page.getByRole('searchbox', { name: 'Search products or model numbers' }).fill('no-match-9382')
+    await page.getByRole('heading', { name: 'No matching products' }).waitFor()
+    assert.equal(await page.locator('.product-card').count(), 0)
+    await page.getByRole('button', { name: 'Show all products', exact: true }).click()
+    await page.getByRole('status').filter({ hasText: 'Showing 1–9 of 40 products' }).waitFor()
+    assert.equal(await page.getByRole('combobox', { name: 'Sort products' }).inputValue(), 'name')
+    await page.getByRole('region', { name: 'Your quote shortlist' }).getByText('1 product in your quote').waitFor()
+  })
+  await check('mobile product pagination stays compact and usable when the catalogue API is offline', async page => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    await page.route('**/api/products', route => route.fulfill({ status: 503, contentType: 'application/json', body: '{}' }))
+    await page.goto(origin + '/products')
+    await page.getByText('Showing our brochure range.', { exact: false }).waitFor()
+    const pager = page.getByRole('navigation', { name: 'Product catalogue pages' })
+    await pager.getByRole('button', { name: 'Next' }).click()
+    await page.getByRole('status').filter({ hasText: 'Showing 10–18 of 40 products' }).waitFor()
+    assert.equal(await page.locator('.product-card').count(), 9)
+    assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1))
+    const heading = await page.getByRole('heading', { name: 'Browse products', exact: true }).boundingBox()
+    assert.ok(heading.y >= 100 && heading.y < 180, `Page changes return to the catalogue below the sticky header (heading y=${heading.y})`)
+  })
   for (const [route, heading] of [['/admin/dashboard', 'Admin Dashboard'], ['/admin/products', 'Product & Stock Manager']]) {
     await check(`local synthetic session can open ${route}`, async page => {
       await page.route('**/api/admin/session', route => route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({user_id:'aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa',csrf_token:'synthetic-csrf',expires_at:Math.floor(Date.now()/1000)+3600})}))
