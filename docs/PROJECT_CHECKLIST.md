@@ -1,6 +1,6 @@
 # Wipro Fire & Safety V2 — delivery checklist
 
-Last reviewed: 29 October 2026. Owner: Jashwanth. Scope: V2 only; preserve V1.
+Last reviewed: 30 October 2026. Owner: Jashwanth. Scope: V2 only; preserve V1.
 
 ## How to use this document
 
@@ -67,7 +67,7 @@ The daily task covers the full website and backend, not only inventory. Confirme
 - [ ] Verify backup schedule/retention and perform restore drill in an isolated database. **Needs access/plan details; no paid upgrades assumed.**
 - [x] Implement credential-free production smoke checks and an hourly GitHub Actions workflow with safe pass/fail summaries (19 Oct). Local live run: 13/13 passed. GitHub Production health run 39297017241 succeeded.
 - [ ] Complete error monitoring, notification delivery and recovery alerts; a scheduled smoke checker alone does not satisfy this item.
-- [ ] Extend production smoke coverage to dynamically imported route chunks; current HTTP checks validate entry JS/CSS, while route rendering is checked separately.
+- [x] Extend production smoke coverage to dynamically imported route chunks (30 Oct, 5704d4b): recursive same-origin asset discovery, content validation, deduplication and explicit traversal-limit failure. All 18 current build JS/CSS assets covered; live checker passed 29/29. Rendering remains a separate browser check.
 - [ ] Make the local browser regression suite reproducible in hosted CI with pinned browser installation; current quality workflow runs frontend/API tests and build, but not Chromium checks.
 - [x] Preserve unconfirmed stock requests across refresh and same-account sign-in in the same tab; verify replay and storage-failure behavior with automated tests (23 Oct). See docs/STOCK_RECOVERY.md. Live authenticated browser verification remains pending.
 - [x] Add readable timeout and connection-loss feedback without automatic write retries; distinguish caller cancellation and preserve uncertain stock requests (24 Oct, automated request tests).
@@ -185,6 +185,16 @@ The daily task covers the full website and backend, not only inventory. Confirme
 - Merged [PR #1](https://github.com/Jashwanth0612/wipro-fire-safety-v2/pull/1) at [87e53d3](https://github.com/Jashwanth0612/wipro-fire-safety-v2/commit/87e53d309d6cd8ab3be5035a5c287b33d99a405f). Production deployment dpl_FQMrk7absp1HeJByLGW4QYDrYC81 is READY. Hosted main quality run [40819313117](https://github.com/Jashwanth0612/wipro-fire-safety-v2/actions/runs/40819313117) passed frontend tests, API tests and build.
 - Post-release production smoke at 04:45:27 UTC (10:15 IST): 13/13 passed, including new entry index-D1ccl0pr.js and CSS index-DYvJZRkK.css. Live cloud-browser checks completed by 04:46 UTC: both /admin/products and /admin/dashboard redirected to /admin/login and rendered the sign-in form; public /products rendered all 40 catalogue products and five category filters. Browser DOM confirmed the new entry asset. No login attempt, customer submission or stock mutation was made.
 - Remaining limits: no active staff session for real receipt/dispatch/count/Excel verification; real opening quantities and reorder thresholds need business figures. Independent uptime/error/recovery alerts, closed-tab stock recovery, full mobile/accessibility checks, backup restore verification and content certification evidence remain pending. Next actionable reliability work: include deferred route assets in production monitoring and run the browser regression suite in hosted CI. Preserve real catalogue data while reviewing unsupported marketing claims.
+
+## 30 October 2026 verification
+
+- Read AGENTS.md, current main checklist and monitoring source. Previous local worktree metadata was unavailable; recovered a fresh clone of main 2eb9bd3 without modifying earlier workspaces.
+- Pre-release production check at 04:43:02 UTC (10:13 IST): 13/13 passed across /, /about, /products, /services, /contact, /clients, /admin/login, entry JS/CSS, /api/health, /api/products and anonymous-denied /api/contact and /api/inventory/movements. Required headers passed; database connected. Latest two deployments READY. Recent 30-minute error/fatal log query returned no groups; longer periods unverified.
+- npm production audit: zero known vulnerabilities. All four public tables retain RLS. Supabase advisors unchanged: staff-checked SECURITY DEFINER stock RPC and disabled leaked-password protection (remediation links above). No schema, policies, credentials or business records changed. Authenticated policy and stock workflow retesting remain pending.
+- Extended the production monitor to follow literal Vite JS/CSS asset references recursively. It rejects missing/empty/HTML responses, deduplicates shared/cyclic references, excludes external/traversal/query URLs and fails explicitly above 64 assets. It never executes downloaded code. This closes missing-page-file coverage after route splitting; it does not prove page rendering or establish continuous alerting.
+- Validation: 42 frontend tests (including four new monitor regressions), 19 API tests, production build and whitespace check passed. Comparison against local build output covered all 18 JS/CSS files with none missing. Expanded live check at 04:43:34 UTC (10:13 IST): 29/29 passed. New fixtures exercise broken lazy chunks, shared dependencies/preload CSS, URL restrictions and excessive graphs. No authenticated browser or stock mutation test was performed.
+- Release: [5704d4b](https://github.com/Jashwanth0612/wipro-fire-safety-v2/commit/5704d4b7482a1e1f8bb3aa26bd628eb570456ae2). Vercel production dpl_FKVTLgk2h6a6W5AENjw2chzP6YU6 READY, with the production alias confirmed. Hosted [quality run 41004600126](https://github.com/Jashwanth0612/wipro-fire-safety-v2/actions/runs/41004600126) and [Production health run 41004600173](https://github.com/Jashwanth0612/wipro-fire-safety-v2/actions/runs/41004600173) both succeeded. Post-release live check at 04:46:43 UTC (10:16 IST): 29/29 passed. Application asset hashes are unchanged because this release changes monitoring/tests/docs only.
+- Next: pin and run browser regression tooling in hosted CI; establish independent uptime/error and recovery notifications with verified delivery. Real opening quantities, reorder thresholds, authenticated receipt/dispatch/count/export, backup restore drill and certification evidence remain outstanding. Recheck asset-discovery coverage whenever bundler output syntax changes.
 
 ## Operating guide
 
