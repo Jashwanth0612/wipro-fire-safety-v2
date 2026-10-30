@@ -25,7 +25,7 @@ The security change replaces local-storage bearer sessions with server-verified,
 
 | Control | Result / boundary |
 | --- | --- |
-| Authentication/admin access | Every staff API requires a valid signed cookie, active shared session, valid Supabase user and current staff membership. RLS independently restricts staff reads/writes. No new staff account was granted. |
+| Authentication/admin access | Every staff API requires a valid signed cookie, active shared session, valid Supabase user and current staff membership. RLS independently restricts staff reads/writes. Public signup and anonymous-user authentication were confirmed disabled through the live Auth settings endpoint. No new staff account was granted. |
 | API keys/environment | Supabase keys are server variables; production metadata identifies both keys and `JWT_SECRET` as sensitive. No `VITE_` secret variables found. Values were not decrypted or printed. Legacy Mongo variables remain for the retained implementation; their current use by V1/rollback is not established, so they were not deleted. |
 | Password hashing | Live Supabase aggregate confirms bcrypt; no password/hash values exported. Local compatibility uses PBKDF2. No custom production password store introduced. |
 | HTTPS/cookies | HTTP redirects to HTTPS with 308; HSTS, Secure/HttpOnly/Strict cookie flags, no Domain attribute and no-store responses. One-hour maximum; no refresh tokens exposed to browser code. |
@@ -38,7 +38,7 @@ The security change replaces local-storage bearer sessions with server-verified,
 | Leaked-password check | Supabase advisor still reports disabled protection. Prior checklist records the Free plan and no approved upgrade. No paid service was enabled. |
 | Uploads | No upload endpoint or Supabase Storage bucket exists. Multipart submission to the JSON enquiry endpoint is rejected; bodies are bounded. Future uploads need MIME/content/size checks and private access before enabling. |
 | Prices/payments | No payment/checkout endpoint exists. The site collects enquiries and product quantities; it does not charge money or confirm sale prices. Payment verification is therefore not applicable to the current feature set. |
-| Exposed files/secrets | Gitleaks 8.30.1 scanned all 42 reachable commits across fetched refs and the working tree with zero matching leaks. This is pattern-based detection and does not prove a secret never existed in an unreachable/deleted ref, another repository, logs or a third-party system. No confirmed compromised key was found, so no speculative credential revocation was performed. |
+| Exposed files/secrets | Gitleaks 8.30.1 scanned fetched history (42 initially reachable commits; 40 eligible commits processed by the scanner), the working tree and built frontend with zero matching leaks. This is pattern-based detection and does not prove a secret never existed in an unreachable/deleted ref, another repository, logs or a third-party system. No confirmed compromised key was found, so no speculative credential revocation was performed. |
 | Dependencies | Full root npm audit and Python environment audit report zero known vulnerabilities after cleanup. Python audit initially flagged the local toolchain's old pip; pip was updated. Direct backend packages are pinned and unused multipart/direct requests/certifi requirements removed. Dormant legacy Node/reference projects are not deployed by the V2 Vercel config. |
 
 ## Verification
@@ -81,3 +81,16 @@ The two new private security tables intentionally have RLS enabled with no publi
 - [Vercel request headers](https://vercel.com/docs/headers/request-headers)
 - [Official SheetJS installation](https://docs.sheetjs.com/docs/getting-started/installation/frameworks/)
 - [Gitleaks](https://github.com/gitleaks/gitleaks)
+
+## Verified release evidence
+
+- [PR #2](https://github.com/Jashwanth0612/wipro-fire-safety-v2/pull/2) merged as [21d3a3c](https://github.com/Jashwanth0612/wipro-fire-safety-v2/commit/21d3a3c1e137bf7adccf8dafd9c5a7ad42d38aec). Vercel production deployment `dpl_31BA2UGagTAHRYbJRzeY8VFAfMk6` is READY and owns the public V2 alias.
+- Final application-head hosted [quality run 41039498960](https://github.com/Jashwanth0612/wipro-fire-safety-v2/actions/runs/41039498960) and [secret scan 41039499051](https://github.com/Jashwanth0612/wipro-fire-safety-v2/actions/runs/41039499051) passed. The quality run includes frontend/API tests, browser checks, build, npm audit and pip-audit. Ubuntu is pinned to 24.04 to keep the browser dependency installation reproducible.
+- Additive session/rate migration applied as `20261030100946`; public inventory restriction applied after the matching API release as `20261030102023`. Local migration filenames now match those returned provider versions.
+- Post-release production smoke passed 32/32, covering every current JS/CSS route/export chunk, health, catalogue and denial on four private endpoints. The live browser rendered the sign-in form after redirecting from `/admin/products`.
+- Live database count is 40 total products: 39 active and 1 archived. No catalogue, stock, enquiry or staff records were changed by this work. Public API returns the 39 active rows with no stock/threshold fields.
+- Post-release RLS/stock/session/rate regression checks passed in a rollback transaction. Security RPCs have no PUBLIC/anon/authenticated execution grants. Six tables (four business, two private security) retain RLS.
+- Production security-event aggregation returned 16 warning events during the controlled denial checks, confirming log ingestion without reading private contents. It does not establish notification delivery.
+- The first supplemental live-check harness used case-sensitive HTTP header lookup and incorrectly assumed all stored products were active. Those assertions were corrected against the live schema before recording final results.
+
+- Supplemental live security checks: **18/18 passed** after correcting the harness, covering configuration readiness, 39 active public records without stock data, four private-route denials, cross-origin login rejection, invalid enquiry rejection, 64 KiB body enforcement, restricted CORS, exposed-file checks and strict headers. These tests made no valid customer submission or inventory write.

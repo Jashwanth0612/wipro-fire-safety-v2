@@ -62,13 +62,13 @@ The daily task covers the full website and backend, not only inventory. Confirme
 - [ ] Test password recovery with approved sender/redirect and enable staff MFA where supported.
 - [ ] Enable leaked-password protection when an approved Pro-or-higher plan is available. Current organization is Free; no upgrade authorized.
 - [x] Restrict internal auto-RLS event-trigger function execution to privileged roles (19 Oct migration 20261019174849). Anonymous/authenticated execution denied; owner execution, enabled event trigger and stock RPC preserved; advisor warning cleared.
-- [ ] Review browser token storage and migrate to secure HttpOnly sessions with CSRF protection.
-- [ ] Shared rate limiting / bot protection for login and enquiry endpoints; existing per-process limiter is not a global limit.
+- [x] Replace browser token storage with Secure HttpOnly Strict cookies, server revocation and CSRF protection (30 Oct; local integrated browser/API test, hosted regressions and live anonymous checks passed; real owner sign-in remains pending).
+- [x] Shared atomic rate limits for login, enquiries and chat (30 Oct; database concurrency/access tests passed). Additional edge bot challenges are not configured.
 - [ ] Verify backup schedule/retention and perform restore drill in an isolated database. **Needs access/plan details; no paid upgrades assumed.**
 - [x] Implement credential-free production smoke checks and an hourly GitHub Actions workflow with safe pass/fail summaries (19 Oct). Local live run: 13/13 passed. GitHub Production health run 39297017241 succeeded.
 - [ ] Complete error monitoring, notification delivery and recovery alerts; a scheduled smoke checker alone does not satisfy this item.
 - [x] Extend production smoke coverage to dynamically imported route chunks (30 Oct, 5704d4b): recursive same-origin asset discovery, content validation, deduplication and explicit traversal-limit failure. All 18 current build JS/CSS assets covered; live checker passed 29/29. Rendering remains a separate browser check.
-- [ ] Make the local browser regression suite reproducible in hosted CI with pinned browser installation; current quality workflow runs frontend/API tests and build, but not Chromium checks.
+- [x] Pin Playwright and Ubuntu 24.04; hosted CI now runs the Chromium regression suite alongside frontend/API/build and dependency checks (30 Oct, run 41039498960 passed).
 - [x] Preserve unconfirmed stock requests across refresh and same-account sign-in in the same tab; verify replay and storage-failure behavior with automated tests (23 Oct). See docs/STOCK_RECOVERY.md. Live authenticated browser verification remains pending.
 - [x] Add readable timeout and connection-loss feedback without automatic write retries; distinguish caller cancellation and preserve uncertain stock requests (24 Oct, automated request tests).
 - [ ] Test session expiry, offline responses, retries, timeout feedback and safe recovery end-to-end in the authenticated browser.
@@ -214,3 +214,9 @@ Automation cannot detect physical deliveries on its own. Staff still identify th
 ## 30 October 2026 — requested security hardening
 
 Prepared cookie sessions with shared revocation, CSRF checks, shared abuse budgets, public inventory column restrictions, local spreadsheet bundling and whole-tree dependency cleanup. See docs/SECURITY_REVIEW_2026-10-30.md for the complete control matrix, validation and exact remaining dependencies. Local checks: 27 API/security tests, 43 frontend tests, 20 Chromium checks, integrated browser/API session flow, production build, Gitleaks zero matches and npm/Python audits zero known vulnerabilities. Database access/stock/security regression checks passed in a rollback transaction with synthetic fixtures. Release/migration evidence will be appended after hosted verification. Recovery/MFA require operator login; dedicated alerts require approved destination/provider; backup restore remains unverified. No real stock/customer records changed.
+
+### Security release verified
+
+Released via PR #2, merge 21d3a3c1e137bf7adccf8dafd9c5a7ad42d38aec; Vercel production dpl_31BA2UGagTAHRYbJRzeY8VFAfMk6 READY. Final application CI quality 41039498960 and secret scan 41039499051 passed. Shared-session/rate migration 20261030100946 and post-release public-column restriction 20261030102023 applied. Live smoke 32/32; signed-out live admin route rendered login. Database rollback regression checks passed after activation. Live Auth settings confirm public signup/anonymous users disabled. Controlled rate concurrency: 5 accepted, 7 denied from 12 simultaneous requests. Structured denial logs reached production logging. Database remains 40 products, 39 active/1 archived, one staff member; no real inventory/customer changes. See the full security report for account-controlled recovery/MFA, leaked-password plan restriction, dedicated alerts, branch checks and backup-restore limits.
+
+Supplemental live security checks passed 18/18, including validation, body limits, CORS, inventory privacy and exposed-file responses. The live harness was corrected for case-insensitive headers and the actual active-record count before recording this result.
