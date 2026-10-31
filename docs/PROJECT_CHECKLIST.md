@@ -1,6 +1,6 @@
 # Wipro Fire & Safety V2 — delivery checklist
 
-Last reviewed: 30 October 2026. Owner: Jashwanth. Scope: V2 only; preserve V1.
+Last reviewed: 31 October 2026. Owner: Jashwanth. Scope: V2 only; preserve V1.
 
 ## How to use this document
 
@@ -59,6 +59,8 @@ The daily task covers the full website and backend, not only inventory. Confirme
 - [x] Public signup disabled; staff membership cannot be self-granted (15 Oct).
 - [x] Input/body limits, generic errors, cache/security headers and dependency updates implemented (71447ed; 15 Oct tests).
 - [ ] Recheck dependencies and access policies after each backend change.
+- [ ] Resolve new development-tree minimatch advisory GHSA-g3hv-75wg-m249 with a compatible lint-toolchain update. 31 Oct full audit: six moderate findings through ESLint; production-only audit remains clear. Do not suppress the audit gate or force a breaking transitive override.
+- [ ] Release contact-form focused error feedback and safe uncertain-submission guidance after dependency/hosted quality verification (31 Oct: local tests passed; draft PR evidence below).
 - [ ] Test password recovery with approved sender/redirect and enable staff MFA where supported.
 - [ ] Enable leaked-password protection when an approved Pro-or-higher plan is available. Current organization is Free; no upgrade authorized.
 - [x] Restrict internal auto-RLS event-trigger function execution to privileged roles (19 Oct migration 20261019174849). Anonymous/authenticated execution denied; owner execution, enabled event trigger and stock RPC preserved; advisor warning cleared.
@@ -231,3 +233,12 @@ Supplemental live security checks passed 18/18, including validation, body limit
 - Live browser verified nine cards on page 1, Next showing 10–18, page 5 showing 37–40 with Next disabled, full-catalogue VFPA4 search from page 5, and clearing search returning to page 1. Captured the live page controls in outputs/Wipro-products-pagination-live.png in the task workspace. Public display retains the original 40-item brochure range through the existing catalogue merge behavior; database active-record counts are a separate concern.
 - Production smoke at 21:55 IST: 32/33 checks passed initially; the single icon-chunk fetch failed. A targeted retry returned HTTP 200 and its SHA-256 exactly matched the local production build, resolving that check without an application change. Live public pages/API/access denials and remaining assets passed. The release error/fatal log query returned no groups for its recent 10-minute window; this is not continuous monitoring.
 - No database, credentials or real business records changed. Previously documented owner workflow/security follow-ups remain unchanged.
+
+## 31 October 2026 verification
+
+- Inspected AGENTS.md, latest main ad60f06, updated checklist and 30 October security review. Preserved intervening cookie-session, rate-limit, inventory-privacy and public-pagination releases.
+- Production at 05:23:43 UTC (10:53 IST): 33/33 checks passed: /, /about, /products, /services, /contact, /clients, /admin/login, entry and deferred JS/CSS, /api/health, /api/products, anonymous-denied /api/contact, /api/inventory/movements, /api/admin/products and /api/admin/session. Security-header and inventory-privacy assertions passed. Latest two deployments READY; recent 30-minute error/fatal query returned no groups, not full-day coverage.
+- All four public tables retain RLS. Private web_sessions/rate_windows tables retain RLS and neither anon nor authenticated has SELECT privileges. Their no-policy informational notices are intentional default-deny controls. Existing staff-checked stock RPC and disabled leaked-password advisories remain; no schema/policy/business data changed.
+- Full dependency audit newly reports six moderate findings via ESLint/minimatch 3.1.5, despite runtime-only audit reporting zero. [GHSA-g3hv-75wg-m249](https://github.com/advisories/GHSA-g3hv-75wg-m249) lists versions below 11.0.1 affected; npm reports no compatible automatic fix. The current lint dependencies require the older API; an unverified major override is not an acceptable fix. Hosted full-audit gate remains enabled. This is a development dependency finding, not evidence of a production exploit.
+- Prepared contact recovery improvements: validation/failure feedback receives keyboard focus; uncertain submissions preserve details and advise confirming by phone/email before resending; rate-limited and invalid requests have distinct guidance. Local 45 frontend tests, 27 API tests, production build and 25 Chromium checks passed. Two new synthetic browser cases verify error focus, preserved details and no automatic retry. Browser POST is locally intercepted; no real enquiry was submitted.
+- Application changes are saved for review, not deployed while the dependency gate is unresolved. Next work: compatible lint dependency remediation, hosted checks, then release the contact recovery patch. Real owner workflow, opening counts, approved alert destination/provider, MFA/recovery and isolated backup restore remain outstanding.

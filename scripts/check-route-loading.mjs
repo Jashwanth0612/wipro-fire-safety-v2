@@ -176,5 +176,35 @@ try {
     await page.locator('#inquiry').waitFor()
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1))
   })
+  await check('contact validation focuses feedback without submitting an enquiry', async page => {
+    await page.goto(origin + '/contact#inquiry')
+    await page.getByLabel('Full name').fill('Synthetic test')
+    await page.getByLabel('Phone number').fill('abcdefghij')
+    await page.getByLabel('Email address').fill('fixture@example.invalid')
+    await page.getByLabel('Your requirements').fill('Synthetic validation only')
+    await page.getByRole('button', { name: 'Send enquiry', exact: true }).click()
+    await page.waitForFunction(() => document.activeElement?.classList.contains('form-error'))
+    assert.match(await page.getByRole('alert').innerText(), /10 to 15 digits/)
+    assert.equal(await page.getByLabel('Your requirements').inputValue(), 'Synthetic validation only')
+  })
+  await check('uncertain enquiry keeps details and focuses confirmation guidance without retrying', async page => {
+    let submissions = 0
+    await page.route('**/api/contact', route => {
+      assert.equal(route.request().method(), 'POST')
+      submissions++
+      return route.fulfill({status:503,contentType:'application/json',body:'{"detail":"Synthetic outage"}'})
+    })
+    await page.goto(origin + '/contact#inquiry')
+    await page.getByLabel('Full name').fill('Synthetic test')
+    await page.getByLabel('Phone number').fill('9999999999')
+    await page.getByLabel('Email address').fill('fixture@example.invalid')
+    await page.getByLabel('Your requirements').fill('Synthetic failure only')
+    await page.getByRole('button', { name: 'Send enquiry', exact: true }).click()
+    await page.waitForFunction(() => document.activeElement?.classList.contains('form-error'))
+    assert.match(await page.getByRole('alert').innerText(), /confirm before sending again/)
+    assert.equal(await page.getByLabel('Your requirements').inputValue(), 'Synthetic failure only')
+    assert.equal(await page.getByRole('button', { name: 'Send enquiry', exact: true }).isEnabled(), true)
+    assert.equal(submissions, 1)
+  })
   console.log(`${passed} browser route checks passed; synthetic API data only`)
 } finally { await browser.close() }

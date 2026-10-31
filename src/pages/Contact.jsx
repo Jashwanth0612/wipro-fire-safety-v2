@@ -14,8 +14,12 @@ export default function Contact() {
   const [error,setError] = useState('')
   const controller = useRef(null)
   const statusRef = useRef(null)
+  const errorRef = useRef(null)
   const sending = useRef(false)
   useEffect(() => () => controller.current?.abort(), [])
+  useEffect(() => {
+    if (status === 'error') errorRef.current?.focus()
+  }, [status, error])
   const change = event => setForm(current => ({ ...current,[event.target.name]:event.target.value }))
   const submit = async event => {
     event.preventDefault()
@@ -33,7 +37,11 @@ export default function Contact() {
       requestAnimationFrame(() => statusRef.current?.focus())
     } catch (err) {
       setStatus('error')
-      setError(err.name === 'AbortError' ? 'The request timed out. Your enquiry may still have reached us. Please call or email to confirm before sending again.' : 'We could not confirm your enquiry. Your details are still here. Try again, or contact us by phone or email.')
+      setError(err.status === 429
+        ? 'Too many enquiries have been submitted. Please wait before trying again, or call or email our team.'
+        : err.status === 400 || err.status === 422
+          ? 'Please check your contact details and enquiry, then try again. Your details are still here.'
+          : 'We could not confirm your enquiry. It may already have reached us. Your details are still here. Please call or email to confirm before sending again.')
     } finally { clearTimeout(timeout); sending.current = false }
   }
   return <div className="contact-page">
@@ -47,7 +55,7 @@ export default function Contact() {
       <section className="inquiry-card" id="inquiry" aria-labelledby="inquiry-heading"><div className="inquiry-heading"><span className="eyebrow">TELL US WHAT YOU NEED</span><h2 id="inquiry-heading">Send an enquiry</h2><p>First safety audit is FREE — we respond within 24 hours.</p></div>
         {products.length > 0 && <div className="quote-summary"><div className="quote-summary-heading"><h3>Your quote shortlist</h3><Link to="/products"><Plus size={15} /> Add products</Link></div><p>Choose quantities below. Our team will confirm models, availability and pricing.</p>{products.map(product => <div className="quote-item" key={product.id}>{product.img && <img src={product.img} alt="" />}<div><strong>{product.title}</strong><span>{product.subtitle}</span></div><label><span className="sr-only">Quantity for {product.title}, {product.subtitle}</span><input type="number" min="1" max="999" value={product.quantity} onChange={event => updateQuantity(product.id,event.target.value)} disabled={status === 'sending'} /></label><button className="icon-button" disabled={status === 'sending'} onClick={() => remove(product.id)} aria-label={`Remove ${product.title}, ${product.subtitle}`}><Trash2 size={17} /></button></div>)}</div>}
         {status === 'success' && <div className="form-success" role="status" tabIndex="-1" ref={statusRef}><CheckCircle size={22} /><div><strong>Enquiry received.</strong><p>Our team will contact you shortly. Thank you for getting in touch.</p></div></div>}
-        {status === 'error' && <div className="form-error" role="alert"><p>{error}</p><a href="tel:+918019918288">Call +91 80199 18288</a><span> · </span><a href="mailto:jashwanthsai268@gmail.com">Email our team</a></div>}
+        {status === 'error' && <div className="form-error" role="alert" tabIndex="-1" ref={errorRef}><p>{error}</p><a href="tel:+918019918288">Call +91 80199 18288</a><span> · </span><a href="mailto:jashwanthsai268@gmail.com">Email our team</a></div>}
         <form onSubmit={submit} className="inquiry-form" aria-busy={status === 'sending'}><fieldset disabled={status === 'sending'}><legend className="sr-only">Your contact details and enquiry</legend><div className="form-row"><label htmlFor="contact-name">Full name <span aria-hidden="true">*</span><input id="contact-name" name="name" autoComplete="name" required maxLength="120" value={form.name} onChange={change} placeholder="Your name" /></label><label htmlFor="contact-phone">Phone number <span aria-hidden="true">*</span><input id="contact-phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" required minLength="10" maxLength="22" value={form.phone} onChange={change} placeholder="Your contact number" /></label></div><label htmlFor="contact-email">Email address <span aria-hidden="true">*</span><input id="contact-email" name="email" type="email" autoComplete="email" required maxLength="254" value={form.email} onChange={change} placeholder="you@company.com" /></label><label htmlFor="contact-service">Service required<select id="contact-service" name="service" value={form.service} onChange={change}><option value="">Select a service</option><option value="installation">Fire Safety Installation</option><option value="amc">Annual Maintenance Contract (AMC)</option><option value="audit">Free Safety Audit</option><option value="refilling">Extinguisher Refilling</option><option value="training">Safety Training</option><option value="other">Other / General Enquiry</option></select></label><label htmlFor="contact-message">Your requirements <span aria-hidden="true">*</span><textarea id="contact-message" name="message" required maxLength="5000" rows="5" value={form.message} onChange={change} placeholder="Tell us about your facility, location and what you need." /></label><p className="form-note">Fields marked * are required. Your selected products will be included with this enquiry.</p><button className="button submit-button" type="submit" disabled={status === 'sending'}>{status === 'sending' ? 'Sending your enquiry…' : 'Send enquiry'}<ArrowRight size={18} /></button></fieldset></form>
       </section>
     </div><section className="container contact-bottom"><p>Explore what we offer</p><div className="button-row"><Link className="button button-secondary" to="/services">Our services</Link><Link className="button button-secondary" to="/products">Products</Link><Link className="button button-secondary" to="/about">About us</Link></div></section>
